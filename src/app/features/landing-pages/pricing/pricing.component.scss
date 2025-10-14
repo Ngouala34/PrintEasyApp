@@ -1,0 +1,585 @@
+// src/app/features/pricing/pricing.component.scss
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.pricing-page {
+  margin-top: 80px;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Hero
+.hero {
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 8%) 100%);
+  padding: $spacing-3xl 0;
+  color: $white;
+}
+
+.hero-container {
+  @include container;
+}
+
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+
+  .highlight {
+    display: block;
+    color: $primary-yellow;
+    margin-top: $spacing-sm;
+  }
+}
+
+.hero-description {
+  font-size: $font-size-lg;
+  line-height: 1.8;
+  color: rgba($white, 0.9);
+}
+
+// Pricing Tiers
+.pricing-tiers-section {
+  @include section-spacing;
+  background: $gray-light;
+}
+
+.section-container {
+  @include container;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: $spacing-3xl;
+}
+
+.section-title {
+  @include heading-primary;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-md;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.section-subtitle {
+  font-size: $font-size-lg;
+  color: $gray-dark;
+}
+
+.tiers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tier-card {
+  position: relative;
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-2xl;
+  box-shadow: $shadow-md;
+  transition: all $transition-base;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: $shadow-xl;
+  }
+
+  &.recommended {
+    border: 3px solid $primary-yellow;
+    transform: scale(1.05);
+
+    @include responsive(md) {
+      transform: scale(1.08);
+    }
+
+    &:hover {
+      transform: scale(1.05) translateY(-8px);
+
+      @include responsive(md) {
+        transform: scale(1.08) translateY(-8px);
+      }
+    }
+  }
+}
+
+.recommended-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  @include flex-center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-lg;
+  background: $primary-yellow;
+  color: $primary-dark;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  border-radius: $radius-full;
+  box-shadow: $shadow-md;
+}
+
+.tier-header {
+  text-align: center;
+}
+
+.tier-name {
+  font-family: $font-heading;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $primary-dark;
+  margin-bottom: $spacing-sm;
+}
+
+.tier-description {
+  color: $gray-dark;
+  margin-bottom: $spacing-lg;
+  line-height: 1.6;
+}
+
+.tier-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-xs;
+
+  .price-value {
+    font-size: $font-size-4xl;
+    font-weight: $font-weight-bold;
+    color: $primary-dark;
+  }
+
+  .price-currency {
+    font-size: $font-size-lg;
+    color: $gray-dark;
+  }
+}
+
+.price-unit {
+  font-size: $font-size-sm;
+  color: $gray-medium;
+}
+
+.tier-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    font-size: $font-size-sm;
+    color: $gray-dark;
+    line-height: 1.6;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+}
+
+.btn-tier {
+  @include button-base;
+  justify-content: center;
+  background: $white;
+  color: $primary-dark;
+  border: 2px solid $primary-dark;
+  text-decoration: none;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+    color: $white;
+  }
+
+  &.primary {
+    @include button-primary;
+  }
+}
+
+// Service Pricing
+.service-pricing-section {
+  @include section-spacing;
+  background: $white;
+}
+
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  justify-content: center;
+  margin-bottom: $spacing-3xl;
+}
+
+.filter-btn {
+  @include button-base;
+  padding: $spacing-sm $spacing-lg;
+  background: $white;
+  color: $gray-dark;
+  border: 2px solid $gray-light;
+  font-size: $font-size-sm;
+
+  &:hover:not(:disabled) {
+    border-color: $primary-yellow;
+    background: lighten($primary-yellow, 45%);
+  }
+
+  &.active {
+    background: $primary-yellow;
+    color: $primary-dark;
+    border-color: $primary-yellow;
+  }
+}
+
+.pricing-tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-2xl;
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pricing-table {
+  background: $white;
+  border-radius: $radius-xl;
+  border: 2px solid $gray-light;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $primary-yellow;
+    box-shadow: $shadow-lg;
+  }
+}
+
+.table-header {
+  @include flex-center;
+  gap: $spacing-md;
+  padding: $spacing-xl;
+  background: linear-gradient(135deg, $primary-dark, lighten($primary-dark, 8%));
+  color: $white;
+}
+
+.table-icon {
+  font-size: $font-size-3xl;
+}
+
+.table-title {
+  font-family: $font-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  margin: 0;
+}
+
+.table-body {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.pricing-row {
+  @include flex-between;
+  gap: $spacing-lg;
+  padding: $spacing-md;
+  background: $gray-light;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: lighten($primary-yellow, 47%);
+  }
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin-bottom: $spacing-xs;
+}
+
+.item-description {
+  font-size: $font-size-xs;
+  color: $gray-medium;
+}
+
+.item-price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-xs;
+
+  .price-amount {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $primary-dark;
+    white-space: nowrap;
+  }
+
+  .price-unit {
+    font-size: $font-size-xs;
+    color: $gray-medium;
+  }
+}
+
+.table-footer {
+  padding: $spacing-lg;
+  border-top: 2px solid $gray-light;
+  text-align: center;
+}
+
+.btn-order-service {
+  @include button-primary;
+  padding: $spacing-md $spacing-xl;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  svg {
+    transition: transform $transition-base;
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
+  }
+}
+
+// Volume Discounts
+.volume-discounts {
+  @include section-spacing;
+  background: $gray-light;
+}
+
+.discounts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.discount-card {
+  text-align: center;
+  padding: $spacing-2xl;
+  background: $white;
+  border-radius: $radius-xl;
+  border: 3px solid $gray-light;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-8px);
+    border-color: $primary-yellow;
+    box-shadow: $shadow-lg;
+  }
+
+  &.featured {
+    border-color: $primary-yellow;
+    background: lighten($primary-yellow, 47%);
+  }
+
+  .discount-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-lg;
+  }
+
+  .discount-quantity {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $primary-dark;
+    margin-bottom: $spacing-xs;
+  }
+
+  .discount-label {
+    font-size: $font-size-sm;
+    color: $gray-medium;
+    margin-bottom: $spacing-lg;
+  }
+
+  .discount-value {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $success;
+  }
+}
+
+// FAQ
+.faq-section {
+  @include section-spacing;
+  background: $white;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.faq-item {
+  padding: $spacing-xl;
+  background: $gray-light;
+  border-radius: $radius-xl;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $white;
+    box-shadow: $shadow-md;
+  }
+
+  h3 {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    font-family: $font-heading;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $primary-dark;
+    margin-bottom: $spacing-md;
+
+    svg {
+      color: $primary-yellow;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+  }
+
+  p {
+    color: $gray-dark;
+    line-height: 1.7;
+    margin: 0;
+  }
+}
+
+// CTA
+.cta-section {
+  @include section-spacing;
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
+}
+
+.cta-container {
+  @include container;
+  text-align: center;
+  color: $white;
+}
+
+.cta-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.cta-description {
+  font-size: $font-size-lg;
+  color: rgba($white, 0.9);
+  margin-bottom: $spacing-2xl;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  justify-content: center;
+}
+
+.btn-primary-large,
+.btn-secondary-large {
+  padding: $spacing-lg $spacing-2xl;
+  font-size: $font-size-lg;
+  text-decoration: none;
+}
+
+.btn-primary-large {
+  @include button-primary;
+}
+
+.btn-secondary-large {
+  @include button-base;
+  background: transparent;
+  color: $white;
+  border: 2px solid rgba($white, 0.3);
+
+  &:hover:not(:disabled) {
+    background: rgba($white, 0.1);
+    border-color: $white;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .tiers-grid {
+    .tier-card.recommended {
+      transform: scale(1);
+
+      &:hover {
+        transform: translateY(-8px);
+      }
+    }
+  }
+
+  .pricing-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-price {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,409 @@
+// src/app/features/services/services.component.scss
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.services-page {
+  margin-top: 80px;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Hero Section
+.hero {
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 8%) 100%);
+  padding: $spacing-3xl 0;
+  color: $white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba($primary-yellow, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+}
+
+.hero-container {
+  @include container;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+
+  @include responsive(lg) {
+    font-size: $font-size-5xl;
+  }
+
+  .highlight {
+    display: block;
+    color: $primary-yellow;
+    margin-top: $spacing-sm;
+  }
+}
+
+.hero-description {
+  font-size: $font-size-lg;
+  line-height: 1.8;
+  color: rgba($white, 0.9);
+  margin-bottom: $spacing-3xl;
+
+  @include responsive(md) {
+    font-size: $font-size-xl;
+  }
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+  margin-top: $spacing-3xl;
+}
+
+.stat {
+  text-align: center;
+
+  .stat-value {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $primary-yellow;
+    line-height: 1;
+    margin-bottom: $spacing-sm;
+
+    @include responsive(md) {
+      font-size: $font-size-4xl;
+    }
+  }
+
+  .stat-label {
+    font-size: $font-size-sm;
+    color: rgba($white, 0.8);
+  }
+}
+
+// Services Section
+.services-section {
+  @include section-spacing;
+  background: $gray-light;
+}
+
+.section-container {
+  @include container;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-2xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.service-card {
+  @include card;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  background: $white;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: $shadow-xl;
+  }
+}
+
+.card-icon {
+  font-size: 4rem;
+  text-align: center;
+}
+
+.card-title {
+  font-family: $font-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  text-align: center;
+}
+
+.card-description {
+  color: $gray-dark;
+  line-height: 1.7;
+  text-align: center;
+  flex: 1;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-sm;
+    color: $gray-dark;
+
+    svg {
+      color: $success;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.card-footer {
+  @include flex-between;
+  padding-top: $spacing-lg;
+  border-top: 2px solid $gray-light;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.price-info {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .price-label {
+    font-size: $font-size-xs;
+    color: $gray-medium;
+    text-transform: uppercase;
+  }
+
+  .price-value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $primary-dark;
+  }
+}
+
+.btn-details {
+  @include button-primary;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+
+  svg {
+    transition: transform $transition-base;
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
+  }
+}
+
+// Why Choose Us
+.why-choose-us {
+  @include section-spacing;
+  background: $white;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: $spacing-3xl;
+}
+
+.section-title {
+  @include heading-primary;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-md;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.section-subtitle {
+  font-size: $font-size-lg;
+  color: $gray-dark;
+}
+
+.advantages-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.advantage-card {
+  padding: $spacing-2xl;
+  background: $gray-light;
+  border-radius: $radius-xl;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    background: $white;
+  }
+
+  .advantage-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-lg;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $primary-dark;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    color: $gray-dark;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// CTA Section
+.cta-section {
+  @include section-spacing;
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
+}
+
+.cta-container {
+  @include container;
+  text-align: center;
+  color: $white;
+}
+
+.cta-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.cta-description {
+  font-size: $font-size-lg;
+  color: rgba($white, 0.9);
+  margin-bottom: $spacing-2xl;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  justify-content: center;
+}
+
+.btn-primary-large,
+.btn-secondary-large {
+  padding: $spacing-lg $spacing-2xl;
+  font-size: $font-size-lg;
+  text-decoration: none;
+}
+
+.btn-primary-large {
+  @include button-primary;
+}
+
+.btn-secondary-large {
+  @include button-base;
+  background: transparent;
+  color: $white;
+  border: 2px solid rgba($white, 0.3);
+
+  &:hover:not(:disabled) {
+    background: rgba($white, 0.1);
+    border-color: $white;
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba($primary-dark, 0.9);
+  @include flex-center;
+  z-index: $z-modal;
+  padding: $spacing-lg;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: $white;
+  border-radius: $radius-xl;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-xl;
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

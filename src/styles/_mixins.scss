@@ -1,0 +1,229 @@
+// src/styles/_mixins.scss
+@import 'variables';
+
+// Responsive breakpoints
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == 2xl {
+    @media (min-width: $breakpoint-2xl) { @content; }
+  }
+}
+
+// Flexbox center
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Button base
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md $spacing-xl;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-base;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  gap: $spacing-sm;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Button primary
+@mixin button-primary {
+  @include button-base;
+  background: $primary-yellow;
+  color: $primary-dark;
+  
+  &:hover:not(:disabled) {
+    background: darken($primary-yellow, 8%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-yellow;
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Button secondary
+@mixin button-secondary {
+  @include button-base;
+  background: $primary-dark;
+  color: $white;
+  
+  &:hover:not(:disabled) {
+    background: lighten($primary-dark, 10%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-primary;
+  }
+}
+
+// Button outline
+@mixin button-outline {
+  @include button-base;
+  background: transparent;
+  color: $primary-dark;
+  border: 2px solid $primary-dark;
+  
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+    color: $white;
+  }
+}
+
+// Card
+@mixin card {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: $shadow-md;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+  }
+}
+
+// Input base
+@mixin input-base {
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-base;
+  border: 2px solid lighten($gray-medium, 20%);
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+  outline: none;
+  
+  &:focus {
+    border-color: $primary-yellow;
+    box-shadow: 0 0 0 3px rgba($primary-yellow, 0.1);
+  }
+  
+  &::placeholder {
+    color: $gray-medium;
+  }
+  
+  &:disabled {
+    background: $gray-light;
+    cursor: not-allowed;
+  }
+}
+
+// Container
+@mixin container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+  
+  @include responsive(lg) {
+    padding: 0 $spacing-xl;
+  }
+}
+
+// Section spacing
+@mixin section-spacing {
+  padding: $spacing-3xl 0;
+  
+  @include responsive(md) {
+    padding: 4rem 0;
+  }
+  
+  @include responsive(lg) {
+    padding: 6rem 0;
+  }
+}
+
+// Heading style
+@mixin heading-primary {
+  font-family: $font-heading;
+  font-weight: $font-weight-bold;
+  color: $primary-dark;
+  line-height: 1.2;
+}
+
+// Truncate text
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// Overlay
+@mixin overlay($opacity: 0.5) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba($primary-dark, $opacity);
+    z-index: 1;
+  }
+}
+
+// Glassmorphism
+@mixin glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Skeleton loader
+@mixin skeleton {
+  background: linear-gradient(90deg, $gray-light 25%, lighten($gray-light, 3%) 50%, $gray-light 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Badge
+@mixin badge($color) {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-full;
+  background: lighten($color, 40%);
+  color: darken($color, 20%);
+}

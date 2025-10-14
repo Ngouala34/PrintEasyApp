@@ -1,0 +1,354 @@
+<!-- src/app/features/dashboard-client/profil/profil.component.html -->
+<div class="profil-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fas fa-user"></i>
+        Mon Profil
+      </h1>
+      <p class="page-subtitle">Gérez vos informations personnelles</p>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="profil-grid">
+    <!-- Profile Information -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h2>
+          <i class="fas fa-id-card"></i>
+          Informations Personnelles
+        </h2>
+        @if (!isEditingProfile()) {
+          <button class="btn-edit" (click)="isEditingProfile.set(true)">
+            <i class="fas fa-edit"></i>
+            Modifier
+          </button>
+        }
+      </div>
+
+      <!-- Avatar Section -->
+      <div class="avatar-section">
+        <div class="avatar-container">
+          @if (profile().avatar) {
+            <img [src]="profile().avatar" alt="Avatar" class="avatar-img">
+          } @else {
+            <div class="avatar-placeholder">
+              <i class="fas fa-user"></i>
+            </div>
+          }
+          <input 
+            type="file" 
+            #fileInput 
+            accept="image/*"
+            (change)="uploadAvatar($event)"
+            style="display: none">
+          <button class="btn-upload-avatar" (click)="fileInput.click()">
+            <i class="fas fa-camera"></i>
+          </button>
+        </div>
+        <div class="avatar-info">
+          <h3>{{ profile().fullName }}</h3>
+          <p>{{ profile().email }}</p>
+        </div>
+      </div>
+
+<!-- Profile Form -->
+<form class="profile-form">
+  <div class="form-row">
+    <div class="form-group">
+      <label for="fullName">
+        <i class="fas fa-user"></i>
+        Nom complet
+      </label>
+      <input 
+        type="text" 
+        id="fullName"
+        [value]="profile().fullName"
+        (input)="updateProfileField('fullName', $any($event.target).value)"
+        [disabled]="!isEditingProfile()"
+        class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label for="email">
+        <i class="fas fa-envelope"></i>
+        Email
+      </label>
+      <input 
+        type="email" 
+        id="email"
+        [value]="profile().email"
+        (input)="updateProfileField('email', $any($event.target).value)"
+        [disabled]="!isEditingProfile()"
+        class="form-input">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="phone">
+        <i class="fas fa-phone"></i>
+        Téléphone
+      </label>
+      <input 
+        type="tel" 
+        id="phone"
+        [value]="profile().phone"
+        (input)="updateProfileField('phone', $any($event.target).value)"
+        [disabled]="!isEditingProfile()"
+        class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label for="company">
+        <i class="fas fa-building"></i>
+        Entreprise (optionnel)
+      </label>
+      <input 
+        type="text" 
+        id="company"
+        [value]="profile().company"
+        (input)="updateProfileField('company', $any($event.target).value)"
+        [disabled]="!isEditingProfile()"
+        class="form-input">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="address">
+      <i class="fas fa-map-marker-alt"></i>
+      Adresse
+    </label>
+    <input 
+      type="text" 
+      id="address"
+      [value]="profile().address"
+      (input)="updateProfileField('address', $any($event.target).value)"
+      [disabled]="!isEditingProfile()"
+      class="form-input">
+  </div>
+
+  <div class="form-group">
+    <label for="city">
+      <i class="fas fa-city"></i>
+      Ville
+    </label>
+    <input 
+      type="text" 
+      id="city"
+      [value]="profile().city"
+      (input)="updateProfileField('city', $any($event.target).value)"
+      [disabled]="!isEditingProfile()"
+      class="form-input">
+  </div>
+
+  @if (isEditingProfile()) {
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancelEdit()">
+        <i class="fas fa-times"></i>
+        Annuler
+      </button>
+      <button type="button" class="btn-primary" (click)="updateProfile()" [disabled]="isSavingProfile()">
+        @if (!isSavingProfile()) {
+          <i class="fas fa-save"></i>
+          <span>Enregistrer</span>
+        } @else {
+          <div class="spinner"></div>
+          <span>Enregistrement...</span>
+        }
+      </button>
+    </div>
+  }
+</form>
+
+    </div>
+
+    <!-- Security Section -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h2>
+          <i class="fas fa-lock"></i>
+          Sécurité
+        </h2>
+      </div>
+
+      <form class="security-form">
+        <div class="form-group">
+          <label for="currentPassword">
+            <i class="fas fa-key"></i>
+            Mot de passe actuel
+          </label>
+          <input 
+            type="password" 
+            id="currentPassword"
+            [value]="currentPassword()"
+            (input)="currentPassword.set($any($event.target).value)"
+            placeholder="••••••••"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">
+            <i class="fas fa-key"></i>
+            Nouveau mot de passe
+          </label>
+          <input 
+            type="password" 
+            id="newPassword"
+            [value]="newPassword()"
+            (input)="newPassword.set($any($event.target).value)"
+            placeholder="••••••••"
+            class="form-input">
+          <span class="field-hint">Minimum 8 caractères</span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="fas fa-key"></i>
+            Confirmer le mot de passe
+          </label>
+          <input 
+            type="password" 
+            id="confirmPassword"
+            [value]="confirmPassword()"
+            (input)="confirmPassword.set($any($event.target).value)"
+            placeholder="••••••••"
+            class="form-input">
+        </div>
+
+        <button type="button" class="btn-primary" (click)="changePassword()" [disabled]="isChangingPassword()">
+          @if (!isChangingPassword()) {
+            <i class="fas fa-shield-alt"></i>
+            <span>Changer le mot de passe</span>
+          } @else {
+            <div class="spinner"></div>
+            <span>Modification...</span>
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="profile-card stats-card">
+      <div class="card-header">
+        <h2>
+          <i class="fas fa-chart-line"></i>
+          Statistiques du Compte
+        </h2>
+      </div>
+
+      <div class="stats-list">
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">Membre depuis</div>
+            <div class="stat-value">Janvier 2024</div>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">Commandes totales</div>
+            <div class="stat-value">30 commandes</div>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">Points fidélité</div>
+            <div class="stat-value">1,250 points</div>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">Total dépensé</div>
+            <div class="stat-value">850K FCFA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h2>
+          <i class="fas fa-cog"></i>
+          Préférences
+        </h2>
+      </div>
+
+      <div class="preferences-list">
+        <div class="preference-item">
+          <div class="preference-info">
+            <i class="fas fa-bell"></i>
+            <div>
+              <h3>Notifications par email</h3>
+              <p>Recevoir les notifications par email</p>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preference-item">
+          <div class="preference-info">
+            <i class="fas fa-sms"></i>
+            <div>
+              <h3>Notifications par SMS</h3>
+              <p>Recevoir les alertes par SMS</p>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preference-item">
+          <div class="preference-info">
+            <i class="fas fa-bullhorn"></i>
+            <div>
+              <h3>Offres promotionnelles</h3>
+              <p>Recevoir les offres et promotions</p>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

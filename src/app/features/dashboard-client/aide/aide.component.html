@@ -1,0 +1,159 @@
+<!-- src/app/features/dashboard-client/aide/aide.component.html -->
+<div class="aide-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fas fa-question-circle"></i>
+        Centre d'Aide
+      </h1>
+      <p class="page-subtitle">Trouvez rapidement des réponses à vos questions</p>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher dans l'aide..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($any($event.target).value)"
+        class="search-input">
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="categories-section">
+    <h2 class="section-title">
+      <i class="fas fa-th-large"></i>
+      Catégories
+    </h2>
+    <div class="categories-grid">
+      @for (category of categories; track category.id) {
+        <div class="category-card" (click)="selectCategory(category.id)">
+          <div class="category-icon">
+            <i [class]="'fas ' + category.icon"></i>
+          </div>
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+          <div class="category-meta">
+            <span>{{ category.articles }} articles</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="faq-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fas fa-question"></i>
+        Questions Fréquentes
+      </h2>
+      <div class="filter-tabs">
+        <button 
+          class="filter-tab"
+          [class.active]="selectedCategory() === 'all'"
+          (click)="selectCategory('all')">
+          Toutes
+        </button>
+        @for (category of categories; track category.id) {
+          <button 
+            class="filter-tab"
+            [class.active]="selectedCategory() === category.id"
+            (click)="selectCategory(category.id)">
+            {{ category.name }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (filteredFAQs().length > 0) {
+      <div class="faq-list">
+        @for (faq of filteredFAQs(); track faq.id) {
+          <div class="faq-item" [class.expanded]="faq.expanded">
+            <div class="faq-question" (click)="toggleFAQ(faq.id)">
+              <div class="question-content">
+                <i class="fas fa-circle-question"></i>
+                <h3>{{ faq.question }}</h3>
+              </div>
+              <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            @if (faq.expanded) {
+              <div class="faq-answer">
+                <p>{{ faq.answer }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>Aucun résultat trouvé</h3>
+        <p>Essayez avec d'autres mots-clés ou parcourez les catégories</p>
+      </div>
+    }
+  </div>
+
+  <!-- Contact Support -->
+  <div class="support-section">
+    <div class="support-card">
+      <div class="support-icon">
+        <i class="fas fa-headset"></i>
+      </div>
+      <div class="support-content">
+        <h2>Vous ne trouvez pas ce que vous cherchez ?</h2>
+        <p>Notre équipe de support est disponible pour vous aider</p>
+        <div class="support-actions">
+          <a routerLink="/dashboard-client/discussion" class="btn-support">
+            <i class="fas fa-comments"></i>
+            Démarrer un chat
+          </a>
+          <a href="mailto:support@printpro.cm" class="btn-support secondary">
+            <i class="fas fa-envelope"></i>
+            Envoyer un email
+          </a>
+          <a href="tel:+237600000000" class="btn-support secondary">
+            <i class="fas fa-phone"></i>
+            Appeler
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="quick-links-section">
+    <h2 class="section-title">
+      <i class="fas fa-link"></i>
+      Liens Utiles
+    </h2>
+    <div class="quick-links-grid">
+      <a href="#" class="quick-link">
+        <i class="fas fa-file-pdf"></i>
+        <span>Guide des formats de fichiers</span>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="#" class="quick-link">
+        <i class="fas fa-palette"></i>
+        <span>Guide des couleurs et finitions</span>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="#" class="quick-link">
+        <i class="fas fa-calculator"></i>
+        <span>Calculateur de prix</span>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="#" class="quick-link">
+        <i class="fas fa-book"></i>
+        <span>Conditions générales</span>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+    </div>
+  </div>
+</div>

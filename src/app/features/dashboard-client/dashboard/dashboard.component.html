@@ -1,0 +1,136 @@
+<!-- src/app/features/dashboard-client/dashboard/dashboard.component.html -->
+<div class="dashboard-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Tableau de Bord</h1>
+      <p class="page-subtitle">Vue d'ensemble de votre activité</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/order" class="btn-primary">
+        <i class="fas fa-plus"></i>
+        Nouvelle commande
+      </a>
+    </div>
+  </div>
+
+  <!-- KPIs Grid -->
+  <div class="kpis-grid">
+    @for (kpi of kpis(); track kpi.label) {
+      <div class="kpi-card" [style.border-left-color]="kpi.color">
+        <div class="kpi-icon" [style.background]="kpi.color + '20'" [style.color]="kpi.color">
+          <i [class]="'fas ' + kpi.icon"></i>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-label">{{ kpi.label }}</div>
+          <div class="kpi-value">{{ kpi.value }}</div>
+          @if (kpi.trend) {
+            <div class="kpi-trend">
+              <i class="fas fa-arrow-up"></i>
+              {{ kpi.trend }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Recent Orders Section -->
+  <div class="section-card">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">
+          <i class="fas fa-box"></i>
+          Commandes Récentes
+        </h2>
+        <p class="section-subtitle">Vos dernières commandes en cours</p>
+      </div>
+      <a routerLink="/dashboard-client/commandes" class="btn-link">
+        Voir tout
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="orders-list">
+      @for (order of recentOrders(); track order.id) {
+        <div class="order-item">
+          <div class="order-header">
+            <div class="order-number">
+              <i class="fas fa-file-alt"></i>
+              {{ order.orderNumber }}
+            </div>
+            <div class="order-status" [style.background]="getStatusInfo(order.status).color + '20'" [style.color]="getStatusInfo(order.status).color">
+              <i [class]="'fas ' + getStatusInfo(order.status).icon"></i>
+              {{ getStatusInfo(order.status).label }}
+            </div>
+          </div>
+
+          <div class="order-body">
+            <div class="order-detail">
+              <span class="detail-label">
+                <i class="fas fa-print"></i>
+                Service
+              </span>
+              <span class="detail-value">{{ order.service }}</span>
+            </div>
+            <div class="order-detail">
+              <span class="detail-label">
+                <i class="fas fa-calculator"></i>
+                Quantité
+              </span>
+              <span class="detail-value">{{ order.quantity }} exemplaires</span>
+            </div>
+            <div class="order-detail">
+              <span class="detail-label">
+                <i class="fas fa-calendar-alt"></i>
+                Date
+              </span>
+              <span class="detail-value">{{ order.date | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <div class="order-footer">
+            <div class="order-total">
+              <span>Total</span>
+              <strong>{{ order.total | number:'1.0-0' }} FCFA</strong>
+            </div>
+            <button class="btn-details">
+              <i class="fas fa-eye"></i>
+              Détails
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2 class="section-title">
+      <i class="fas fa-bolt"></i>
+      Actions Rapides
+    </h2>
+    <div class="actions-grid">
+      <a routerLink="/order" class="action-card">
+        <i class="fas fa-plus-circle"></i>
+        <h3>Nouvelle Commande</h3>
+        <p>Créer une nouvelle impression</p>
+      </a>
+      <a routerLink="/dashboard-client/historique" class="action-card">
+        <i class="fas fa-history"></i>
+        <h3>Historique</h3>
+        <p>Consulter vos anciennes commandes</p>
+      </a>
+      <a routerLink="/dashboard-client/discussion" class="action-card">
+        <i class="fas fa-comments"></i>
+        <h3>Support</h3>
+        <p>Contacter le service client</p>
+      </a>
+      <a routerLink="/dashboard-client/aide" class="action-card">
+        <i class="fas fa-question-circle"></i>
+        <h3>Aide</h3>
+        <p>Consulter la documentation</p>
+      </a>
+    </div>
+  </div>
+</div>

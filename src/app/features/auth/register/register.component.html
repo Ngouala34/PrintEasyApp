@@ -1,0 +1,345 @@
+<!-- src/app/features/auth/register/register.component.html -->
+<div class="auth-page">
+  <div class="auth-container">
+    <!-- Auth Card -->
+    <div class="auth-card">
+      <!-- Header -->
+      <div class="auth-header">
+        <div class="logo">
+          <svg width="50" height="50" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="8" fill="#f0e222"/>
+            <path d="M12 12h16v4H12z" fill="#0e0734"/>
+            <path d="M12 20h16v4H12z" fill="#0e0734"/>
+            <path d="M12 28h10v4H12z" fill="#0e0734"/>
+          </svg>
+        </div>
+        <h1 class="auth-title">Créer un compte</h1>
+        <p class="auth-subtitle">Rejoignez PrintPro dès aujourd'hui</p>
+      </div>
+
+      <!-- Form -->
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <!-- Error Alert -->
+        @if (errorMessage()) {
+          <div class="alert alert-error">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- Success Alert -->
+        @if (successMessage()) {
+          <div class="alert alert-success">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M6 10l2 2 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            {{ successMessage() }}
+          </div>
+        }
+
+        <!-- Full Name Field -->
+        <div class="form-group">
+          <label for="fullName">
+            Nom complet <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 18a6 6 0 0112 0" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <input 
+              type="text" 
+              id="fullName"
+              [(ngModel)]="fullName"
+              name="fullName"
+              placeholder="Jean Kamga"
+              class="form-input"
+              autocomplete="name"
+              required>
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email">
+            Adresse email <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <path d="M3 4h14c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/>
+              <path d="M3 6l7 5 7-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input 
+              type="email" 
+              id="email"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="votre@email.com"
+              class="form-input"
+              autocomplete="email"
+              required>
+          </div>
+        </div>
+
+        <!-- Phone Field -->
+        <div class="form-group">
+          <label for="phone">
+            Téléphone <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <path d="M2 3h3l2 5-1.5 1.5a11 11 0 006 6L13 14l5 2v3a2 2 0 01-2 2A16 16 0 012 5a2 2 0 012-2z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <input 
+              type="tel" 
+              id="phone"
+              [(ngModel)]="phone"
+              name="phone"
+              placeholder="+237 6XX XXX XXX"
+              class="form-input"
+              autocomplete="tel"
+              required>
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password">
+            Mot de passe <span class="required">*</span>
+          </label>
+          <div class="password-input">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <rect x="4" y="9" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input 
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="••••••••"
+              class="form-input"
+              autocomplete="new-password"
+              (input)="onPasswordChange()"
+              required>
+            <button 
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility('password')"
+              aria-label="Afficher/Masquer le mot de passe">
+              @if (showPassword()) {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                  <path d="M2 2l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                </svg>
+              }
+            </button>
+          </div>
+          
+          <!-- Password Strength Indicator -->
+          @if (password && passwordStrength().label) {
+            <div class="password-strength">
+              <div class="strength-bar">
+                <div 
+                  class="strength-fill" 
+                  [style.width.%]="passwordStrength().score * 33.33"
+                  [style.background]="passwordStrength().color">
+                </div>
+              </div>
+              <span 
+                class="strength-label" 
+                [style.color]="passwordStrength().color">
+                {{ passwordStrength().label }}
+              </span>
+            </div>
+          }
+          
+          <p class="field-hint">
+            Minimum 8 caractères avec majuscules, minuscules et chiffres
+          </p>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <label for="confirmPassword">
+            Confirmer le mot de passe <span class="required">*</span>
+          </label>
+          <div class="password-input">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <rect x="4" y="9" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input 
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              id="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              name="confirmPassword"
+              placeholder="••••••••"
+              class="form-input"
+              autocomplete="new-password"
+              required>
+            <button 
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility('confirmPassword')"
+              aria-label="Afficher/Masquer le mot de passe">
+              @if (showConfirmPassword()) {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                  <path d="M2 2l16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                </svg>
+              }
+            </button>
+          </div>
+          
+          @if (confirmPassword && password !== confirmPassword) {
+            <p class="field-error">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="2"/>
+                <path d="M8 5v3M8 11h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Les mots de passe ne correspondent pas
+            </p>
+          } @else if (confirmPassword && password === confirmPassword) {
+            <p class="field-success">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="2"/>
+                <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Les mots de passe correspondent
+            </p>
+          }
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="acceptTerms" 
+              name="acceptTerms"
+              id="acceptTerms"
+              required>
+            <span>
+              J'accepte les 
+              <a routerLink="/terms" class="link" target="_blank">conditions d'utilisation</a>
+              et la 
+              <a routerLink="/privacy" class="link" target="_blank">politique de confidentialité</a>
+            </span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="btn-submit" 
+          [disabled]="isLoading()">
+          @if (!isLoading()) {
+            <span>Créer mon compte</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M8 4l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          } @else {
+            <div class="spinner"></div>
+            <span>Création en cours...</span>
+          }
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>ou</span>
+      </div>
+
+      <!-- Social Login (Optional) -->
+      <div class="social-login">
+        <button type="button" class="btn-social google">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" fill="#4285F4"/>
+            <path d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z" fill="#34A853"/>
+            <path d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z" fill="#FBBC05"/>
+            <path d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z" fill="#EA4335"/>
+          </svg>
+          <span>S'inscrire avec Google</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <p>
+          Vous avez déjà un compte ? 
+          <a routerLink="/auth/login" class="link-primary">
+            Se connecter
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Illustration -->
+    <!-- <div class="auth-illustration">
+      <svg viewBox="0 0 500 500" class="illustration-svg">
+        <defs>
+          <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0e0734;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1a0f52;stop-opacity:1" />
+          </linearGradient>
+        </defs> -->
+        <!-- Background -->
+        <!-- <rect width="500" height="500" fill="url(#grad2)" rx="24"/> -->
+        
+        <!-- Decorative circles -->
+        <!-- <circle cx="420" cy="100" r="70" fill="#f0e222" opacity="0.12"/>
+        <circle cx="80" cy="380" r="90" fill="#f0e222" opacity="0.08"/>
+        <circle cx="450" cy="450" r="50" fill="#f0e222" opacity="0.1"/>
+         -->
+        <!-- Multiple documents illustration -->
+        <!-- <g transform="translate(100, 150)"> -->
+          <!-- Document 1 -->
+          <!-- <rect x="0" y="20" width="120" height="160" rx="8" fill="#f0e222" opacity="0.3"/> -->
+          
+          <!-- Document 2 -->
+          <!-- <rect x="80" y="10" width="120" height="160" rx="8" fill="#f0e222" opacity="0.6"/> -->
+          
+          <!-- Document 3 (front) -->
+          <!-- <rect x="160" y="0" width="120" height="160" rx="8" fill="#f0e222"/>
+          <rect x="175" y="15" width="90" height="10" rx="3" fill="#0e0734"/>
+          <rect x="175" y="35" width="90" height="10" rx="3" fill="#0e0734"/>
+          <rect x="175" y="55" width="70" height="10" rx="3" fill="#0e0734"/>
+          <rect x="175" y="75" width="90" height="10" rx="3" fill="#0e0734"/>
+          <rect x="175" y="95" width="60" height="10" rx="3" fill="#0e0734"/>
+           -->
+          <!-- Checkmark -->
+          <!-- <circle cx="235" cy="135" r="20" fill="#10b981"/>
+          <path d="M225 135l7 7 13-13" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+         -->
+        <!-- Floating elements with animation -->
+        <!-- <circle cx="60" cy="100" r="12" fill="#f0e222" opacity="0.2">
+          <animate attributeName="cy" values="100;80;100" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="440" cy="350" r="18" fill="#f0e222" opacity="0.15">
+          <animate attributeName="cy" values="350;330;350" dur="4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="120" cy="480" r="15" fill="#f0e222" opacity="0.18">
+          <animate attributeName="cx" values="120;140;120" dur="5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div> -->
+  </div>
+</div>

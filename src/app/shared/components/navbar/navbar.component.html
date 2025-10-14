@@ -1,0 +1,49 @@
+<nav class="navbar" [class.scrolled]="isScrolled()">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="8" fill="currentColor"/>
+        <path d="M12 12h16v4H12z" fill="#f0e222"/>
+        <path d="M12 20h16v4H12z" fill="#f0e222"/>
+        <path d="M12 28h10v4H12z" fill="#f0e222"/>
+      </svg>
+      <span class="logo-text">PrintEasy</span>
+    </a>
+
+    <!-- Burger menu button -->
+    <button class="menu-toggle" (click)="toggleMenu()" [class.open]="menuOpen()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Navigation links -->
+    <div class="nav-menu" [class.open]="menuOpen()">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        Accueil
+      </a>
+      <a routerLink="/services" routerLinkActive="active" class="nav-link">
+        Services
+      </a>
+      <a routerLink="/pricing" routerLinkActive="active" class="nav-link">
+        Tarifs
+      </a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-link">
+        Contact
+      </a>
+
+      <!-- Auth buttons -->
+      <div class="nav-actions">
+        <ng-container *ngIf="!isAuthenticated(); else loggedIn">
+          <a routerLink="/login" class="btn-login">Connexion</a>
+          <a routerLink="/register" class="btn-register">S'inscrire</a>
+        </ng-container>
+        <ng-template #loggedIn>
+          <a routerLink="/dashboard" class="btn-dashboard">Dashboard</a>
+          <button class="btn-logout" (click)="logout()">Déconnexion</button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</nav>

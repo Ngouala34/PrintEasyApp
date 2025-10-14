@@ -1,0 +1,247 @@
+<app-navbar></app-navbar>
+
+<div class="pricing-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content fade-in">
+        <h1 class="hero-title">
+          Tarifs Transparents
+          <span class="highlight">et Compétitifs</span>
+        </h1>
+        <p class="hero-description">
+          Des prix clairs sans frais cachés. Choisissez la formule qui correspond à vos besoins et bénéficiez de tarifs dégressifs sur les grandes quantités.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Tiers -->
+  <section class="pricing-tiers-section">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Nos Formules</h2>
+        <p class="section-subtitle">Choisissez la formule adaptée à votre activité</p>
+      </div>
+
+      <div class="tiers-grid">
+        @for (tier of pricingTiers(); track tier.id) {
+          <div class="tier-card fade-in" [class.recommended]="tier.recommended">
+            @if (tier.recommended) {
+              <div class="recommended-badge">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5l2-5z"/>
+                </svg>
+                Recommandé
+              </div>
+            }
+            
+            <div class="tier-header">
+              <h3 class="tier-name">{{ tier.name }}</h3>
+              <p class="tier-description">{{ tier.description }}</p>
+              <div class="tier-price">
+                <span class="price-value">{{ tier.price | number:'1.0-0' }}</span>
+                <span class="price-currency">FCFA</span>
+              </div>
+              <span class="price-unit">{{ tier.unit }}</span>
+            </div>
+
+            <ul class="tier-features">
+              @for (feature of tier.features; track feature) {
+                <li>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="9" fill="#10b981" opacity="0.1"/>
+                    <path d="M6 10l2 2 6-6" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+
+            <a routerLink="/order" class="btn-tier" [class.primary]="tier.recommended">
+              {{ tier.recommended ? 'Commencer maintenant' : 'Choisir cette formule' }}
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Pricing -->
+  <section class="service-pricing-section">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Tarifs par Service</h2>
+        <p class="section-subtitle">Prix unitaires indicatifs - Devis personnalisé sur demande</p>
+      </div>
+
+      <!-- Category Filter -->
+      <div class="category-filter fade-in">
+        <button 
+          class="filter-btn"
+          [class.active]="selectedCategory() === 'all'"
+          (click)="selectCategory('all')">
+          Tous
+        </button>
+        @for (service of servicePricing(); track service.category) {
+          <button 
+            class="filter-btn"
+            [class.active]="selectedCategory() === service.category"
+            (click)="selectCategory(service.category)">
+            {{ service.icon }} {{ service.category }}
+          </button>
+        }
+      </div>
+
+      <!-- Pricing Tables -->
+      <div class="pricing-tables">
+        @for (service of filteredPricing(); track service.category) {
+          <div class="pricing-table fade-in">
+            <div class="table-header">
+              <span class="table-icon">{{ service.icon }}</span>
+              <h3 class="table-title">{{ service.category }}</h3>
+            </div>
+
+            <div class="table-body">
+              @for (item of service.items; track item.name) {
+                <div class="pricing-row">
+                  <div class="item-info">
+                    <div class="item-name">{{ item.name }}</div>
+                    <div class="item-description">{{ item.description }}</div>
+                  </div>
+                  <div class="item-price">
+                    <span class="price-amount">{{ item.price | number:'1.0-0' }} FCFA</span>
+                    <span class="price-unit">/ {{ item.unit }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="table-footer">
+              <a [routerLink]="['/order']" [queryParams]="{category: service.category}" class="btn-order-service">
+                Commander
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Volume Discounts -->
+  <section class="volume-discounts">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Remises sur Volume</h2>
+        <p class="section-subtitle">Plus vous commandez, plus vous économisez !</p>
+      </div>
+
+      <div class="discounts-grid">
+        <div class="discount-card fade-in">
+          <div class="discount-icon">📦</div>
+          <div class="discount-quantity">100-500</div>
+          <div class="discount-label">exemplaires</div>
+          <div class="discount-value">-5%</div>
+        </div>
+
+        <div class="discount-card fade-in featured">
+          <div class="discount-icon">📦📦</div>
+          <div class="discount-quantity">500-1000</div>
+          <div class="discount-label">exemplaires</div>
+          <div class="discount-value">-10%</div>
+        </div>
+
+        <div class="discount-card fade-in">
+          <div class="discount-icon">📦📦📦</div>
+          <div class="discount-quantity">1000-5000</div>
+          <div class="discount-label">exemplaires</div>
+          <div class="discount-value">-15%</div>
+        </div>
+
+        <div class="discount-card fade-in">
+          <div class="discount-icon">🏭</div>
+          <div class="discount-quantity">5000+</div>
+          <div class="discount-label">exemplaires</div>
+          <div class="discount-value">Sur devis</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Questions Fréquentes</h2>
+        <p class="section-subtitle">Tout ce que vous devez savoir sur nos tarifs</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item fade-in">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Les prix incluent-ils la TVA ?
+          </h3>
+          <p>Tous nos prix sont affichés TTC (Toutes Taxes Comprises) pour plus de transparence. Pas de frais cachés ni de surprises à la caisse.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Comment obtenir un devis personnalisé ?
+          </h3>
+          <p>Contactez-nous via le formulaire de contact ou par téléphone. Nous vous répondrons sous 24h avec un devis détaillé et gratuit.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Proposez-vous des tarifs pour les associations ?
+          </h3>
+          <p>Oui ! Nous offrons des tarifs préférentiels pour les associations et ONG. Contactez-nous avec votre statut associatif pour en bénéficier.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="9" stroke="currentColor" fill="none" stroke-width="2"/>
+              <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Quels moyens de paiement acceptez-vous ?
+          </h3>
+          <p>Nous acceptons les cartes bancaires, Mobile Money (MTN, Orange), virements bancaires et paiements en espèces pour les retraits en boutique.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container fade-in">
+      <h2 class="cta-title">Besoin d'un Devis Personnalisé ?</h2>
+      <p class="cta-description">
+        Notre équipe est à votre disposition pour vous accompagner et vous proposer la meilleure solution
+      </p>
+      <div class="cta-actions">
+        <a routerLink="/contact" class="btn-primary-large">
+          Demander un devis gratuit
+        </a>
+        <a routerLink="/order" class="btn-secondary-large">
+          Commander en ligne
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

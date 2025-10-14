@@ -1,0 +1,249 @@
+<app-navbar></app-navbar>
+
+<div class="services-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content fade-in">
+        <h1 class="hero-title">
+          Nos Services
+          <span class="highlight">d'Impression Professionnelle</span>
+        </h1>
+        <p class="hero-description">
+          De la conception à la livraison, nous vous accompagnons dans tous vos projets d'impression avec des solutions adaptées à vos besoins.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-value">15+</div>
+            <div class="stat-label">Types de services</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">10K+</div>
+            <div class="stat-label">Clients satisfaits</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">24h</div>
+            <div class="stat-label">Livraison express</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Grid -->
+  <section class="services-section">
+    <div class="section-container">
+      <div class="services-grid">
+        @for (service of services(); track service.id) {
+          <article class="service-card fade-in" (click)="selectService(service)">
+            <div class="card-icon">{{ service.icon }}</div>
+            <h3 class="card-title">{{ service.title }}</h3>
+            <p class="card-description">{{ service.description }}</p>
+            
+            <ul class="features-list">
+              @for (feature of service.features.slice(0, 3); track feature) {
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+
+            <div class="card-footer">
+              <div class="price-info">
+                <span class="price-label">À partir de</span>
+                <span class="price-value">{{ service.priceFrom | number:'1.0-0' }} FCFA</span>
+              </div>
+              <button class="btn-details">
+                Voir détails
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section class="why-choose-us">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Pourquoi Choisir PrintEasy ?</h2>
+        <p class="section-subtitle">Des avantages qui font la différence</p>
+      </div>
+
+      <div class="advantages-grid">
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">⚡</div>
+          <h3>Rapidité</h3>
+          <p>Livraison express en 24-48h pour la plupart de nos services</p>
+        </div>
+
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">✨</div>
+          <h3>Qualité Premium</h3>
+          <p>Papiers haut de gamme et impression haute résolution</p>
+        </div>
+
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">💰</div>
+          <h3>Prix Compétitifs</h3>
+          <p>Les meilleurs tarifs du marché sans compromis sur la qualité</p>
+        </div>
+
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">🎨</div>
+          <h3>Personnalisation</h3>
+          <p>Solutions sur mesure adaptées à vos besoins spécifiques</p>
+        </div>
+
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">🤝</div>
+          <h3>Accompagnement</h3>
+          <p>Conseils experts pour optimiser vos projets d'impression</p>
+        </div>
+
+        <div class="advantage-card fade-in">
+          <div class="advantage-icon">♻️</div>
+          <h3>Éco-responsable</h3>
+          <p>Options papier recyclé et encres écologiques disponibles</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container fade-in">
+      <h2 class="cta-title">Prêt à Démarrer Votre Projet ?</h2>
+      <p class="cta-description">
+        Obtenez un devis gratuit en quelques clics ou contactez notre équipe pour des conseils personnalisés
+      </p>
+      <div class="cta-actions">
+        <a routerLink="/order" class="btn-primary-large">
+          Commander Maintenant
+        </a>
+        <a routerLink="/contact" class="btn-secondary-large">
+          Demander un Devis
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Detail Modal -->
+  @if (selectedService()) {
+    <div class="modal-overlay" (click)="closeServiceDetail()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeServiceDetail()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="modal-header">
+          <div class="modal-icon">{{ selectedService()!.icon }}</div>
+          <h2>{{ selectedService()!.title }}</h2>
+          <p>{{ selectedService()!.description }}</p>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-section">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6l2-6z" fill="currentColor"/>
+              </svg>
+              Caractéristiques
+            </h3>
+            <ul class="detail-list">
+              @for (feature of selectedService()!.features; track feature) {
+                <li>{{ feature }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="detail-section">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" fill="none" stroke-width="2"/>
+              </svg>
+              Formats Disponibles
+            </h3>
+            <div class="options-grid">
+              @for (format of selectedService()!.formats; track format) {
+                <span class="option-badge">{{ format }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M4 4h12v12H4z" stroke="currentColor" fill="none" stroke-width="2"/>
+              </svg>
+              Types de Papier
+            </h3>
+            <div class="options-grid">
+              @for (paper of selectedService()!.papers; track paper) {
+                <span class="option-badge">{{ paper }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="10" r="7" stroke="currentColor" fill="none" stroke-width="2"/>
+                <path d="M10 6v4l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Finitions
+            </h3>
+            <div class="options-grid">
+              @for (finishing of selectedService()!.finishings; track finishing) {
+                <span class="option-badge">{{ finishing }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9 2L3 8l6 6M11 2l6 6-6 6" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Cas d'Usage
+            </h3>
+            <ul class="use-cases-list">
+              @for (useCase of selectedService()!.useCases; track useCase) {
+                <li>{{ useCase }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="pricing-info">
+            <div class="pricing-row">
+              <span>Prix à partir de</span>
+              <strong>{{ selectedService()!.priceFrom | number:'1.0-0' }} FCFA</strong>
+            </div>
+            <div class="pricing-row">
+              <span>Délai de livraison</span>
+              <strong>{{ selectedService()!.deliveryTime }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeServiceDetail()">
+            Fermer
+          </button>
+          <a [routerLink]="['/order']" [queryParams]="{service: selectedService()!.id}" class="btn-primary">
+            Commander ce service
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+</div>

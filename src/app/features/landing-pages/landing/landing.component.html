@@ -1,0 +1,262 @@
+<app-navbar></app-navbar>
+
+<!-- src/app/features/landing/landing.component.html -->
+<div class="landing-page">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content fade-in">
+        <h1 class="hero-title">
+          Imprimez Vos Idées
+          <span class="highlight">En Toute Simplicité</span>
+        </h1>
+        <p class="hero-description">
+          Services d'impression professionnels pour tous vos besoins.
+          Qualité garantie, livraison rapide et tarifs compétitifs.
+        </p>
+        <div class="hero-actions">
+          <a routerLink="/order" class="btn-primary">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 5v10M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Commander Maintenant
+          </a>
+          <button (click)="scrollToServices()" class="btn-secondary">
+            Découvrir nos Services
+          </button>
+        </div>
+        <div class="hero-stats">
+          @for (stat of stats(); track stat.label) {
+            <div class="stat-item">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="hero-image fade-in">
+        <div class="image-decoration"></div>
+        <svg viewBox="0 0 400 400" class="hero-svg">
+          <rect x="50" y="50" width="300" height="200" rx="12" fill="#0e0734"/>
+          <rect x="70" y="70" width="260" height="20" rx="4" fill="#f0e222"/>
+          <rect x="70" y="110" width="260" height="20" rx="4" fill="#f0e222"/>
+          <rect x="70" y="150" width="200" height="20" rx="4" fill="#f0e222"/>
+          <circle cx="200" cy="320" r="30" fill="#f0e222" opacity="0.3"/>
+          <circle cx="280" cy="280" r="20" fill="#f0e222" opacity="0.5"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="services-section">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Nos Services d'Impression</h2>
+        <p class="section-subtitle">
+          Des solutions professionnelles adaptées à tous vos besoins
+        </p>
+      </div>
+      <div class="services-grid">
+        @for (service of services(); track service.id) {
+          <div class="service-card fade-in">
+            <div class="service-icon">{{ service.icon }}</div>
+            <h3 class="service-title">{{ service.title }}</h3>
+            <p class="service-description">{{ service.description }}</p>
+            <div class="service-footer">
+              <span class="service-price">{{ service.price }}</span>
+              <a routerLink="/services" [queryParams]="{service: service.id}" class="service-link">
+                Commander
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Comment Ça Marche ?</h2>
+        <p class="section-subtitle">Un processus simple en 4 étapes</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card fade-in">
+          <div class="step-number">1</div>
+          <div class="step-icon">📤</div>
+          <h3 class="step-title">Uploadez vos fichiers</h3>
+          <p class="step-description">
+            Téléchargez vos documents PDF, JPG ou PNG en toute sécurité
+          </p>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">2</div>
+          <div class="step-icon">⚙️</div>
+          <h3 class="step-title">Personnalisez</h3>
+          <p class="step-description">
+            Choisissez format, papier, finition et quantité
+          </p>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">3</div>
+          <div class="step-icon">💳</div>
+          <h3 class="step-title">Payez en ligne</h3>
+          <p class="step-description">
+            Paiement sécurisé par carte bancaire ou Mobile Money
+          </p>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">4</div>
+          <div class="step-icon">🚚</div>
+          <h3 class="step-title">Recevez votre commande</h3>
+          <p class="step-description">
+            Livraison rapide à domicile ou retrait en boutique
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <div class="section-container">
+      <div class="section-header fade-in">
+        <h2 class="section-title">Ce Que Disent Nos Clients</h2>
+        <p class="section-subtitle">Des milliers de clients satisfaits</p>
+      </div>
+      <div class="testimonials-grid">
+        @for (testimonial of testimonials(); track testimonial.id) {
+          <div class="testimonial-card fade-in">
+            <div class="testimonial-header">
+              <div class="testimonial-avatar">{{ testimonial.avatar }}</div>
+              <div class="testimonial-info">
+                <h4 class="testimonial-name">{{ testimonial.name }}</h4>
+                <p class="testimonial-company">{{ testimonial.company }}</p>
+              </div>
+            </div>
+            <div class="testimonial-rating">
+              @for (star of [1,2,3,4,5]; track star) {
+                <svg width="20" height="20" viewBox="0 0 20 20" [class.filled]="star <= testimonial.rating">
+                  <path d="M10 2l2.5 6.5L19 9l-5 4.5L15.5 20 10 16l-5.5 4L6 13.5 1 9l6.5-.5L10 2z" fill="currentColor"/>
+                </svg>
+              }
+            </div>
+            <p class="testimonial-comment">{{ testimonial.comment }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container fade-in">
+      <h2 class="cta-title">Prêt à Imprimer Vos Projets ?</h2>
+      <p class="cta-description">
+        Commencez dès maintenant et bénéficiez de nos tarifs compétitifs
+      </p>
+      <div class="cta-actions">
+        <a routerLink="/order" class="btn-primary-large">
+          Commander Maintenant
+        </a>
+        <a routerLink="/contact" class="btn-secondary-large">
+          Nous Contacter
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <rect width="40" height="40" rx="8" fill="#f0e222"/>
+              <path d="M12 12h16v4H12z" fill="#0e0734"/>
+              <path d="M12 20h16v4H12z" fill="#0e0734"/>
+              <path d="M12 28h10v4H12z" fill="#0e0734"/>
+            </svg>
+            <span>PrintEasy</span>
+          </div>
+          <p class="footer-description">
+            Votre partenaire de confiance pour tous vos besoins d'impression professionnelle.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 0C4.477 0 0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.879V12.89h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.989C16.343 19.129 20 14.99 20 10c0-5.523-4.477-10-10-10z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M6.29 18.25c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 0C7.284 0 6.944.012 5.877.06 4.813.11 4.086.278 3.45.525a4.902 4.902 0 00-1.772 1.153A4.902 4.902 0 00.525 3.45C.278 4.086.109 4.813.06 5.877.012 6.944 0 7.284 0 10s.012 3.056.06 4.123c.05 1.064.218 1.791.465 2.427a4.902 4.902 0 001.153 1.772 4.902 4.902 0 001.772 1.153c.636.247 1.363.416 2.427.465C6.944 19.988 7.284 20 10 20s3.056-.012 4.123-.06c1.064-.05 1.791-.218 2.427-.465a4.902 4.902 0 001.772-1.153 4.902 4.902 0 001.153-1.772c.247-.636.416-1.363.465-2.427.048-1.067.06-1.407.06-4.123s-.012-3.056-.06-4.123c-.05-1.064-.218-1.791-.465-2.427a4.902 4.902 0 00-1.153-1.772A4.902 4.902 0 0016.55.525C15.914.278 15.187.109 14.123.06 13.056.012 12.716 0 10 0zm0 1.802c2.67 0 2.986.01 4.04.058.975.045 1.504.207 1.857.344.467.181.8.398 1.15.748.35.35.567.683.748 1.15.137.353.3.882.344 1.857.048 1.054.058 1.37.058 4.04 0 2.67-.01 2.986-.058 4.04-.045.975-.207 1.504-.344 1.857-.181.467-.398.8-.748 1.15-.35.35-.683.567-1.15.748-.353.137-.882.3-1.857.344-1.054.048-1.37.058-4.04.058-2.67 0-2.986-.01-4.04-.058-.975-.045-1.504-.207-1.857-.344a3.097 3.097 0 01-1.15-.748 3.097 3.097 0 01-.748-1.15c-.137-.353-.3-.882-.344-1.857-.048-1.054-.058-1.37-.058-4.04 0-2.67.01-2.986.058-4.04.045-.975.207-1.504.344-1.857.181-.467.398-.8.748-1.15.35-.35.683-.567 1.15-.748.353-.137.882-.3 1.857-.344 1.054-.048 1.37-.058 4.04-.058z"/>
+                <path d="M10 13.333a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm0-8.468a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm6.538-.203a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M18.667 0H1.333C.597 0 0 .597 0 1.333v17.334C0 19.403.597 20 1.333 20h17.334c.736 0 1.333-.597 1.333-1.333V1.333C20 .597 19.403 0 18.667 0zM6 17H3V8h3v9zM4.5 6.5C3.67 6.5 3 5.83 3 5s.67-1.5 1.5-1.5S6 4.17 6 5s-.67 1.5-1.5 1.5zM17 17h-3v-4.5c0-1.12-.02-2.56-1.56-2.56-1.56 0-1.8 1.22-1.8 2.48V17H8V8h2.88v1.24h.04c.4-.76 1.38-1.56 2.84-1.56 3.04 0 3.6 2 3.6 4.6V17z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Services</h3>
+          <ul class="footer-links">
+            <li><a routerLink="/services">Flyers & Dépliants</a></li>
+            <li><a routerLink="/services">Cartes de Visite</a></li>
+            <li><a routerLink="/services">Brochures</a></li>
+            <li><a routerLink="/services">Affiches</a></li>
+            <li><a routerLink="/services">Reliure</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Entreprise</h3>
+          <ul class="footer-links">
+            <li><a routerLink="/about">À Propos</a></li>
+            <li><a routerLink="/contact">Contact</a></li>
+            <li><a routerLink="/careers">Carrières</a></li>
+            <li><a routerLink="/partners">Partenaires</a></li>
+            <li><a routerLink="/blog">Blog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Support</h3>
+          <ul class="footer-links">
+            <li><a routerLink="/help">Centre d'Aide</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
+            <li><a routerLink="/shipping">Livraison</a></li>
+            <li><a routerLink="/returns">Retours</a></li>
+            <li><a routerLink="/terms">Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 PrintEasy. Tous droits réservés.</p>
+        <div class="footer-legal">
+          <a routerLink="/privacy">Politique de Confidentialité</a>
+          <span>•</span>
+          <a routerLink="/terms">Conditions d'Utilisation</a>
+          <span>•</span>
+          <a routerLink="/cookies">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

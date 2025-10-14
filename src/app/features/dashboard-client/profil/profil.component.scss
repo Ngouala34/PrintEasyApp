@@ -1,0 +1,479 @@
+// src/app/features/dashboard-client/profil/profil.component.scss
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.profil-page {
+  padding: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+
+  @include responsive(md) {
+    padding: $spacing-3xl;
+  }
+}
+
+.page-header {
+  margin-bottom: $spacing-lg;
+}
+
+.page-title {
+  @include heading-primary;
+  font-size: $font-size-2xl;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  i {
+    color: $primary-yellow;
+  }
+
+  @include responsive(md) {
+    font-size: $font-size-3xl;
+  }
+}
+
+.page-subtitle {
+  color: $gray-dark;
+  font-size: $font-size-base;
+}
+
+// Alerts
+.alert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-md;
+  animation: slideDown 0.3s ease-out;
+
+  i {
+    flex-shrink: 0;
+  }
+
+  &.alert-success {
+    background: lighten($success, 50%);
+    color: darken($success, 10%);
+    border: 1px solid lighten($success, 40%);
+  }
+
+  &.alert-error {
+    background: lighten($error, 45%);
+    color: darken($error, 10%);
+    border: 1px solid lighten($error, 35%);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Profile Grid
+.profil-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.profile-card {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-2xl;
+  box-shadow: $shadow-sm;
+
+  &.stats-card {
+    @include responsive(lg) {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.card-header {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+  gap: $spacing-lg;
+
+  h2 {
+    @include heading-primary;
+    font-size: $font-size-lg;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    i {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.btn-edit {
+  @include button-base;
+  padding: $spacing-sm $spacing-lg;
+  background: $white;
+  color: $primary-dark;
+  border: 2px solid $gray-light;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-sm;
+
+  &:hover:not(:disabled) {
+    border-color: $primary-yellow;
+    background: lighten($primary-yellow, 45%);
+  }
+}
+
+// Avatar Section
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xl;
+  padding-bottom: $spacing-xl;
+  border-bottom: 2px solid $gray-light;
+  margin-bottom: $spacing-xl;
+}
+
+.avatar-container {
+  position: relative;
+}
+
+.avatar-img,
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: $radius-full;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  @include flex-center;
+  background: $gray-light;
+  color: $gray-medium;
+
+  i {
+    font-size: 3rem;
+  }
+}
+
+.btn-upload-avatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  @include flex-center;
+  width: 36px;
+  height: 36px;
+  background: $primary-yellow;
+  color: $primary-dark;
+  border: 3px solid $white;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: darken($primary-yellow, 10%);
+    transform: scale(1.1);
+  }
+
+  i {
+    font-size: $font-size-sm;
+  }
+}
+
+.avatar-info {
+  flex: 1;
+
+  h3 {
+    font-family: $font-heading;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $primary-dark;
+    margin: 0 0 $spacing-xs;
+  }
+
+  p {
+    color: $gray-medium;
+    margin: 0;
+  }
+}
+
+// Forms
+.profile-form,
+.security-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  label {
+    font-weight: $font-weight-medium;
+    color: $primary-dark;
+    font-size: $font-size-sm;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    i {
+      color: $gray-medium;
+      width: 16px;
+    }
+  }
+}
+
+.form-input {
+  @include input-base;
+
+  &:disabled {
+    background: $gray-light;
+    cursor: not-allowed;
+  }
+}
+
+.field-hint {
+  font-size: $font-size-xs;
+  color: $gray-medium;
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: flex-end;
+  margin-top: $spacing-md;
+}
+
+.btn-primary,
+.btn-secondary {
+  @include button-base;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-xl;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  background: $white;
+  color: $primary-dark;
+  border: 2px solid $gray-light;
+
+  &:hover:not(:disabled) {
+    border-color: $primary-dark;
+    background: $gray-light;
+  }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba($primary-dark, 0.2);
+  border-top-color: $primary-dark;
+  border-radius: $radius-full;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Stats List
+.stats-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(xl) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  background: $gray-light;
+  border-radius: $radius-lg;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: lighten($primary-yellow, 47%);
+    transform: translateY(-2px);
+  }
+}
+
+.stat-icon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $white;
+  border-radius: $radius-md;
+  color: $primary-yellow;
+  flex-shrink: 0;
+
+  i {
+    font-size: $font-size-xl;
+  }
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: $font-size-xs;
+  color: $gray-medium;
+  margin-bottom: $spacing-xs;
+}
+
+.stat-value {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $primary-dark;
+}
+
+// Preferences
+.preferences-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.preference-item {
+  @include flex-between;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
+  background: $gray-light;
+  border-radius: $radius-lg;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: lighten($primary-yellow, 47%);
+  }
+}
+
+.preference-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  flex: 1;
+
+  i {
+    font-size: $font-size-xl;
+    color: $primary-yellow;
+    width: 32px;
+    text-align: center;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $primary-dark;
+    margin: 0 0 $spacing-xs;
+  }
+
+  p {
+    font-size: $font-size-sm;
+    color: $gray-dark;
+    margin: 0;
+  }
+}
+
+// Toggle Switch
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .slider {
+      background: $success;
+
+      &::before {
+        transform: translateX(24px);
+      }
+    }
+  }
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: $gray-medium;
+  border-radius: $radius-full;
+  transition: $transition-base;
+
+  &::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background: $white;
+    border-radius: $radius-full;
+    transition: $transition-base;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .profil-page {
+    padding: $spacing-lg;
+  }
+
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

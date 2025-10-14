@@ -1,0 +1,583 @@
+// src/app/features/landing/landing.component.scss
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.landing-page {
+  margin-top: 80px;
+}
+
+// Animation fade-in
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Hero Section
+.hero {
+  position: relative;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, lighten($primary-dark, 5%) 0%, $primary-dark 100%);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba($primary-yellow, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba($primary-yellow, 0.08) 0%, transparent 50%);
+  }
+}
+
+.hero-container {
+  @include container;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-3xl;
+  padding-top: $spacing-3xl;
+  padding-bottom: $spacing-3xl;
+  position: relative;
+  z-index: 1;
+
+  @include responsive(lg) {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+  }
+}
+
+.hero-content {
+  color: $white;
+}
+
+.hero-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+
+  @include responsive(lg) {
+    font-size: $font-size-5xl;
+  }
+
+  .highlight {
+    display: block;
+    color: $primary-yellow;
+    margin-top: $spacing-sm;
+  }
+}
+
+.hero-description {
+  font-size: $font-size-lg;
+  line-height: 1.7;
+  color: rgba($white, 0.9);
+  margin-bottom: $spacing-2xl;
+  max-width: 600px;
+
+  @include responsive(md) {
+    font-size: $font-size-xl;
+  }
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-3xl;
+}
+
+.btn-primary,
+.btn-primary-large {
+  @include button-primary;
+  
+  svg {
+    transition: transform $transition-base;
+  }
+
+  &:hover svg {
+    transform: rotate(90deg);
+  }
+}
+
+.btn-primary-large {
+  padding: $spacing-lg $spacing-2xl;
+  font-size: $font-size-lg;
+}
+
+.btn-secondary,
+.btn-secondary-large {
+  @include button-base;
+  background: transparent;
+  color: $white;
+  border: 2px solid rgba($white, 0.3);
+
+  &:hover:not(:disabled) {
+    background: rgba($white, 0.1);
+    border-color: $white;
+  }
+}
+
+.btn-secondary-large {
+  padding: $spacing-lg $spacing-2xl;
+  font-size: $font-size-lg;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  text-align: center;
+
+  @include responsive(lg) {
+    text-align: left;
+  }
+}
+
+.stat-value {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $primary-yellow;
+  line-height: 1;
+  margin-bottom: $spacing-xs;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.stat-label {
+  font-size: $font-size-sm;
+  color: rgba($white, 0.7);
+}
+
+.hero-image {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-decoration {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle, rgba($primary-yellow, 0.15) 0%, transparent 70%);
+  filter: blur(60px);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.hero-svg {
+  width: 100%;
+  max-width: 400px;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+// Section Styles
+.services-section,
+.how-it-works,
+.testimonials-section {
+  @include section-spacing;
+}
+
+.section-container {
+  @include container;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: $spacing-3xl;
+}
+
+.section-title {
+  @include heading-primary;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-md;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.section-subtitle {
+  font-size: $font-size-lg;
+  color: $gray-dark;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+// Services Grid
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.service-card {
+  @include card;
+  text-align: center;
+}
+
+.service-icon {
+  font-size: 4rem;
+  margin-bottom: $spacing-lg;
+}
+
+.service-title {
+  font-family: $font-heading;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin-bottom: $spacing-md;
+}
+
+.service-description {
+  color: $gray-dark;
+  line-height: 1.6;
+  margin-bottom: $spacing-lg;
+}
+
+.service-footer {
+  @include flex-between;
+  padding-top: $spacing-lg;
+  border-top: 2px solid $gray-light;
+}
+
+.service-price {
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+}
+
+.service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  color: $primary-dark;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  transition: gap $transition-fast;
+
+  &:hover {
+    gap: $spacing-sm;
+  }
+}
+
+// How It Works
+.how-it-works {
+  background: $gray-light;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.step-card {
+  @include card;
+  text-align: center;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-8px);
+  }
+}
+
+.step-number {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  @include flex-center;
+  background: $primary-yellow;
+  color: $primary-dark;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-lg;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $primary-yellow;
+    color: $primary-dark;
+    transform: translateY(-3px);
+  }
+}
+
+.footer-title {
+  font-family: $font-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-lg;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: $spacing-sm;
+  }
+
+  a {
+    color: rgba($white, 0.8);
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.footer-bottom {
+  @include flex-between;
+  padding-top: $spacing-xl;
+  border-top: 1px solid rgba($white, 0.1);
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  font-size: $font-size-sm;
+  color: rgba($white, 0.7);
+
+  @include responsive(md) {
+    flex-wrap: nowrap;
+  }
+}
+
+.footer-legal {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+
+  a {
+    color: rgba($white, 0.7);
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $white;
+    }
+  }
+
+  span {
+    color: rgba($white, 0.3);
+  }
+} 
+
+.step-icon {
+  font-size: 3rem;
+  margin: $spacing-lg 0;
+}
+
+.step-title {
+  font-family: $font-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin-bottom: $spacing-sm;
+}
+
+.step-description {
+  color: $gray-dark;
+  line-height: 1.6;
+}
+
+// Testimonials
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.testimonial-card {
+  @include card;
+}
+
+.testimonial-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  @include flex-center;
+  background: $primary-dark;
+  color: $primary-yellow;
+  font-weight: $font-weight-bold;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.testimonial-name {
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin-bottom: $spacing-xs;
+}
+
+.testimonial-company {
+  font-size: $font-size-sm;
+  color: $gray-medium;
+}
+
+.testimonial-rating {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+
+  svg {
+    color: $gray-light;
+
+    &.filled {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.testimonial-comment {
+  color: $gray-dark;
+  line-height: 1.7;
+  font-style: italic;
+}
+
+// CTA Section
+.cta-section {
+  @include section-spacing;
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
+}
+
+.cta-container {
+  @include container;
+  text-align: center;
+  color: $white;
+}
+
+.cta-title {
+  @include heading-primary;
+  color: $white;
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-lg;
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.cta-description {
+  font-size: $font-size-lg;
+  color: rgba($white, 0.9);
+  margin-bottom: $spacing-2xl;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  justify-content: center;
+}
+
+// Footer
+.footer {
+  background: $primary-dark;
+  color: $white;
+  padding: $spacing-3xl 0 $spacing-xl;
+}
+
+.footer-container {
+  @include container;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-2xl;
+  margin-bottom: $spacing-3xl;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  font-family: $font-heading;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-lg;
+}
+
+.footer-description {
+  color: rgba($white, 0.8);
+  line-height: 1.7;
+  margin-bottom: $spacing-lg;
+}
+
+.social-links {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  @include flex-center;
+  background: rgba($white, 0.1);
+  color: $white;
+}
