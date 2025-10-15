@@ -3,7 +3,7 @@
 @import '../../../../styles/mixins';
 
 .auth-page {
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,14 +12,11 @@
 }
 
 .auth-container {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
   max-width: 1200px;
-  width: 100%;
-  gap: $spacing-3xl;
-
   @include responsive(lg) {
-    grid-template-columns: 1fr 1fr;
     align-items: center;
   }
 }
@@ -27,14 +24,12 @@
 .auth-card {
   background: $white;
   border-radius: $radius-xl;
-  padding: $spacing-2xl;
   box-shadow: $shadow-xl;
-  max-width: 500px;
-  width: 100%;
+  width: 35%;
   margin: 0 auto;
 
   @include responsive(md) {
-    padding: $spacing-3xl;
+    padding: $spacing-xl;
   }
 
   @include responsive(lg) {
@@ -44,12 +39,12 @@
 
 .auth-header {
   text-align: center;
-  margin-bottom: $spacing-3xl;
+  margin-bottom: $spacing-xl;
 }
 
 .logo {
   @include flex-center;
-  margin-bottom: $spacing-lg;
+  margin-bottom: $spacing-sm;
 
   svg {
     filter: drop-shadow(0 4px 12px rgba(14, 7, 52, 0.15));
@@ -285,7 +280,7 @@
   @include button-primary;
   justify-content: center;
   margin-top: $spacing-md;
-  padding: $spacing-lg;
+  padding: $spacing-md;
   font-size: $font-size-base;
 
   @include responsive(md) {
@@ -325,7 +320,7 @@
 .divider {
   position: relative;
   text-align: center;
-  margin: $spacing-xl 0;
+  margin: $spacing-lg 0;
 
   &::before,
   &::after {
@@ -388,7 +383,7 @@
 
 // Footer
 .auth-footer {
-  margin-top: $spacing-2xl;
+  margin-top: $spacing-lg;
   padding-top: $spacing-xl;
   border-top: 2px solid $gray-light;
   text-align: center;

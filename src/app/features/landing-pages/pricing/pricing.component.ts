@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
+import { FooterComponent } from "../../../shared/components/footer/footer.component";
 
 interface PricingTier {
   id: string;
@@ -29,7 +30,7 @@ interface ServicePricing {
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, RouterModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './pricing.component.html',
   styleUrls: ['./pricing.component.scss']
 })

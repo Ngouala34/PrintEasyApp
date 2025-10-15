@@ -242,13 +242,25 @@
 }
 
 .service-card {
-  @include card;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+  transition: all $transition-base;
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+  }
   text-align: center;
+  margin: 0;
+  border-radius: 1rem;
+  box-shadow: 1px;
 }
 
-.service-icon {
-  font-size: 4rem;
-  margin-bottom: $spacing-lg;
+.service-img {
+  height: 300px;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  width: 100%;
 }
 
 .service-title {
@@ -257,18 +269,28 @@
   font-weight: $font-weight-semibold;
   color: $primary-dark;
   margin-bottom: $spacing-md;
+  padding-left: $spacing-xl;
+  padding-right: $spacing-xl;
+
 }
 
 .service-description {
   color: $gray-dark;
   line-height: 1.6;
   margin-bottom: $spacing-lg;
+  padding-left: $spacing-xl;
+  padding-right: $spacing-xl;
 }
 
 .service-footer {
   @include flex-between;
   padding-top: $spacing-lg;
-  border-top: 2px solid $gray-light;
+  border-top: 2px solid $gray-light; 
+  padding-left: $spacing-xl;
+  padding-right: $spacing-xl;
+  padding-bottom: $spacing-xl;
+
+
 }
 
 .service-price {
@@ -277,18 +299,20 @@
 }
 
 .service-link {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  color: $primary-dark;
-  font-weight: $font-weight-semibold;
-  text-decoration: none;
-  transition: gap $transition-fast;
 
-  &:hover {
-    gap: $spacing-sm;
+  @include button-primary;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+
+  svg {
+    transition: transform $transition-base;
+  }
+
+  &:hover svg {
+    transform: translateX(4px);
   }
 }
+
 
 // How It Works
 .how-it-works {
@@ -490,7 +514,9 @@
 
 // CTA Section
 .cta-section {
-  @include section-spacing;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
   background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
 }
 
@@ -581,3 +607,78 @@
   background: rgba($white, 0.1);
   color: $white;
 }
+
+    .hero-illustration {
+      position: relative;
+      height: 600px;
+
+      .floating-card {
+        position: absolute;
+        background: $white;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: float 3s ease-in-out infinite;
+
+        .icon {
+          font-size: 2rem;
+        }
+
+        .text {
+          font-weight: 600;
+          color: #2d3748;
+        }
+
+        &.card-1 {
+          left: 10%;
+          width: 200px;
+          height: 150px;
+          animation-delay: 0s;
+          background-image: url(https://i.pinimg.com/736x/ea/40/7e/ea407e6d7f2af706fe176c50c910f200.jpg);
+          background-repeat: no-repeat;
+          background-size: contain;
+          background-position: center;
+        }
+
+        &.card-2 {
+          top: 35%;
+          right: 10%;
+          width: 220px;
+          height: 150px;
+          animation-delay: 1s;
+          background-image: url(https://i.pinimg.com/1200x/ac/c4/8f/acc48f909bdd3d3fdc294ffcdee37860.jpg);
+          background-repeat: no-repeat;
+          background-size: cover;
+
+        }
+
+        &.card-3 {
+          top: 70%;
+          bottom: 15%;
+          left: 20%;
+          width: 230px;
+          height: 150px;
+          animation-delay: 2s;
+          background-image: url(https://i.pinimg.com/736x/63/76/c1/6376c16c7a4151ac7e02736acd7dd3e8.jpg);
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      }
+    }
+      @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+
+
+
+
+

@@ -2,6 +2,10 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+* {
+  box-sizing: border-box;
+}
+
 .contact-page {
   margin-top: 80px;
 }
@@ -271,6 +275,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
+  
 
   label {
     font-weight: $font-weight-medium;

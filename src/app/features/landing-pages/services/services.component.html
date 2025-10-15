@@ -3,6 +3,14 @@
 <div class="services-page">
   <!-- Hero Section -->
   <section class="hero">
+    <video autoplay muted loop playsinline class="background-video" id="bgVideo">
+      <source src="assets/videos/video2.mp4" type="video/mp4" />
+
+      <!-- Image de secours si la vidéo ne charge pas -->
+      <img src="assets/images/imprimente2.jpg" alt="Image d'arrière-plan" class="video-fallback">
+      Votre navigateur ne supporte pas la lecture de vidéos.
+    </video>
+
     <div class="hero-container">
       <div class="hero-content fade-in">
         <h1 class="hero-title">
@@ -36,7 +44,7 @@
       <div class="services-grid">
         @for (service of services(); track service.id) {
           <article class="service-card fade-in" (click)="selectService(service)">
-            <div class="card-icon">{{ service.icon }}</div>
+            <img class="service-img" [src]="service.image" [alt]="service.title" />
             <h3 class="card-title">{{ service.title }}</h3>
             <p class="card-description">{{ service.description }}</p>
             
@@ -247,3 +255,4 @@
     </div>
   }
 </div>
+<app-footer></app-footer>

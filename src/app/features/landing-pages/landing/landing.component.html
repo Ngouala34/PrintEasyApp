@@ -7,7 +7,7 @@
     <div class="hero-container">
       <div class="hero-content fade-in">
         <h1 class="hero-title">
-          Imprimez Vos Idées
+          Imprimez Vos Fchiers
           <span class="highlight">En Toute Simplicité</span>
         </h1>
         <p class="hero-description">
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="hero-image fade-in">
-        <div class="image-decoration"></div>
+        <!-- <div class="image-decoration"></div>
         <svg viewBox="0 0 400 400" class="hero-svg">
           <rect x="50" y="50" width="300" height="200" rx="12" fill="#0e0734"/>
           <rect x="70" y="70" width="260" height="20" rx="4" fill="#f0e222"/>
@@ -43,10 +43,23 @@
           <rect x="70" y="150" width="200" height="20" rx="4" fill="#f0e222"/>
           <circle cx="200" cy="320" r="30" fill="#f0e222" opacity="0.3"/>
           <circle cx="280" cy="280" r="20" fill="#f0e222" opacity="0.5"/>
-        </svg>
+        </svg> -->
+
+              <div class="hero-image">
+        <div class="hero-illustration">
+          <div class="floating-card card-1">
+          </div>
+          <div class="floating-card card-2">
+          </div>
+          <div class="floating-card card-3">
+          </div>
+        </div>
+      </div>
+
       </div>
     </div>
   </section>
+  
 
   <!-- Services Section -->
   <section id="services" class="services-section">
@@ -60,7 +73,7 @@
       <div class="services-grid">
         @for (service of services(); track service.id) {
           <div class="service-card fade-in">
-            <div class="service-icon">{{ service.icon }}</div>
+            <img [src]="service.image" alt="illustration du service" class="service-img">
             <h3 class="service-title">{{ service.title }}</h3>
             <p class="service-description">{{ service.description }}</p>
             <div class="service-footer">
@@ -75,6 +88,9 @@
           </div>
         }
       </div>
+
+      
+
     </div>
   </section>
 

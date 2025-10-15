@@ -3,6 +3,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from "../../../shared/components/navbar/navbar.component";
+import { FooterComponent } from "../../../shared/components/footer/footer.component";
 
 interface ServiceDetail {
   id: string;
@@ -22,7 +23,7 @@ interface ServiceDetail {
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule, RouterModule, NavbarComponent],
+  imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.scss']
 })
@@ -33,6 +34,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'flyers',
       icon: '📄',
+      image: 'assets/images/Flyers2.jpg',
       title: 'Flyers & Dépliants',
       description: 'Imprimez vos flyers publicitaires et dépliants promotionnels en haute qualité pour vos campagnes marketing.',
       features: [
@@ -56,6 +58,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'business-cards',
       icon: '💼',
+      image: 'assets/images/visitCard2.jpg',
       title: 'Cartes de Visite',
       description: 'Des cartes de visite élégantes et professionnelles qui marquent les esprits et reflètent l\'identité de votre entreprise.',
       features: [
@@ -79,6 +82,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'brochures',
       icon: '📘',
+      image: 'assets/images/brochure2.jpg',
       title: 'Brochures & Catalogues',
       description: 'Présentez votre entreprise, vos produits ou services avec des brochures élégantes et des catalogues professionnels.',
       features: [
@@ -102,6 +106,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'posters',
       icon: '🎨',
+      image: 'assets/images/rollUp3.jpg',
       title: 'Affiches & Posters',
       description: 'Imprimez vos affiches publicitaires en grand format avec une qualité d\'image exceptionnelle.',
       features: [
@@ -125,6 +130,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'binding',
       icon: '📋',
+      image: 'assets/images/railliure2.jpg',
       title: 'Reliure & Finition',
       description: 'Services de reliure professionnelle pour vos documents, rapports, mémoires et présentations.',
       features: [
@@ -148,6 +154,7 @@ export class ServicesComponent implements OnInit {
     {
       id: 'packaging',
       icon: '🎁',
+      image: 'assets/images/packaging2.jpg',
       title: 'Packaging Personnalisé',
       description: 'Créez des emballages sur mesure pour sublimer vos produits et renforcer votre image de marque.',
       features: [
@@ -198,4 +205,14 @@ export class ServicesComponent implements OnInit {
       document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     }, 100);
   }
+
+  ngAfterViewInit() {
+  const video = document.getElementById('bgVideo') as HTMLVideoElement;
+  if (video) {
+    video.muted = true;
+    video.volume = 0; // optionnel, pour être sûr
+    video.play().catch(err => console.log('Autoplay bloqué :', err));
+  }
+}
+
 }

@@ -8,6 +8,7 @@ export const routes: Routes = [
   { path: 'services', loadComponent: () => import('./features/landing-pages/services/services.component').then(m => m.ServicesComponent) },
   { path: 'pricing', loadComponent: () => import('./features/landing-pages/pricing/pricing.component').then(m => m.PricingComponent) },
   { path: 'contact', loadComponent: () => import('./features/landing-pages/contact/contact.component').then(m => m.ContactComponent) },
+  { path: 'about', loadComponent: () => import('./features/landing-pages/about/about.component').then(m => m.AboutComponent) },
 
   // 🔹 Dashboard client (layout + enfants)
   {

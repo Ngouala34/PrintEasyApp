@@ -6,7 +6,7 @@ import { NavbarComponent } from "../../../shared/components/navbar/navbar.compon
 
 interface Service {
   id: number;
-  icon: string;
+  image: string;
   title: string;
   description: string;
   price: string;
@@ -32,52 +32,53 @@ export class LandingComponent implements OnInit {
   services = signal<Service[]>([
     {
       id: 1,
-      icon: '📄',
+      image: 'assets/images/Flyers.jpg',
       title: 'Flyers & Dépliants',
       description: 'Créez des flyers percutants pour vos événements et promotions',
       price: 'À partir de 50 FCFA'
     },
     {
       id: 2,
-      icon: '💼',
+      image: 'assets/images/visitCard.jpg',
       title: 'Cartes de Visite',
       description: 'Des cartes professionnelles qui marquent les esprits',
       price: 'À partir de 5 000 FCFA/100'
     },
     {
       id: 3,
-      icon: '📘',
+      image: 'assets/images/brochure.jpg',
       title: 'Brochures',
       description: 'Présentez votre entreprise avec élégance',
       price: 'À partir de 200 FCFA'
     },
     {
       id: 4,
-      icon: '🎨',
+      image: 'assets/images/rollUp2.jpg',
       title: 'Affiches',
       description: 'Grandes affiches pour un impact maximum',
       price: 'À partir de 1 000 FCFA'
     },
     {
       id: 5,
-      icon: '📋',
+      image: 'assets/images/railliure.jpg',
       title: 'Documents Reliés',
       description: 'Reliure professionnelle pour tous vos documents',
       price: 'À partir de 500 FCFA'
     },
     {
       id: 6,
-      icon: '🎁',
+      image: 'assets/images/packaging.jpg',
       title: 'Packaging Personnalisé',
       description: 'Emballages sur mesure pour vos produits',
       price: 'Sur devis'
     }
   ]);
+  
 
   testimonials = signal<Testimonial[]>([
     {
       id: 1,
-      name: 'Marie Dubois',
+      name: 'Ngouegni Nelly',
       company: 'TechStart SARL',
       comment: 'Service impeccable et livraison rapide. Nos cartes de visite sont magnifiques !',
       rating: 5,
@@ -93,7 +94,7 @@ export class LandingComponent implements OnInit {
     },
     {
       id: 3,
-      name: 'Sophie Martin',
+      name: 'paola jeanne',
       company: 'Design Studio',
       comment: 'Excellent rapport qualité-prix. L\'équipe est très professionnelle.',
       rating: 5,
@@ -133,4 +134,7 @@ export class LandingComponent implements OnInit {
   scrollToServices() {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   }
+
+
+  
 }

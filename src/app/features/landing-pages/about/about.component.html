@@ -1,0 +1,181 @@
+<div class="about-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">À propos de PrintFlow</h1>
+        <p class="hero-subtitle">
+          Nous révolutionnons l'impression en ligne depuis 2020 avec une technologie 
+          de pointe et un service client exceptionnel
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" (click)="navigateToRegister()">
+            <span class="icon">✨</span>
+            Commencer gratuitement
+          </button>
+          <button class="btn btn-secondary" (click)="scrollToSection('mission')">
+            <span class="icon">📖</span>
+            Notre mission
+          </button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-illustration">
+          <div class="floating-card card-1">
+            <span class="icon">🖨️</span>
+            <span class="text">Impression rapide</span>
+          </div>
+          <div class="floating-card card-2">
+            <span class="icon">🔒</span>
+            <span class="text">100% Sécurisé</span>
+          </div>
+          <div class="floating-card card-3">
+            <span class="icon">⚡</span>
+            <span class="text">Service 24/7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats">
+          <div class="stat-icon">{{ getIconEmoji(stat.icon) }}</div>
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="mission-section" id="mission">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Notre Mission</span>
+        <h2 class="section-title">Simplifier l'impression pour tous</h2>
+        <p class="section-description">
+          Notre objectif est de rendre l'impression professionnelle accessible, 
+          rapide et abordable pour tous, des particuliers aux grandes entreprises.
+        </p>
+      </div>
+
+      <div class="mission-content">
+        <div class="mission-card vision">
+          <div class="card-icon">🎯</div>
+          <h3>Notre Vision</h3>
+          <p>
+            Devenir la plateforme d'impression en ligne de référence en offrant 
+            une expérience utilisateur exceptionnelle et des technologies innovantes 
+            qui transforment la façon dont les gens impriment leurs documents.
+          </p>
+        </div>
+
+        <div class="mission-card values">
+          <div class="card-icon">💎</div>
+          <h3>Nos Valeurs</h3>
+          <ul>
+            <li><span class="check">✓</span> Excellence dans tout ce que nous faisons</li>
+            <li><span class="check">✓</span> Innovation continue et amélioration</li>
+            <li><span class="check">✓</span> Transparence totale avec nos clients</li>
+            <li><span class="check">✓</span> Engagement envers la durabilité</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Pourquoi PrintFlow</span>
+        <h2 class="section-title">Ce qui nous distingue</h2>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" *ngFor="let feature of features">
+          <div class="feature-icon">{{ getIconEmoji(feature.icon) }}</div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline Section -->
+  <section class="timeline-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Notre Histoire</span>
+        <h2 class="section-title">Un parcours d'innovation</h2>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item" *ngFor="let item of timeline; let i = index" 
+             [class.left]="i % 2 === 0" [class.right]="i % 2 !== 0">
+          <div class="timeline-content">
+            <div class="timeline-year">{{ item.year }}</div>
+            <h3 class="timeline-title">{{ item.title }}</h3>
+            <p class="timeline-description">{{ item.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Notre Équipe</span>
+        <h2 class="section-title">Les talents derrière PrintFlow</h2>
+        <p class="section-description">
+          Une équipe passionnée et dévouée qui travaille chaque jour pour vous 
+          offrir la meilleure expérience d'impression en ligne
+        </p>
+      </div>
+
+      <div class="team-grid">
+        <div class="team-card" *ngFor="let member of teamMembers">
+          <div class="member-image">
+            <div class="image-placeholder">
+              <span class="avatar-icon">👤</span>
+            </div>
+          </div>
+          <div class="member-info">
+            <h3 class="member-name">{{ member.name }}</h3>
+            <p class="member-role">{{ member.role }}</p>
+            <p class="member-description">{{ member.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Prêt à commencer ?</h2>
+        <p class="cta-description">
+          Rejoignez des milliers d'utilisateurs satisfaits et découvrez 
+          une nouvelle façon d'imprimer vos documents
+        </p>
+        <div class="cta-actions">
+          <button class="btn btn-primary" (click)="navigateToRegister()">
+            <span class="icon">🚀</span>
+            Créer un compte gratuit
+          </button>
+          <button class="btn btn-secondary" (click)="navigateToContact()">
+            <span class="icon">💬</span>
+            Nous contacter
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
