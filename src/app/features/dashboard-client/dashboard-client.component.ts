@@ -13,7 +13,10 @@ import { RouterModule } from '@angular/router';
 export class DashboardClientComponent {
   sidebarCollapsed = signal(false);
   showUserMenu = signal(false);
+  showuSideBarElement = signal(false)
   showNotifications = signal(false);
+  showMenu= false;
+
 
   user = {
     name: 'Jean Kamga',
@@ -26,13 +29,13 @@ export class DashboardClientComponent {
     {
       icon: 'fa-th-large',
       label: 'Tableau de bord',
-      route: '/dashboard-client',
+      route: '/dashboard-client/dashboard',
       exact: true
     },
     {
       icon: 'fa-box',
-      label: 'Mes Commandes',
-      route: '/dashboard-client/commandes',
+      label: 'commandes',
+      route: '/dashboard-client/upload-document',
       badge: 3
     },
     {
@@ -74,6 +77,11 @@ export class DashboardClientComponent {
     this.sidebarCollapsed.update(v => !v);
   }
 
+  togleSideBarElement() : void{
+    this.showuSideBarElement.update(v => !v)
+  }
+  
+
   toggleUserMenu(): void {
     this.showUserMenu.update(v => !v);
     if (this.showNotifications()) {
@@ -92,4 +100,20 @@ export class DashboardClientComponent {
     // Implémenter la déconnexion
     console.log('Déconnexion...');
   }
+
+  get unreadCount(): number {
+  return this.notifications.filter(n => !n.read).length;
+}
+
+showSidebarDropdown = false;
+
+toggleSideMenu() {
+  this.showMenu = !this.showMenu;
+}
+
+closeMenu() {
+  this.showMenu = false;
+}
+
+
 }

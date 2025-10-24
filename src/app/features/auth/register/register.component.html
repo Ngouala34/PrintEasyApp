@@ -63,6 +63,28 @@
           </div>
         </div>
 
+                <!-- Full Name Field -->
+        <div class="form-group">
+          <label for="fullName">
+            Nom complet <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
+              <circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 18a6 6 0 0112 0" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <input 
+              type="text" 
+              id="fullName"
+              [(ngModel)]="fullName"
+              name="fullName"
+              placeholder="Jean Kamga"
+              class="form-input"
+              autocomplete="name"
+              required>
+          </div>
+        </div>
+
         <!-- Email Field -->
         <div class="form-group">
           <label for="email">
@@ -284,7 +306,7 @@
       <div class="auth-footer">
         <p>
           Vous avez déjà un compte ? 
-          <a routerLink="/auth/login" class="link-primary">
+          <a routerLink="/login" class="link-primary">
             Se connecter
           </a>
         </p>

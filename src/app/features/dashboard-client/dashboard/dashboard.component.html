@@ -1,13 +1,12 @@
-<!-- src/app/features/dashboard-client/dashboard/dashboard.component.html -->
 <div class="dashboard-page">
   <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">Tableau de Bord</h1>
-      <p class="page-subtitle">Vue d'ensemble de votre activité</p>
+      <p class="page-subtitle">Vue d'ensemble de votre activité d'impression</p>
     </div>
     <div class="header-actions">
-      <a routerLink="/order" class="btn-primary">
+      <a routerLink="/dashboard-client/upload-document" class="btn-primary">
         <i class="fas fa-plus"></i>
         Nouvelle commande
       </a>
@@ -24,113 +23,267 @@
         <div class="kpi-info">
           <div class="kpi-label">{{ kpi.label }}</div>
           <div class="kpi-value">{{ kpi.value }}</div>
-          @if (kpi.trend) {
-            <div class="kpi-trend">
-              <i class="fas fa-arrow-up"></i>
-              {{ kpi.trend }}
-            </div>
-          }
+
         </div>
       </div>
     }
   </div>
 
-  <!-- Recent Orders Section -->
-  <div class="section-card">
-    <div class="section-header">
-      <div>
-        <h2 class="section-title">
-          <i class="fas fa-box"></i>
-          Commandes Récentes
-        </h2>
-        <p class="section-subtitle">Vos dernières commandes en cours</p>
+  <!-- Two Columns Layout -->
+  <div class="dashboard-grid">
+    <!-- Recent Orders Section -->
+    <div class="section-card main-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">
+            <i class="fas fa-clock"></i>
+            Commandes Récentes
+          </h2>
+          <p class="section-subtitle">Vos dernières commandes en cours de traitement</p>
+        </div>
+        <a routerLink="/dashboard-client/commandes" class="btn-link">
+          Voir tout
+          <i class="fas fa-arrow-right"></i>
+        </a>
       </div>
-      <a routerLink="/dashboard-client/commandes" class="btn-link">
-        Voir tout
-        <i class="fas fa-arrow-right"></i>
-      </a>
+
+      <div class="orders-container">
+        @if (recentOrders().length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>Aucune commande récente</h3>
+            <p>Créez votre première commande d'impression</p>
+            <a routerLink="/dashboard-client/upload-document" class="btn-primary">
+              <i class="fas fa-plus"></i>
+              Nouvelle commande
+            </a>
+          </div>
+        } @else {
+          <div class="orders-list">
+            @for (order of recentOrders(); track order.id) {
+              <div class="order-item" [class.expanded]="expandedOrderId === order.id">
+                <div class="order-summary" (click)="toggleOrderDetails(order.id)">
+                  <div class="order-main-info">
+                    <div class="order-number">
+                      <i class="fas fa-file-alt"></i>
+                      {{ order.orderNumber }}
+                    </div>
+                    <div class="order-service">
+                      <span class="service-name">{{ order.service }}</span>
+                      <span class="service-details">{{ order.format }} • {{ order.quantity }} ex.</span>
+                    </div>
+                  </div>
+                  
+                  <div class="order-meta">
+                    <div class="order-status" 
+                         [style.background]="getStatusInfo(order.status).color + '20'" 
+                         [style.color]="getStatusInfo(order.status).color">
+                      <i [class]="'fas ' + getStatusInfo(order.status).icon"></i>
+                      {{ getStatusInfo(order.status).label }}
+                    </div>
+                    <div class="order-total">
+                      <strong>{{ order.total | number:'1.0-0' }} FCFA</strong>
+                    </div>
+                    <div class="expand-icon">
+                      <i class="fas" 
+                         [class.fa-chevron-down]="expandedOrderId !== order.id" 
+                         [class.fa-chevron-up]="expandedOrderId === order.id"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Order Details (Expandable) -->
+                @if (expandedOrderId === order.id) {
+                  <div class="order-details">
+                    <div class="details-grid">
+                      <div class="detail-group">
+                        <h4>Informations du document</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Type de document:</span>
+                          <span class="detail-value">{{ order.documentType }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Format:</span>
+                          <span class="detail-value">{{ order.format }}</span>
+                        </div>
+                        @if (order.customDimensions) {
+                          <div class="detail-item">
+                            <span class="detail-label">Dimensions:</span>
+                            <span class="detail-value">{{ order.customDimensions.width }} × {{ order.customDimensions.height }} cm</span>
+                          </div>
+                        }
+                        <div class="detail-item">
+                          <span class="detail-label">Impression:</span>
+                          <span class="detail-value">{{ order.sides === 'double' ? 'Recto-verso' : 'Recto simple' }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Couleur:</span>
+                          <span class="detail-value">{{ order.color === 'color' ? 'Couleur' : 'Noir & Blanc' }}</span>
+                        </div>
+                      </div>
+
+                      <div class="detail-group">
+                        <h4>Configuration</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Support:</span>
+                          <span class="detail-value">{{ order.paperType }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Quantité:</span>
+                          <span class="detail-value">{{ order.quantity }} exemplaires</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Fichiers:</span>
+                          <span class="detail-value">{{ order.fileCount }} fichier(s)</span>
+                        </div>
+                        @if (order.additionalNotes) {
+                          <div class="detail-item full-width">
+                            <span class="detail-label">Instructions:</span>
+                            <span class="detail-value notes">{{ order.additionalNotes }}</span>
+                          </div>
+                        }
+                      </div>
+
+                      <div class="detail-group">
+                        <h4>Livraison & Paiement</h4>
+                        <div class="detail-item">
+                          <span class="detail-label">Mode de récupération:</span>
+                          <span class="detail-value">{{ order.deliveryType === 'pickup' ? 'Retrait en magasin' : 'Livraison à domicile' }}</span>
+                        </div>
+                        @if (order.deliveryType === 'delivery') {
+                          <div class="detail-item">
+                            <span class="detail-label">Adresse:</span>
+                            <span class="detail-value">{{ order.deliveryAddress }}</span>
+                          </div>
+                        }
+                        <div class="detail-item">
+                          <span class="detail-label">Date de commande:</span>
+                          <span class="detail-value">{{ order.date | date:'dd/MM/yyyy à HH:mm' }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Estimation livraison:</span>
+                          <span class="detail-value">{{ order.estimatedDelivery | date:'dd/MM/yyyy' }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="order-actions">
+                      <button class="btn-outline" (click)="downloadFiles(order)">
+                        <i class="fas fa-download"></i>
+                        Télécharger les fichiers
+                      </button>
+                      <button class="btn-primary" (click)="contactSupport(order)">
+                        <i class="fas fa-headset"></i>
+                        Contacter le support
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
     </div>
 
-    <div class="orders-list">
-      @for (order of recentOrders(); track order.id) {
-        <div class="order-item">
-          <div class="order-header">
-            <div class="order-number">
-              <i class="fas fa-file-alt"></i>
-              {{ order.orderNumber }}
-            </div>
-            <div class="order-status" [style.background]="getStatusInfo(order.status).color + '20'" [style.color]="getStatusInfo(order.status).color">
-              <i [class]="'fas ' + getStatusInfo(order.status).icon"></i>
-              {{ getStatusInfo(order.status).label }}
-            </div>
+    <!-- Sidebar Sections -->
+    <div class="sidebar-sections">
+      <!-- Quick Stats -->
+      <div class="section-card stats-card">
+        <h3 class="section-title">
+          <i class="fas fa-chart-bar"></i>
+          Statistiques du mois
+        </h3>
+        <div class="stats-list">
+          <div class="stat-item">
+            <div class="stat-value">{{ monthlyStats().totalOrders }}</div>
+            <div class="stat-label">Commandes</div>
           </div>
-
-          <div class="order-body">
-            <div class="order-detail">
-              <span class="detail-label">
-                <i class="fas fa-print"></i>
-                Service
-              </span>
-              <span class="detail-value">{{ order.service }}</span>
-            </div>
-            <div class="order-detail">
-              <span class="detail-label">
-                <i class="fas fa-calculator"></i>
-                Quantité
-              </span>
-              <span class="detail-value">{{ order.quantity }} exemplaires</span>
-            </div>
-            <div class="order-detail">
-              <span class="detail-label">
-                <i class="fas fa-calendar-alt"></i>
-                Date
-              </span>
-              <span class="detail-value">{{ order.date | date:'dd/MM/yyyy' }}</span>
-            </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ monthlyStats().totalPages | number:'1.0-0' }}</div>
+            <div class="stat-label">Pages imprimées</div>
           </div>
-
-          <div class="order-footer">
-            <div class="order-total">
-              <span>Total</span>
-              <strong>{{ order.total | number:'1.0-0' }} FCFA</strong>
-            </div>
-            <button class="btn-details">
-              <i class="fas fa-eye"></i>
-              Détails
-            </button>
+          <div class="stat-item">
+            <div class="stat-value">{{ monthlyStats().savings | number:'1.0-0' }} FCFA</div>
+            <div class="stat-label">Économies</div>
           </div>
         </div>
-      }
+      </div>
+
+      <!-- Progress Tracking -->
+      <div class="section-card progress-card">
+        <h3 class="section-title">
+          <i class="fas fa-tasks"></i>
+          Suivi en temps réel
+        </h3>
+        <div class="progress-list">
+          @for (progress of currentProgress(); track progress.orderNumber) {
+            <div class="progress-item">
+              <div class="progress-info">
+                <div class="progress-order">{{ progress.orderNumber }}</div>
+                <div class="progress-service">{{ progress.service }}</div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="progress.percentage"></div>
+              </div>
+              <div class="progress-percentage">{{ progress.percentage }}%</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-card actions-card">
+        <h3 class="section-title">
+          <i class="fas fa-bolt"></i>
+          Actions Rapides
+        </h3>
+        <div class="quick-actions-list">
+          <a routerLink="/dashboard-client/upload-document" class="quick-action">
+            <i class="fas fa-print"></i>
+            <span>Nouvelle impression</span>
+          </a>
+          <a routerLink="/dashboard-client/historique" class="quick-action">
+            <i class="fas fa-history"></i>
+            <span>Historique complet</span>
+          </a>
+          <a routerLink="/dashboard-client/discussion" class="quick-action">
+            <i class="fas fa-comments"></i>
+            <span>Support en ligne</span>
+          </a>
+          <button class="quick-action" (click)="trackDelivery()">
+            <i class="fas fa-truck"></i>
+            <span>Suivi livraison</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <h2 class="section-title">
-      <i class="fas fa-bolt"></i>
-      Actions Rapides
-    </h2>
-    <div class="actions-grid">
-      <a routerLink="/order" class="action-card">
-        <i class="fas fa-plus-circle"></i>
-        <h3>Nouvelle Commande</h3>
-        <p>Créer une nouvelle impression</p>
-      </a>
-      <a routerLink="/dashboard-client/historique" class="action-card">
-        <i class="fas fa-history"></i>
-        <h3>Historique</h3>
-        <p>Consulter vos anciennes commandes</p>
-      </a>
-      <a routerLink="/dashboard-client/discussion" class="action-card">
-        <i class="fas fa-comments"></i>
-        <h3>Support</h3>
-        <p>Contacter le service client</p>
-      </a>
-      <a routerLink="/dashboard-client/aide" class="action-card">
-        <i class="fas fa-question-circle"></i>
-        <h3>Aide</h3>
-        <p>Consulter la documentation</p>
-      </a>
+  <!-- Promotions Section -->
+  <div class="section-card promotions-card">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">
+          <i class="fas fa-tag"></i>
+          Promotions en cours
+        </h2>
+        <p class="section-subtitle">Profitez de nos offres spéciales</p>
+      </div>
+    </div>
+    <div class="promotions-grid">
+      @for (promo of currentPromotions(); track promo.id) {
+        <div class="promo-card" [style.background]="promo.color + '10'">
+          <div class="promo-badge" [style.background]="promo.color">
+            {{ promo.discount }}
+          </div>
+          <div class="promo-content">
+            <h4>{{ promo.title }}</h4>
+            <p>{{ promo.description }}</p>
+            <span class="promo-period">Valable jusqu'au {{ promo.validUntil | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>

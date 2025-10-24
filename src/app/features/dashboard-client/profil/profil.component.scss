@@ -249,6 +249,7 @@
 
 .form-input {
   @include input-base;
+  box-sizing: border-box;
 
   &:disabled {
     background: $gray-light;

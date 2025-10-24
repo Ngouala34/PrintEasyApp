@@ -3,12 +3,7 @@
   <!-- Top Navbar -->
   <nav class="navbar">
     <div class="navbar-left">
-      <button class="menu-toggle" (click)="toggleSidebar()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-      
+
       <a routerLink="/" class="brand">
         <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
           <rect width="40" height="40" rx="8" fill="#f0e222"/>
@@ -16,17 +11,17 @@
           <path d="M12 20h16v4H12z" fill="#0e0734"/>
           <path d="M12 28h10v4H12z" fill="#0e0734"/>
         </svg>
-        <span class="brand-text">PrintPro</span>
+        <span class="brand-text">PrintEasy</span>
       </a>
     </div>
 
     <div class="navbar-right">
       <!-- Quick Actions -->
-      <a routerLink="/order" class="btn-new-order">
+      <a routerLink="/dashboard-client/upload-document" class="btn-new-order">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <span>Nouvelle commande</span>
+        <span>Nouvelle impréssion</span>
       </a>
 
       <!-- Notifications -->
@@ -35,9 +30,10 @@
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9zM13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          <!-- @if (notifications.filter(n => !n.read).length > 0) {
-            <span class="badge">{{ notifications.filter(n => !n.read).length }}</span>
-          } -->
+          @if (unreadCount > 0) {
+            <span class="badge">{{ unreadCount }}</span>
+          }
+
         </button>
 
         @if (showNotifications()) {
@@ -113,37 +109,74 @@
           </div>
         }
       </div>
+
+ <!-- Bouton menu burger -->
+      <div class="sideBarMenu">
+        <button class="menu-toggle" (click)="toggleSideMenu()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- 🌟 Menu déroulant -->
+        <div class="side-menu" [class.open]="showMenu">
+          <nav class="menu-items">
+            @for (item of menuItems; track item.route) {
+              <a 
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: item.exact || false}"
+                class="menu-item"
+                (click)="closeMenu()">
+                <span class="icon">
+                  <i [class]="'fa-solid ' + item.icon"></i>
+                </span>
+                <span class="label">{{ item.label }}</span>
+                @if (item.badge) {
+                  <span class="badge">{{ item.badge }}</span>
+                }
+              </a>
+            }
+          </nav>
+        </div>
+      </div>
+
     </div>
   </nav>
 
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+
+    <div class="sidebar-footer">
+      <button class="collapse-btn" (click)="toggleSidebar()">
+        <i 
+          class="fa-solid fa-chevron-left" 
+          [class.rotated]="sidebarCollapsed()">
+        </i>
+      </button>
+    </div>    
     <nav class="sidebar-nav">
       @for (item of menuItems; track item.route) {
-        <a 
+        <div 
           [routerLink]="item.route"
           [routerLinkActiveOptions]="{exact: item.exact || false}"
           routerLinkActive="active"
           class="nav-item">
           <span class="nav-icon">
-            <i [class]="'fas ' + item.icon"></i>
+            <i [class]="'fa-solid ' + item.icon"></i>
           </span>
           <span class="nav-label">{{ item.label }}</span>
           @if (item.badge) {
             <span class="nav-badge">{{ item.badge }}</span>
           }
-        </a>
+        </div>
       }
     </nav>
 
-    <div class="sidebar-footer">
-      <button class="collapse-btn" (click)="toggleSidebar()">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" [class.rotated]="sidebarCollapsed()">
-          <path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <span class="collapse-text">Réduire</span>
-      </button>
-    </div>
+
   </aside>
 
   <!-- Main Content -->

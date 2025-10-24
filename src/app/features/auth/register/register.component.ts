@@ -170,6 +170,6 @@ export class RegisterComponent {
    * Navigate to login page
    */
   goToLogin(): void {
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 }

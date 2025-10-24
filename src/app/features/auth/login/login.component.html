@@ -104,6 +104,7 @@
 
         <!-- Submit Button -->
         <button 
+          routerLink="/dashboard-client/dashboard/"
           type="submit" 
           class="btn-submit" 
           [disabled]="isLoading()">
@@ -141,7 +142,7 @@
       <div class="auth-footer">
         <p>
           Vous n'avez pas de compte ? 
-          <a routerLink="/auth/register" class="link-primary">
+          <a routerLink="/register" class="link-primary">
             Créer un compte gratuitement
           </a>
         </p>

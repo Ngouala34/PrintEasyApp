@@ -9,6 +9,7 @@ export const routes: Routes = [
   { path: 'pricing', loadComponent: () => import('./features/landing-pages/pricing/pricing.component').then(m => m.PricingComponent) },
   { path: 'contact', loadComponent: () => import('./features/landing-pages/contact/contact.component').then(m => m.ContactComponent) },
   { path: 'about', loadComponent: () => import('./features/landing-pages/about/about.component').then(m => m.AboutComponent) },
+    
 
   // 🔹 Dashboard client (layout + enfants)
   {
@@ -22,6 +23,8 @@ export const routes: Routes = [
       { path: 'profil', loadComponent: () => import('./features/dashboard-client/profil/profil.component').then(m => m.ProfilComponent) },
       { path: 'aide', loadComponent: () => import('./features/dashboard-client/aide/aide.component').then(m => m.AideComponent)},
       { path: 'discussion', loadComponent: () => import('./features/dashboard-client/discussion/discussion.component').then(m => m.DiscussionComponent) },
+      { path: 'upload-document', loadComponent: () => import('./features/dashboard-client/upload-document/upload-document.component').then(m => m.UploadDocumentComponent) },
+
     ]
   },
 ];

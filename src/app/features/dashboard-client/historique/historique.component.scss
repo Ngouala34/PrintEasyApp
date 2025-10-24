@@ -80,12 +80,16 @@
   background: $white;
   border-radius: $radius-xl;
   box-shadow: $shadow-sm;
+  box-sizing: border-box;
+
 }
 
 .search-box {
   position: relative;
   flex: 1;
   min-width: 250px;
+  box-sizing: border-box;
+
 
   i {
     position: absolute;
@@ -94,6 +98,8 @@
     transform: translateY(-50%);
     color: $gray-medium;
     pointer-events: none;
+    box-sizing: border-box;
+
   }
 }
 
@@ -101,12 +107,16 @@
   @include input-base;
   padding-left: 3rem;
   width: 100%;
+  box-sizing: border-box;
+
 }
 
 .filter-group {
   display: flex;
   gap: $spacing-md;
   flex-wrap: wrap;
+  box-sizing: border-box;
+
 }
 
 .filter-select {
@@ -118,6 +128,9 @@
   background-position: right $spacing-md center;
   padding-right: 3rem;
   appearance: none;
+  box-sizing: border-box;
+
+  
 }
 
 // Table

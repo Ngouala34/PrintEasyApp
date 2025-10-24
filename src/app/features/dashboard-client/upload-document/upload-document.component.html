@@ -1,0 +1,538 @@
+<div class="upload-document-container">
+  <div class="page-header">
+    <h1 class="page-title">Nouvelle commande d'impression</h1>
+    <p class="page-subtitle">Configurez votre impression en quelques étapes simples</p>
+  </div>
+
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="order-form">
+    
+    <!-- ÉTAPE 1: Choix du type de document -->
+    <section class="form-section">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <div>
+          <h2 class="section-title">Choisissez le type de document</h2>
+          <p class="section-description">Sélectionnez le type de document que vous souhaitez imprimer</p>
+        </div>
+      </div>
+
+      <div class="document-types-grid">
+        <div 
+          *ngFor="let docType of documentTypes"
+          class="doc-type-card"
+          [class.selected]="selectedDocType === docType.id"
+          (click)="selectDocumentType(docType.id)"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Sélectionner ' + docType.name"
+          (keypress)="$event.key === 'Enter' && selectDocumentType(docType.id)">
+          <div class="doc-image">
+            <img [src]="docType.image" [alt]="docType.name" />
+          </div>
+          <p class="doc-name">{{ docType.name }}</p>
+        </div>
+      </div>
+
+      <div class="validation-message error" *ngIf="orderForm.get('documentType')?.invalid && orderForm.get('documentType')?.touched">
+        <i class="fas fa-exclamation-circle"></i>
+        Veuillez sélectionner un type de document
+      </div>
+    </section>
+
+    <!-- ÉTAPE 2: Upload du document -->
+    <section class="form-section" *ngIf="selectedDocType">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <div>
+          <h2 class="section-title">Téléchargez votre document</h2>
+          <p class="section-description">Glissez-déposez vos fichiers ou parcourez votre appareil</p>
+        </div>
+      </div>
+
+      <div 
+        class="upload-zone"
+        [class.drag-over]="isDragOver"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        
+        <div class="upload-content">
+          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+          <h3 class="upload-title">Glissez-déposez vos fichiers ici</h3>
+          <p class="upload-text">ou</p>
+          <label for="fileInput" class="upload-btn">
+            <i class="fas fa-folder-open"></i>
+            Parcourir les fichiers
+          </label>
+          <input 
+            type="file" 
+            id="fileInput" 
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            (change)="onFileSelected($event)"
+            style="display: none;">
+          <p class="upload-info">
+            <i class="fas fa-info-circle"></i>
+            Formats acceptés: PDF, JPG, PNG, DOC, DOCX (max 50 MB par fichier)
+          </p>
+        </div>
+      </div>
+
+      <!-- Liste des fichiers uploadés -->
+      <div class="uploaded-files" *ngIf="uploadedFiles.length > 0">
+        <h3 class="files-title">
+          <i class="fas fa-check-circle"></i>
+          Fichiers téléchargés ({{ uploadedFiles.length }})
+        </h3>
+        <div class="files-list">
+          <div *ngFor="let file of uploadedFiles; let i = index" class="file-item">
+            <div class="file-icon">
+              <i class="fas fa-file-pdf" *ngIf="file.file.type === 'application/pdf'"></i>
+              <i class="fas fa-file-image" *ngIf="file.file.type.startsWith('image/')"></i>
+              <i class="fas fa-file-word" *ngIf="file.file.type.includes('word')"></i>
+              <i class="fas fa-file" *ngIf="!file.file.type.startsWith('image/') && file.file.type !== 'application/pdf' && !file.file.type.includes('word')"></i>
+            </div>
+            <div class="file-info">
+              <p class="file-name">{{ file.name }}</p>
+              <p class="file-size">{{ file.size }}</p>
+            </div>
+            <button 
+              type="button" 
+              class="file-remove"
+              (click)="removeFile(i)"
+              aria-label="Supprimer le fichier">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÉTAPE 3: Configuration de l'impression -->
+    <section class="form-section" *ngIf="uploadedFiles.length > 0">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <div>
+          <h2 class="section-title">Configuration de l'impression</h2>
+          <p class="section-description">Personnalisez les détails de votre impression</p>
+        </div>
+      </div>
+
+      <div class="config-grid">
+        
+        <!-- Format -->
+        <div class="form-group">
+          <label for="format" class="form-label">
+            <i class="fas fa-ruler-combined"></i>
+            Format <span class="required">*</span>
+          </label>
+          <select 
+            id="format" 
+            formControlName="format" 
+            class="form-control"
+            [class.invalid]="orderForm.get('format')?.invalid && orderForm.get('format')?.touched">
+            <option value="">Sélectionner un format</option>
+            <option *ngFor="let format of formats" [value]="format.value">
+              {{ format.label }}
+            </option>
+          </select>
+          <div class="validation-message error" *ngIf="orderForm.get('format')?.invalid && orderForm.get('format')?.touched">
+            <i class="fas fa-exclamation-circle"></i>
+            Veuillez sélectionner un format
+          </div>
+        </div>
+
+        <!-- Dimensions personnalisées (si Autre sélectionné) -->
+        <div class="custom-dimensions" *ngIf="isCustomFormat">
+          <div class="form-group">
+            <label for="customLength" class="form-label">
+              <i class="fas fa-arrows-alt-h"></i>
+              Longueur (cm) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="customLength" 
+              formControlName="customLength" 
+              class="form-control"
+              placeholder="Ex: 30"
+              min="1"
+              max="500"
+              [class.invalid]="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              La longueur doit être entre 1 et 500 cm
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="customWidth" class="form-label">
+              <i class="fas fa-arrows-alt-v"></i>
+              Largeur (cm) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="customWidth" 
+              formControlName="customWidth" 
+              class="form-control"
+              placeholder="Ex: 20"
+              min="1"
+              max="500"
+              [class.invalid]="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              La largeur doit être entre 1 et 500 cm
+            </div>
+          </div>
+        </div>
+
+        <!-- Recto / Recto-verso -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-clone"></i>
+            Impression <span class="required">*</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option" [class.selected]="orderForm.get('sides')?.value === 'single'">
+              <input type="radio" value="single" formControlName="sides">
+              <div class="radio-content">
+                <i class="fas fa-file"></i>
+                <span>Recto simple</span>
+              </div>
+            </label>
+            <label class="radio-option" [class.selected]="orderForm.get('sides')?.value === 'double'">
+              <input type="radio" value="double" formControlName="sides">
+              <div class="radio-content">
+                <i class="fas fa-copy"></i>
+                <span>Recto-Verso</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+                <!-- Support -->
+        <div class="form-group full-width">
+          <label for="support" class="form-label">
+            <i class="fas fa-file-invoice"></i>
+            Support d'impression <span class="required">*</span>
+          </label>
+          <select 
+            id="support" 
+            formControlName="support" 
+            class="form-control"
+            [class.invalid]="orderForm.get('support')?.invalid && orderForm.get('support')?.touched">
+            <option value="">Sélectionner un support</option>
+            <option *ngFor="let paper of paperSupports" [value]="paper.id">
+              {{ paper.name }} - {{ paper.description }}
+            </option>
+          </select>
+          <div class="validation-message error" *ngIf="orderForm.get('support')?.invalid && orderForm.get('support')?.touched">
+            <i class="fas fa-exclamation-circle"></i>
+            Veuillez sélectionner un support d'impression
+          </div>
+        </div>
+
+        <!-- Couleur -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-palette"></i>
+            Couleur <span class="required">*</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option" [class.selected]="orderForm.get('color')?.value === 'bw'">
+              <input type="radio" value="bw" formControlName="color">
+              <div class="radio-content">
+                <i class="fas fa-adjust"></i>
+                <span>Noir & Blanc</span>
+              </div>
+            </label>
+            <label class="radio-option" [class.selected]="orderForm.get('color')?.value === 'color'">
+              <input type="radio" value="color" formControlName="color">
+              <div class="radio-content">
+                <i class="fas fa-fill-drip"></i>
+                <span>Couleur</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+
+
+        <!-- Nombre d'exemplaires -->
+        <div class="form-group">
+          <label for="quantity" class="form-label">
+            <i class="fas fa-hashtag"></i>
+            Nombre d'exemplaires <span class="required">*</span>
+          </label>
+          <div class="quantity-control">
+            <button 
+              type="button" 
+              class="qty-btn"
+              (click)="decrementQuantity()"
+              [disabled]="orderForm.get('quantity')?.value <= 1"
+              aria-label="Diminuer la quantité">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input 
+              type="number" 
+              id="quantity" 
+              formControlName="quantity" 
+              class="qty-input"
+              min="1"
+              max="10000"
+              (input)="onQuantityInput($event)"
+              (blur)="validateQuantity()">
+            <button 
+              type="button" 
+              class="qty-btn"
+              (click)="incrementQuantity()"
+              aria-label="Augmenter la quantité">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <div class="validation-message error" *ngIf="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
+            <i class="fas fa-exclamation-circle"></i>
+            La quantité doit être entre 1 et 10 000
+          </div>
+          <p class="quantity-hint" *ngIf="orderForm.get('quantity')?.value >= 20 && orderForm.get('quantity')?.valid">
+            <i class="fas fa-tag"></i>
+            Réduction applicable à partir de 20 exemplaires !
+          </p>
+        </div>
+
+        <!-- Instructions supplémentaires -->
+        <div class="form-group full-width">
+          <label for="additionalNotes" class="form-label">
+            <i class="fas fa-sticky-note"></i>
+            Instructions supplémentaires
+          </label>
+          <textarea 
+            id="additionalNotes" 
+            formControlName="additionalNotes" 
+            class="form-control textarea"
+            placeholder="Ex: Impression avec reliure spirale, découpe spécifique, zone d'impression particulière..."
+            rows="4"
+            maxlength="500"></textarea>
+          <div class="textarea-counter">
+            {{ orderForm.get('additionalNotes')?.value?.length || 0 }}/500 caractères
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ÉTAPE 4: Livraison -->
+    <section class="form-section" *ngIf="orderForm.get('support')?.value && orderForm.get('support')?.valid">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <div>
+          <h2 class="section-title">Mode de récupération</h2>
+          <p class="section-description">Choisissez comment vous souhaitez récupérer votre commande</p>
+        </div>
+      </div>
+
+      <div class="delivery-options">
+        <label class="delivery-card" [class.selected]="orderForm.get('deliveryType')?.value === 'pickup'">
+          <input type="radio" value="pickup" formControlName="deliveryType">
+          <div class="delivery-content">
+            <i class="fas fa-store delivery-icon"></i>
+            <h3 class="delivery-name">Retrait en magasin</h3>
+            <p class="delivery-desc">Gratuit - Disponible sous 24-48h</p>
+          </div>
+        </label>
+
+        <label class="delivery-card" [class.selected]="orderForm.get('deliveryType')?.value === 'delivery'">
+          <input type="radio" value="delivery" formControlName="deliveryType">
+          <div class="delivery-content">
+            <i class="fas fa-truck delivery-icon"></i>
+            <h3 class="delivery-name">Livraison à domicile</h3>
+            <p class="delivery-desc">2 000 FCFA - Livraison sous 2-3 jours</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Informations de livraison -->
+      <div class="delivery-details" *ngIf="isDelivery">
+        <h3 class="details-title">
+          <i class="fas fa-map-marker-alt"></i>
+          Informations de livraison
+        </h3>
+        <div class="delivery-grid">
+          <div class="form-group">
+            <label for="city" class="form-label">
+              Ville <span class="required">*</span>
+            </label>
+            <select 
+              id="city" 
+              formControlName="city" 
+              class="form-control"
+              [class.invalid]="orderForm.get('city')?.invalid && orderForm.get('city')?.touched">
+              <option value="">Sélectionner une ville</option>
+              <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+            </select>
+            <div class="validation-message error" *ngIf="orderForm.get('city')?.invalid && orderForm.get('city')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez sélectionner une ville
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="neighborhood" class="form-label">
+              Quartier <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="neighborhood" 
+              formControlName="neighborhood" 
+              class="form-control"
+              placeholder="Ex: Bastos"
+              [class.invalid]="orderForm.get('neighborhood')?.invalid && orderForm.get('neighborhood')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('neighborhood')?.invalid && orderForm.get('neighborhood')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez saisir votre quartier
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="address" class="form-label">
+              Adresse précise <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="address" 
+              formControlName="address" 
+              class="form-control"
+              placeholder="Ex: Rue des fleurs, après le carrefour..."
+              [class.invalid]="orderForm.get('address')?.invalid && orderForm.get('address')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('address')?.invalid && orderForm.get('address')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              Veuillez saisir votre adresse
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="form-label">
+              Numéro de téléphone <span class="required">*</span>
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              formControlName="phone" 
+              class="form-control"
+              placeholder="6XXXXXXXX (9 chiffres)"
+              maxlength="9"
+              [class.invalid]="orderForm.get('phone')?.invalid && orderForm.get('phone')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('phone')?.invalid && orderForm.get('phone')?.touched">
+              <i class="fas fa-exclamation-circle"></i>
+              Format: 6XXXXXXXX (9 chiffres)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Récapitulatif et prix -->
+    <section class="summary-section" *ngIf="orderForm.get('deliveryType')?.value && orderForm.get('deliveryType')?.valid">
+      <div class="summary-card">
+        <h2 class="summary-title">
+          <i class="fas fa-receipt"></i>
+          Récapitulatif de votre commande
+        </h2>
+
+        <div class="summary-details">
+          <div class="summary-row">
+            <span class="label">Type de document:</span>
+            <span class="value">{{ getDocumentTypeName() }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Nombre de fichiers:</span>
+            <span class="value">{{ uploadedFiles.length }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Format:</span>
+            <span class="value">
+              <span *ngIf="!isCustomFormat">{{ getFormatLabel() }}</span>
+              <span *ngIf="isCustomFormat">
+                {{ orderForm.get('customLength')?.value }} × {{ orderForm.get('customWidth')?.value }} cm
+              </span>
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Impression:</span>
+            <span class="value">
+              {{ orderForm.get('sides')?.value === 'single' ? 'Recto simple' : 'Recto-Verso' }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Couleur:</span>
+            <span class="value">
+              {{ orderForm.get('color')?.value === 'color' ? 'Couleur' : 'Noir & Blanc' }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Support:</span>
+            <span class="value">{{ getPaperSupportName() }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Quantité:</span>
+            <span class="value">{{ orderForm.get('quantity')?.value }} exemplaires</span>
+          </div>
+          <div class="summary-row" *ngIf="orderForm.get('additionalNotes')?.value">
+            <span class="label">Instructions:</span>
+            <span class="value additional-notes">{{ orderForm.get('additionalNotes')?.value }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Livraison:</span>
+            <span class="value">
+              {{ orderForm.get('deliveryType')?.value === 'pickup' ? 'Retrait en magasin' : 'Livraison à domicile' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="price-section">
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span class="label">Sous-total:</span>
+              <span class="price">{{ basePrice | number:'1.0-0' }} FCFA</span>
+            </div>
+            <div class="price-row" *ngIf="discount > 0">
+              <span class="label">Remise:</span>
+              <span class="price discount">-{{ discount | number:'1.0-0' }} FCFA</span>
+            </div>
+            <div class="price-row" *ngIf="isDelivery">
+              <span class="label">Livraison:</span>
+              <span class="price">2 000 FCFA</span>
+            </div>
+          </div>
+          <div class="price-row total">
+            <span class="label">
+              <i class="fas fa-money-bill-wave"></i>
+              Total à payer
+            </span>
+            <span class="price">{{ totalPrice | number:'1.0-0' }} FCFA</span>
+          </div>
+          <p class="price-info">
+            <i class="fas fa-info-circle"></i>
+            Prix TTC incluant tous les frais
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="orderForm.invalid || uploadedFiles.length === 0 || isSubmitting">
+            <i class="fas fa-paper-plane"></i>
+            {{ isSubmitting ? 'Envoi en cours...' : 'Confirmer la commande' }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="resetForm()">
+            <i class="fas fa-redo"></i>
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </form>
+</div>
