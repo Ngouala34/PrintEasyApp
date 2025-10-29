@@ -933,6 +933,33 @@
 
 }
 
+// CONTENEUR PRINCIPAL
+.testimonials-grid,.how-it-works {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  
+  // Snap scrolling mobile
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 1rem;
+  
+  // Masquer scrollbar
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+// CARTES INDIVIDUELLES
+.testimonial-card {
+  flex: 0 0 300px;      // Ne grandit pas, ne rétrécit pas, largeur de base 300px
+  min-width: 300px;
+  scroll-snap-align: start;
+}
+
 }
 
 @media (max-width: 640px) {
@@ -951,6 +978,16 @@
         }
       }
     }
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    .step-card{
+      padding: 1rem;
+    }
+
+
   }
 
 
@@ -1068,3 +1105,17 @@ svg {
   max-width: 100%;
   height: auto;
 }
+
+
+
+
+@media (max-width: 768px) {
+  .testimonials-section {
+    .testimonials-grid {
+      animation: slide-scroll 20s linear infinite; // défilement plus doux
+    }
+  }
+}
+
+
+
