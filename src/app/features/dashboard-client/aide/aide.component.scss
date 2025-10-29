@@ -1,0 +1,696 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// =============================================================================
+// PAGE D'AIDE - STYLES PRINCIPAUX
+// =============================================================================
+
+.aide-page {
+  padding: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3xl;
+  max-width:95%;
+  margin: 0 auto;
+
+  @include responsive(md) {
+    padding: $spacing-3xl;
+  }
+}
+
+// =============================================================================
+// EN-TÊTE DE PAGE
+// =============================================================================
+
+.page-header {
+  text-align: center;
+  .header-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.page-title {
+  @include heading-primary;
+  font-size: $font-size-3xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  color: $primary-dark;
+
+  i {
+    color: $primary-yellow;
+    font-size: $font-size-2xl;
+  }
+
+  @include responsive(md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+.page-subtitle {
+  font-size: $font-size-lg;
+  color: $gray-dark;
+  line-height: 1.6;
+}
+
+
+// =============================================================================
+// SECTION CATÉGORIES
+// =============================================================================
+
+.categories-section {
+  .section-title {
+    @include heading-primary;
+    font-size: $font-size-2xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    i {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.category-card {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-md;
+  margin-top: $spacing-lg;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: all $transition-base;
+  border: 2px solid transparent;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: $primary-yellow;
+    background: lighten($primary-yellow, 47%);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+}
+
+.category-icon {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto $spacing-lg;
+  background: linear-gradient(135deg, $primary-yellow 0%, darken($primary-yellow, 10%) 100%);
+  border-radius: $radius-full;
+  color: $primary-dark;
+  font-size: $font-size-2xl;
+}
+
+.category-card h3 {
+  font-family: $font-heading;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin-bottom: $spacing-sm;
+}
+
+.category-card p {
+  font-size: $font-size-sm;
+  color: $gray-dark;
+  line-height: 1.5;
+  margin-bottom: $spacing-lg;
+}
+
+.category-meta {
+  @include flex-between;
+  align-items: center;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-light;
+
+  span {
+    font-size: $font-size-sm;
+    color: $gray-medium;
+    font-weight: $font-weight-medium;
+  }
+
+  i {
+    color: $primary-yellow;
+    transition: transform $transition-fast;
+  }
+}
+
+.category-card:hover .category-meta i {
+  transform: translateX(4px);
+}
+
+// =============================================================================
+// SECTION FAQ
+// =============================================================================
+
+.faq-section {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $spacing-2xl;
+  box-shadow: $shadow-sm;
+}
+
+.section-header {
+  @include flex-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-2xl;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+
+  .section-title {
+    @include heading-primary;
+    font-size: $font-size-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    i {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.filter-tabs {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  @include button-base;
+  padding: $spacing-sm $spacing-lg;
+  background: $gray-light;
+  color: $gray-dark;
+  border: 2px solid transparent;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: lighten($primary-yellow, 45%);
+    color: $primary-dark;
+  }
+
+  &.active {
+    background: $primary-yellow;
+    color: $primary-dark;
+    font-weight: $font-weight-semibold;
+    box-shadow: $shadow-yellow;
+  }
+}
+
+// =============================================================================
+// LISTE FAQ
+// =============================================================================
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.faq-item {
+  background: $gray-light;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    background: lighten($primary-yellow, 47%);
+  }
+
+  &.expanded {
+    background: $white;
+    box-shadow: $shadow-md;
+    border: 2px solid $primary-yellow;
+  }
+}
+
+.faq-question {
+  @include flex-between;
+  align-items: center;
+  padding: $spacing-xl;
+  cursor: pointer;
+  gap: $spacing-lg;
+
+  &:hover {
+    .question-content h3 {
+      color: $primary-dark;
+    }
+  }
+}
+
+.question-content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+
+  i {
+    color: $primary-yellow;
+    font-size: $font-size-lg;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $primary-dark;
+    margin: 0;
+    transition: color $transition-fast;
+    line-height: 1.4;
+  }
+}
+
+.toggle-icon {
+  color: $gray-medium;
+  font-size: $font-size-sm;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.faq-item.expanded .toggle-icon {
+  transform: rotate(180deg);
+  color: $primary-yellow;
+}
+
+.faq-answer {
+  padding: 0 $spacing-xl $spacing-xl;
+  animation: slideDown 0.3s ease-out;
+
+  p {
+    margin: 0;
+    color: $gray-dark;
+    line-height: 1.6;
+    font-size: $font-size-base;
+    padding-left: calc(24px + #{$spacing-md}); // Alignement avec l'icône
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// =============================================================================
+// ÉTAT VIDE
+// =============================================================================
+
+.empty-state {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $gray-medium;
+
+  i {
+    font-size: 4rem;
+    margin-bottom: $spacing-lg;
+    color: $gray-light;
+  }
+
+  h3 {
+    font-size: $font-size-xl;
+    margin-bottom: $spacing-sm;
+    color: $gray-dark;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-base;
+  }
+}
+
+// =============================================================================
+// SECTION SUPPORT
+// =============================================================================
+
+.support-section {
+  padding: $spacing-xl 0;
+}
+
+.support-card {
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-3xl;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2xl;
+  color: $white;
+  box-shadow: $shadow-xl;
+
+  @include responsive(md) {
+    padding: $spacing-3xl $spacing-2xl;
+  }
+}
+
+.support-icon {
+  @include flex-center;
+  width: 100px;
+  height: 100px;
+  background: rgba($white, 0.1);
+  border-radius: $radius-full;
+  flex-shrink: 0;
+
+  i {
+    font-size: $font-size-3xl;
+    color: $primary-yellow;
+  }
+
+  @include responsive(md) {
+    width: 120px;
+    height: 120px;
+
+    i {
+      font-size: $font-size-4xl;
+    }
+  }
+}
+
+.support-content {
+  flex: 1;
+
+  h2 {
+    font-family: $font-heading;
+    font-size: $font-size-2xl;
+    margin-bottom: $spacing-md;
+    color: $white;
+
+    @include responsive(md) {
+      font-size: $font-size-3xl;
+    }
+  }
+
+  p {
+    font-size: $font-size-lg;
+    color: rgba($white, 0.8);
+    margin-bottom: $spacing-2xl;
+    line-height: 1.5;
+  }
+}
+
+.support-actions {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.btn-support {
+  @include button-base;
+  padding: $spacing-md $spacing-xl;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-weight: $font-weight-semibold;
+
+  i {
+    font-size: $font-size-base;
+  }
+
+  // Bouton principal
+  &:not(.secondary) {
+    background: $primary-yellow;
+    color: $primary-dark;
+
+    &:hover {
+      background: darken($primary-yellow, 8%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-yellow;
+    }
+  }
+
+  // Bouton secondaire
+  &.secondary {
+    background: rgba($white, 0.1);
+    color: $white;
+    border: 2px solid rgba($white, 0.3);
+
+    &:hover {
+      background: rgba($white, 0.2);
+      border-color: rgba($white, 0.5);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// =============================================================================
+// LIENS RAPIDES
+// =============================================================================
+
+.quick-links-section {
+  .section-title {
+    @include heading-primary;
+    font-size: $font-size-2xl;
+    margin-bottom: $spacing-2xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    i {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $white;
+  border-radius: $radius-lg;
+  text-decoration: none;
+  color: $primary-dark;
+  transition: all $transition-base;
+  border: 2px solid transparent;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+    border-color: $primary-yellow;
+    background: lighten($primary-yellow, 47%);
+
+    .fa-external-link-alt {
+      transform: translateX(2px) translateY(-2px);
+    }
+  }
+
+  i:first-child {
+    color: $primary-yellow;
+    font-size: $font-size-lg;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+  }
+
+  span {
+    flex: 1;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+  }
+
+  .fa-external-link-alt {
+    color: $gray-medium;
+    font-size: $font-size-sm;
+    transition: transform $transition-fast;
+    flex-shrink: 0;
+  }
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN
+// =============================================================================
+
+@media (max-width: $breakpoint-md) {
+  .aide-page {
+    padding: $spacing-lg;
+    gap: $spacing-2xl;
+  }
+
+  .page-header {
+    padding: $spacing-xl 0;
+  }
+
+  .page-title {
+    font-size: $font-size-2xl;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    .filter-tabs {
+      justify-content: center;
+    }
+  }
+
+  .support-card {
+    flex-direction: column;
+    text-align: center;
+    padding: $spacing-2xl;
+  }
+
+  .support-icon {
+    width: 80px;
+    height: 80px;
+
+    i {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  .support-actions {
+    justify-content: center;
+
+    .btn-support {
+      flex: 1;
+      min-width: 160px;
+      justify-content: center;
+    }
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .faq-question {
+    padding: $spacing-lg;
+  }
+
+  .question-content {
+    gap: $spacing-sm;
+
+    h3 {
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .filter-tabs {
+    justify-content: stretch;
+
+    .filter-tab {
+      flex: 1;
+      text-align: center;
+      font-size: $font-size-xs;
+      padding: $spacing-sm $spacing-md;
+    }
+  }
+
+  .support-actions {
+    flex-direction: column;
+
+    .btn-support {
+      width: 100%;
+    }
+  }
+
+  .quick-links-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// =============================================================================
+// ANIMATIONS ET ÉTATS SPÉCIAUX
+// =============================================================================
+
+// Focus states pour l'accessibilité
+.search-input:focus,
+.filter-tab:focus,
+.faq-question:focus,
+.quick-link:focus,
+.btn-support:focus {
+  outline: 2px solid $primary-yellow;
+  outline-offset: 2px;
+}
+
+// Animation de pulse pour les cartes au survol
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba($primary-yellow, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba($primary-yellow, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($primary-yellow, 0);
+  }
+}
+
+.category-card:focus,
+.faq-item:focus {
+  animation: pulse-glow 1s;
+}
+
+// Transition pour les changements de contenu
+.faq-list,
+.categories-grid,
+.quick-links-grid {
+  transition: all $transition-base;
+}
+
+// États de chargement (pour future implémentation)
+.loading-state {
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid $gray-light;
+    border-top: 3px solid $primary-yellow;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

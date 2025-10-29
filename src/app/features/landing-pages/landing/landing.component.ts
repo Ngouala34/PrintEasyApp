@@ -136,5 +136,12 @@ export class LandingComponent implements OnInit {
   }
 
 
-  
+  ngAfterViewInit() {
+  const video = document.getElementById('bgVideo') as HTMLVideoElement;
+  if (video) {
+    video.muted = true;
+    video.volume = 0; // optionnel, pour être sûr
+    video.play().catch(err => console.log('Autoplay bloqué :', err));
+  }
+}
 }

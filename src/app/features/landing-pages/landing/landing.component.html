@@ -4,6 +4,15 @@
 <div class="landing-page">
   <!-- Hero Section -->
   <section class="hero">
+
+
+    <video autoplay muted loop playsinline class="background-video" id="bgVideo">
+      <source src="assets/videos/video2.mp4" type="video/mp4" />
+
+      <!-- Image de secours si la vidéo ne charge pas -->
+      <img src="assets/images/imprimente2.jpg" alt="Image d'arrière-plan" class="video-fallback">
+      Votre navigateur ne supporte pas la lecture de vidéos.
+    </video>
     <div class="hero-container">
       <div class="hero-content fade-in">
         <h1 class="hero-title">
@@ -19,7 +28,7 @@
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M10 5v10M5 10h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Commander Maintenant
+                Importer un fichier
           </a>
           <button (click)="scrollToServices()" class="btn-secondary">
             Découvrir nos Services
@@ -35,27 +44,16 @@
         </div>
       </div>
       <div class="hero-image fade-in">
-        <!-- <div class="image-decoration"></div>
-        <svg viewBox="0 0 400 400" class="hero-svg">
-          <rect x="50" y="50" width="300" height="200" rx="12" fill="#0e0734"/>
-          <rect x="70" y="70" width="260" height="20" rx="4" fill="#f0e222"/>
-          <rect x="70" y="110" width="260" height="20" rx="4" fill="#f0e222"/>
-          <rect x="70" y="150" width="200" height="20" rx="4" fill="#f0e222"/>
-          <circle cx="200" cy="320" r="30" fill="#f0e222" opacity="0.3"/>
-          <circle cx="280" cy="280" r="20" fill="#f0e222" opacity="0.5"/>
-        </svg> -->
-
-              <div class="hero-image">
-        <div class="hero-illustration">
-          <div class="floating-card card-1">
-          </div>
-          <div class="floating-card card-2">
-          </div>
-          <div class="floating-card card-3">
+        <div class="hero-image">
+          <div class="hero-illustration">
+            <div class="floating-card card-1">
+            </div>
+            <div class="floating-card card-2">
+            </div>
+            <div class="floating-card card-3">
+            </div>
           </div>
         </div>
-      </div>
-
       </div>
     </div>
   </section>

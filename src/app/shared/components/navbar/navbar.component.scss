@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   background: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem;
   transition: all 0.3s ease;
   z-index: 1000;
   box-shadow: none;
@@ -40,7 +40,6 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-
   .nav-link {
     text-decoration: none;
     color: #333;
@@ -122,6 +121,7 @@
   cursor: pointer;
   padding: 0;
 
+
   span {
     height: 3px;
     width: 100%;
@@ -156,11 +156,11 @@
     flex-direction: column;
     background: white;
     width: 200px;
-    padding: 1rem;
-    border-radius: 8px;
+    padding: 2rem;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: none;
-
     &.open {
       display: flex;
     }
