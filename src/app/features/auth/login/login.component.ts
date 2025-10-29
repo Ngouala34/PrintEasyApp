@@ -60,9 +60,6 @@ export class LoginComponent {
     // Start loading
     this.isLoading.set(true);
 
-    // Simulate API call (replace with actual AuthService call)
-    setTimeout(() => {
-      // TODO: Replace with actual authentication logic
       // this.authService.login(this.email, this.password).subscribe({
       //   next: (response) => {
       //     localStorage.setItem('token', response.token);
@@ -75,17 +72,9 @@ export class LoginComponent {
       //   }
       // });
 
-      // Simulation
-      if (this.email === 'test@example.com' && this.password === 'password') {
-        // Success - redirect to dashboard
-        this.router.navigate(['/dashboard']);
-      } else {
-        // Error
-        this.errorMessage.set('Email ou mot de passe incorrect');
-      }
+
       
       this.isLoading.set(false);
-    }, 1500);
   }
 
   /**

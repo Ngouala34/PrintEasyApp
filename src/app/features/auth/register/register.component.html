@@ -41,10 +41,10 @@
           </div>
         }
 
-        <!-- Full Name Field -->
+        <!-- first_name -->
         <div class="form-group">
-          <label for="fullName">
-            Nom complet <span class="required">*</span>
+          <label for="first_name">
+            Prénom <span class="required">*</span>
           </label>
           <div class="input-wrapper">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
@@ -54,19 +54,19 @@
             <input 
               type="text" 
               id="fullName"
-              [(ngModel)]="fullName"
-              name="fullName"
-              placeholder="Jean Kamga"
+              [(ngModel)]="first_name"
+              name="first_name"
+              placeholder="ou votre Entreprise"
               class="form-input"
               autocomplete="name"
               required>
           </div>
         </div>
 
-                <!-- Full Name Field -->
+                <!-- last_name -->
         <div class="form-group">
-          <label for="fullName">
-            Nom complet <span class="required">*</span>
+          <label for="last_name">
+            Nom <span class="required">*</span>
           </label>
           <div class="input-wrapper">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="input-icon">
@@ -76,9 +76,9 @@
             <input 
               type="text" 
               id="fullName"
-              [(ngModel)]="fullName"
-              name="fullName"
-              placeholder="Jean Kamga"
+              [(ngModel)]="last_name"
+              name="last_name"
+              placeholder="Kamga"
               class="form-input"
               autocomplete="name"
               required>
@@ -193,7 +193,7 @@
 
         <!-- Confirm Password Field -->
         <div class="form-group">
-          <label for="confirmPassword">
+          <label for="password_confirm">
             Confirmer le mot de passe <span class="required">*</span>
           </label>
           <div class="password-input">
@@ -204,8 +204,8 @@
             <input 
               [type]="showConfirmPassword() ? 'text' : 'password'"
               id="confirmPassword"
-              [(ngModel)]="confirmPassword"
-              name="confirmPassword"
+              [(ngModel)]="password_confirm"
+              name="password_confirm"
               placeholder="••••••••"
               class="form-input"
               autocomplete="new-password"
@@ -213,7 +213,7 @@
             <button 
               type="button"
               class="toggle-password"
-              (click)="togglePasswordVisibility('confirmPassword')"
+              (click)="togglePasswordVisibility('password_confirm')"
               aria-label="Afficher/Masquer le mot de passe">
               @if (showConfirmPassword()) {
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -230,7 +230,7 @@
             </button>
           </div>
           
-          @if (confirmPassword && password !== confirmPassword) {
+          @if (password_confirm && password !== password_confirm) {
             <p class="field-error">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="2"/>
@@ -238,7 +238,7 @@
               </svg>
               Les mots de passe ne correspondent pas
             </p>
-          } @else if (confirmPassword && password === confirmPassword) {
+          } @else if (password_confirm && password === password_confirm) {
             <p class="field-success">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="2"/>

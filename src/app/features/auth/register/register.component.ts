@@ -3,6 +3,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface PasswordStrength {
   score: number;
@@ -19,11 +20,12 @@ interface PasswordStrength {
 })
 export class RegisterComponent {
   // Form fields
-  fullName = '';
+  first_name = '';
+  last_name = '';
   email = '';
   phone = '';
   password = '';
-  confirmPassword = '';
+  password_confirm = '';
   acceptTerms = false;
   
   // UI State
@@ -38,12 +40,12 @@ export class RegisterComponent {
     color: ''
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService : AuthService) {}
 
   /**
    * Toggle password visibility
    */
-  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+  togglePasswordVisibility(field: 'password' | 'password_confirm'): void {
     if (field === 'password') {
       this.showPassword.update(v => !v);
     } else {
@@ -54,7 +56,7 @@ export class RegisterComponent {
   /**
    * Calculate password strength
    */
-  onPasswordChange(): void {
+  onPasswordChange(): void {  
     const password = this.password;
     let score = 0;
 
@@ -90,14 +92,20 @@ export class RegisterComponent {
     this.errorMessage.set('');
 
     // Check all fields
-    if (!this.fullName || !this.email || !this.phone || !this.password || !this.confirmPassword) {
+    if (!this.first_name ||!this.last_name || !this.email || !this.phone || !this.password || !this.password_confirm) {
       this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
       return false;
     }
 
-    // Validate full name
-    if (this.fullName.trim().length < 3) {
-      this.errorMessage.set('Le nom complet doit contenir au moins 3 caractères');
+    // Validate first_name
+    if (this.first_name.trim().length < 3) {
+      this.errorMessage.set('Le prénom doit contenir au moins 3 caractères');
+      return false;
+    }
+
+        // Validate last_name
+    if (this.last_name.trim().length < 2) {
+      this.errorMessage.set('Le nom doit contenir au moins 2 caractères');
       return false;
     }
 
@@ -127,7 +135,7 @@ export class RegisterComponent {
     }
 
     // Check password match
-    if (this.password !== this.confirmPassword) {
+    if (this.password !== this.password_confirm) {
       this.errorMessage.set('Les mots de passe ne correspondent pas');
       return false;
     }
@@ -141,30 +149,44 @@ export class RegisterComponent {
     return true;
   }
 
-  /**
-   * Handle form submission
-   */
-  onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-
-    // Simulation (replace with AuthService)
-    setTimeout(() => {
-      if (this.email === 'test@example.com') {
-        this.errorMessage.set('Cette adresse email est déjà utilisée');
-        this.isLoading.set(false);
-      } else {
-        this.successMessage.set('Compte créé avec succès ! Redirection vers la connexion...');
-        setTimeout(() => {
-          this.router.navigate(['/auth/login']);
-        }, 2000);
-      }
-    }, 1500);
+onSubmit(): void {
+  if (!this.validateForm()) {
+    return;
   }
+
+  this.isLoading.set(true);
+  this.errorMessage.set('');
+
+  // ✅ Création de l'objet userData à partir des champs du formulaire
+  const userData = {
+    first_name: this.first_name.trim(),
+    last_name: this.last_name.trim(),
+    email: this.email.trim(),
+    phone: this.phone,
+    password: this.password,
+    password_confirm: this.password_confirm
+  };
+
+  this.authService.registerUser(userData).subscribe({
+    next: (response) => {
+      this.isLoading.set(false);
+      this.successMessage.set('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+
+      // ✅ Redirection après 3 secondes
+      setTimeout(() => {
+        this.goToLogin();
+      }, 3000);
+    },
+    error: (error) => {
+      this.isLoading.set(false);
+      this.errorMessage.set(
+        error.error?.message || 'Une erreur est survenue lors de l\'inscription.'
+      );
+    }
+  });
+}
+
 
   /**
    * Navigate to login page

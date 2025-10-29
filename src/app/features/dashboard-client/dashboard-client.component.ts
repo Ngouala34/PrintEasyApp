@@ -36,7 +36,6 @@ export class DashboardClientComponent {
       icon: 'fa-box',
       label: 'commandes',
       route: '/dashboard-client/upload-document',
-      badge: 3
     },
     {
       icon: 'fa-history',
