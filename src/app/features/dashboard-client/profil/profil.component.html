@@ -47,7 +47,7 @@
       <div class="avatar-section">
         <div class="avatar-container">
           @if (profile().avatar) {
-            <img [src]="profile().avatar" alt="Avatar" class="avatar-img">
+            <img [src]="userProfile?.profile_picture" alt="Avatar" class="avatar-img">
           } @else {
             <div class="avatar-placeholder">
               <i class="fas fa-user"></i>
@@ -64,8 +64,8 @@
           </button>
         </div>
         <div class="avatar-info">
-          <h3>{{ profile().fullName }}</h3>
-          <p>{{ profile().email }}</p>
+          <h3>{{ userProfile?.full_name }}</h3>
+          <p>{{ userProfile?.email }}</p>
         </div>
       </div>
 
@@ -80,8 +80,8 @@
       <input 
         type="text" 
         id="fullName"
-        [value]="profile().fullName"
-        (input)="updateProfileField('fullName', $any($event.target).value)"
+        [value]="userProfile?.full_name"
+        (input)="updateProfileField('full_name', $any($event.target).value)"
         [disabled]="!isEditingProfile()"
         class="form-input">
     </div>
@@ -94,7 +94,7 @@
       <input 
         type="email" 
         id="email"
-        [value]="profile().email"
+        [value]="userProfile?.email"
         (input)="updateProfileField('email', $any($event.target).value)"
         [disabled]="!isEditingProfile()"
         class="form-input">
@@ -110,7 +110,7 @@
       <input 
         type="tel" 
         id="phone"
-        [value]="profile().phone"
+        [value]="userProfile?.phone"
         (input)="updateProfileField('phone', $any($event.target).value)"
         [disabled]="!isEditingProfile()"
         class="form-input">

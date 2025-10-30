@@ -154,11 +154,10 @@ onSubmit(): void {
   if (!this.validateForm()) {
     return;
   }
-
   this.isLoading.set(true);
   this.errorMessage.set('');
 
-  // ✅ Création de l'objet userData à partir des champs du formulaire
+  // Création de l'objet userData à partir des champs du formulaire
   const userData = {
     first_name: this.first_name.trim(),
     last_name: this.last_name.trim(),
@@ -169,14 +168,11 @@ onSubmit(): void {
   };
 
   this.authService.registerUser(userData).subscribe({
-    next: (response) => {
+    next: () => {
       this.isLoading.set(false);
       this.successMessage.set('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-
-      // ✅ Redirection après 3 secondes
-      setTimeout(() => {
-        this.goToLogin();
-      }, 3000);
+      this.goToLogin();
+      
     },
     error: (error) => {
       this.isLoading.set(false);

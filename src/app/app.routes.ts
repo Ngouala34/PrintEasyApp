@@ -17,7 +17,7 @@ export const routes: Routes = [
 
   //  Dashboard client (layout + enfants)
   {
-    path: 'dashboard-client',
+    path: 'dashboard-client',canActivate: [AuthGuard],
     loadComponent: () => import('./features/dashboard-client/dashboard-client.component').then(m => m.DashboardClientComponent),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

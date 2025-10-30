@@ -2,9 +2,11 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IUserProfile } from '../../../core/models/user';
+import { UserService } from '../../../core/services/user.service';
 
 interface UserProfile {
-  fullName: string;
+  full_name: string;
   email: string;
   phone: string;
   address: string;
@@ -22,13 +24,15 @@ interface UserProfile {
 })
 export class ProfilComponent implements OnInit {
   profile = signal<UserProfile>({
-    fullName: 'Jean Kamga',
+    full_name: 'Jean Kamga',
     email: 'jean.kamga@email.com',
     phone: '+237 6XX XXX XXX',
     address: 'Rue de la Réunification',
     city: 'Douala',
     company: 'TechStart SARL'
   });
+
+  userProfile? : IUserProfile;
 
   currentPassword = signal('');
   newPassword = signal('');
@@ -42,8 +46,10 @@ export class ProfilComponent implements OnInit {
   errorMessage = signal('');
 
   ngOnInit(): void {
-    // Charger le profil depuis API
+    this.loadUserData();
   }
+
+  constructor(private userService : UserService) {}
 
   updateProfile(): void {
     this.isSavingProfile.set(true);
@@ -119,6 +125,18 @@ export class ProfilComponent implements OnInit {
     ...p,
     [field]: value
   }));
+}
+
+  loadUserData(): void {
+  this.userService.getProfile().subscribe({
+    next: (user) => {
+      this.userProfile = user;
+    },
+    error: (err) => {
+      console.error('Erreur chargement profil :', err);
+      // Optionnel : mettre un user par défaut ou rediriger vers login si 401
+    }
+  });
 }
 
 }

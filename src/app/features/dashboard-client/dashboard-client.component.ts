@@ -1,7 +1,11 @@
 // src/app/features/dashboard-client/dashboard-client-layout.component.ts
-import { Component, signal } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { Service } from '../../core/models/service';
+import { AuthService } from '../../core/services/auth.service';
+import { IUserProfile } from '../../core/models/user';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-dashboard-client',
@@ -16,15 +20,41 @@ export class DashboardClientComponent {
   showuSideBarElement = signal(false)
   showNotifications = signal(false);
   showMenu= false;
+  userProfil? : IUserProfile
 
 
-  user = {
-    name: 'Jean Kamga',
-    email: 'jean.kamga@email.com',
-    avatar: 'JK',
-    role: 'Client'
-  };
+  constructor(private router : Router, private authService : AuthService, private userService : UserService){
 
+  }
+
+  ngOnInit(): void {
+    this.loadUserData();
+    this.checkToken();
+  }
+
+
+
+  checkToken(): void {
+    const accessToken = this.authService.getToken();
+    const refreshToken = this.authService.getRefreshToken();
+
+    if (!accessToken) {
+      console.warn('❌ Aucun access token trouvé !');
+      // Optionnel : rediriger vers login
+      return;
+    }
+
+    if (this.authService.isTokenExpired(accessToken)) {
+      console.warn('⚠️ Le token est expiré !');
+      // Optionnel : tenter un refresh ou rediriger vers login
+      return;
+    }
+
+    console.log('✅ Token présent et valide :', accessToken);
+    console.log('Refresh token :', refreshToken);
+
+
+  }
   menuItems = [
     {
       icon: 'fa-th-large',
@@ -97,8 +127,22 @@ export class DashboardClientComponent {
 
   logout(): void {
     // Implémenter la déconnexion
+    this.authService.logout(),
     console.log('Déconnexion...');
   }
+
+  loadUserData(): void {
+  this.userService.getProfile().subscribe({
+    next: (user) => {
+      this.userProfil = user;
+    },
+    error: (err) => {
+      console.error('Erreur chargement profil :', err);
+      // Optionnel : mettre un user par défaut ou rediriger vers login si 401
+    }
+  });
+}
+
 
   get unreadCount(): number {
   return this.notifications.filter(n => !n.read).length;
@@ -114,5 +158,21 @@ closeMenu() {
   this.showMenu = false;
 }
 
+
+  // ⚡ Méthode magique : détecte tout clic sur le document
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+
+    // Vérifie si le clic est DANS un menu ou un bouton
+    const clickedInsideDropdown = target.closest('.dropdown, .icon-btn, .user-btn, .menu-toggle');
+
+    // Si le clic est en dehors de tout menu/bouton => fermer tout
+    if (!clickedInsideDropdown) {
+      this.showNotifications.set(false);
+      this.showUserMenu.set(false);
+      this.showMenu = false;
+    }
+  }
 
 }

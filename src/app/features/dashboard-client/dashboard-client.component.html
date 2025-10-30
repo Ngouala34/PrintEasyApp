@@ -65,8 +65,17 @@
       <!-- User Menu -->
       <div class="navbar-item">
         <button class="user-btn" (click)="toggleUserMenu()">
-          <div class="user-avatar">{{ user.avatar }}</div>
-          <span class="user-name">{{ user.name }}</span>
+        <span class="user-avatar">
+          <img *ngIf="userProfil?.profile_picture; else showInitials" [src]="userProfil?.profile_picture" />
+        </span>
+
+        <ng-template #showInitials>
+          <span class="user-initials">
+            {{ (userProfil?.first_name?.charAt(0) || '') + (userProfil?.last_name?.charAt(0) || '') }}
+          </span>
+        </ng-template>
+
+          <span class="user-name">{{ userProfil?.first_name }}</span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -76,10 +85,19 @@
           <div class="dropdown user-dropdown">
             <div class="dropdown-header">
               <div class="user-info">
-                <div class="user-avatar-large">{{ user.avatar }}</div>
+              <span class="user-avatar">
+                <img *ngIf="userProfil?.profile_picture; else showInitials" [src]="userProfil?.profile_picture" />
+              </span>
+
+              <ng-template #showInitials>
+                <span class="user-initials">
+                  {{ (userProfil?.first_name?.charAt(0) || '') + (userProfil?.last_name?.charAt(0) || '') }}
+                </span>
+              </ng-template>
+
                 <div>
-                  <div class="user-name-large">{{ user.name }}</div>
-                  <div class="user-email">{{ user.email }}</div>
+                  <div class="user-name-large">{{ userProfil?.full_name }}</div>
+                  <div class="user-email">{{ userProfil?.email }}</div>
                 </div>
               </div>
             </div>
