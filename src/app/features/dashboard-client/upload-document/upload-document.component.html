@@ -73,7 +73,7 @@
             style="display: none;">
           <p class="upload-info">
             <i class="fas fa-info-circle"></i>
-            Formats acceptés: PDF, JPG, PNG, DOC, DOCX (max 50 MB par fichier)
+            Formats acceptés: PDF, JPG, PNG, DOC, DOCX (max 100 MB par fichier)
           </p>
         </div>
       </div>
@@ -160,7 +160,7 @@
               [class.invalid]="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
             <div class="validation-message error" *ngIf="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
               <i class="fas fa-exclamation-circle"></i>
-              La longueur doit être entre 1 et 500 cm
+              La longueur doit être superieure à 1 cm 
             </div>
           </div>
           <div class="form-group">
@@ -179,7 +179,7 @@
               [class.invalid]="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
             <div class="validation-message error" *ngIf="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
               <i class="fas fa-exclamation-circle"></i>
-              La largeur doit être entre 1 et 500 cm
+              La largeur doit être superieure à 1 cm 
             </div>
           </div>
         </div>
@@ -312,7 +312,7 @@
             rows="4"
             maxlength="500"></textarea>
           <div class="textarea-counter">
-            {{ orderForm.get('additionalNotes')?.value?.length || 0 }}/500 caractères
+            {{ orderForm.get('additionalNotes')?.value?.length || 0 }}/700 caractères
           </div>
         </div>
 

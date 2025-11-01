@@ -959,6 +959,10 @@
   min-width: 300px;
   scroll-snap-align: start;
 }
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+  }
 
 }
 
@@ -1064,7 +1068,8 @@
   }
 
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+
   }
 
   .footer-bottom {

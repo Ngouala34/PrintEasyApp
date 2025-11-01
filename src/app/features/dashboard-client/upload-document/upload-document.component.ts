@@ -91,7 +91,7 @@ export class UploadDocumentComponent implements OnInit {
 
   // Villes du Cameroun (principales)
   cities = [
-    'Yaoundé', 'Douala', 'Bafoussam', 'Garoua', 'Maroua', 
+    'Yaoundé', 'Douala', 'Bafoussam','Mbouda', 'Garoua', 'Maroua', 
     'Bamenda', 'Ngaoundéré', 'Bertoua', 'Ebolowa', 'Kribi',
     'Limbé', 'Buéa', 'Kumba', 'Dschang', 'Foumban'
   ];
@@ -113,13 +113,13 @@ export class UploadDocumentComponent implements OnInit {
 
       // Étape 3: Configuration
       format: ['', Validators.required],
-      customLength: [{ value: '', disabled: true }, [Validators.min(1), Validators.max(500)]],
-      customWidth: [{ value: '', disabled: true }, [Validators.min(1), Validators.max(500)]],
+      customLength: [{ value: '', disabled: true }, [Validators.min(1)]],
+      customWidth: [{ value: '', disabled: true }, [Validators.min(1)]],
       sides: ['single', Validators.required],
       color: ['color', Validators.required],
       support: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(1), Validators.max(10000)]],
-      additionalNotes: ['', [Validators.maxLength(500)]],
+      additionalNotes: ['', [Validators.maxLength(700)]],
 
       // Étape 4: Livraison
       deliveryType: ['pickup', Validators.required],
@@ -157,8 +157,8 @@ export class UploadDocumentComponent implements OnInit {
       if (format === 'custom') {
         customLengthControl?.enable();
         customWidthControl?.enable();
-        customLengthControl?.setValidators([Validators.required, Validators.min(1), Validators.max(500)]);
-        customWidthControl?.setValidators([Validators.required, Validators.min(1), Validators.max(500)]);
+        customLengthControl?.setValidators([Validators.required, Validators.min(1)]);
+        customWidthControl?.setValidators([Validators.required, Validators.min(1)]);
       } else {
         customLengthControl?.disable();
         customWidthControl?.disable();
@@ -266,8 +266,8 @@ export class UploadDocumentComponent implements OnInit {
       }
 
       // Validation de la taille (max 50 MB)
-      if (file.size > 50 * 1024 * 1024) {
-        alert(`Fichier trop volumineux: ${file.name}. Taille maximum: 50 MB`);
+      if (file.size > 100 * 1024 * 1024) {
+        alert(`Fichier trop volumineux: ${file.name}. Taille maximum: 100 MB`);
         continue;
       }
 
@@ -359,11 +359,11 @@ export class UploadDocumentComponent implements OnInit {
     let basePrice = 1000; // Prix de base en FCFA
     
     const docType = formValue.documentType;
-    if (docType === 'business-card') basePrice = 500;
-    else if (docType === 'flyer') basePrice = 800;
+    if (docType === 'business-card') basePrice = 50;
+    else if (docType === 'flyer') basePrice = 500;
     else if (docType === 'poster') basePrice = 2500;
-    else if (docType === 'brochure') basePrice = 1500;
-    else if (docType === 'banner') basePrice = 15000;
+    else if (docType === 'brochure') basePrice = 250;
+    else if (docType === 'banner') basePrice = 10000;
     
     // Ajustement selon le format
     const format = formValue.format;

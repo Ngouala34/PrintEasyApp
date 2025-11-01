@@ -28,3 +28,22 @@ export interface IOrderData {
         telephone: string;
     };
 }
+
+
+export interface IPrintOrder {
+  note?: string | null;                    // Optionnel
+  quantity?: number;                       // Défaut: 1
+  number_of_pages?: number;                // Défaut: 1
+  document_type_name: string;              // Obligatoire (minLength: 1)
+  option_format?: string | null;           // Optionnel
+  option_color?: string | null;            // Optionnel
+  option_paper?: string | null;            // Optionnel
+  option_sides?: string | null;            // Optionnel
+  option_delivery?: string | null;         // Optionnel
+  option_finish?: string | null;           // Optionnel
+  option_binding?: string | null;          // Optionnel
+  delivery_city?: string | null;           // Optionnel (maxLength: 100)
+  delivery_neighborhood?: string | null;   // Optionnel (maxLength: 150)
+  delivery_address?: string | null;        // Optionnel (maxLength: 300)
+  delivery_phone?: string | null;          // Optionnel (maxLength: 30)
+}

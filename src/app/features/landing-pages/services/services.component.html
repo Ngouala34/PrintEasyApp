@@ -3,13 +3,15 @@
 <div class="services-page">
   <!-- Hero Section -->
   <section class="hero">
-    <video autoplay muted loop playsinline class="background-video" id="bgVideo">
-      <source src="assets/videos/video2.mp4" type="video/mp4" />
-
-      <!-- Image de secours si la vidéo ne charge pas -->
-      <img src="assets/images/imprimente2.jpg" alt="Image d'arrière-plan" class="video-fallback">
-      Votre navigateur ne supporte pas la lecture de vidéos.
-    </video>
+    <div class="hero-video-container">
+      <video autoplay muted loop playsinline class="background-video" id="bgVideo">
+        <source src="assets/videos/video2.mp4" type="video/mp4" />
+        <!-- Image de secours si la vidéo ne charge pas -->
+        <img src="assets/images/imprimente2.jpg" alt="Image d'arrière-plan" class="video-fallback">
+        Votre navigateur ne supporte pas la lecture de vidéos.
+      </video>
+      <div class="video-overlay"></div>
+    </div>
 
     <div class="hero-container">
       <div class="hero-content fade-in">
@@ -41,38 +43,40 @@
   <!-- Services Grid -->
   <section class="services-section">
     <div class="section-container">
-      <div class="services-grid">
-        @for (service of services(); track service.id) {
-          <article class="service-card fade-in" (click)="selectService(service)">
-            <img class="service-img" [src]="service.image" [alt]="service.title" />
-            <h3 class="card-title">{{ service.title }}</h3>
-            <p class="card-description">{{ service.description }}</p>
-            
-            <ul class="features-list">
-              @for (feature of service.features.slice(0, 3); track feature) {
-                <li>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  {{ feature }}
-                </li>
-              }
-            </ul>
+      <div class="services-scroll-container">
+        <div class="services-grid">
+          @for (service of services(); track service.id) {
+            <article class="service-card fade-in" (click)="selectService(service)">
+              <img class="service-img" [src]="service.image" [alt]="service.title" />
+              <h3 class="card-title">{{ service.title }}</h3>
+              <p class="card-description">{{ service.description }}</p>
+              
+              <ul class="features-list">
+                @for (feature of service.features.slice(0, 3); track feature) {
+                  <li>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ feature }}
+                  </li>
+                }
+              </ul>
 
-            <div class="card-footer">
-              <div class="price-info">
-                <span class="price-label">À partir de</span>
-                <span class="price-value">{{ service.priceFrom | number:'1.0-0' }} FCFA</span>
+              <div class="card-footer">
+                <div class="price-info">
+                  <span class="price-label">À partir de</span>
+                  <span class="price-value">{{ service.priceFrom | number:'1.0-0' }} FCFA</span>
+                </div>
+                <button class="btn-details">
+                  Voir détails
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
               </div>
-              <button class="btn-details">
-                Voir détails
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </div>
-          </article>
-        }
+            </article>
+          }
+        </div>
       </div>
     </div>
   </section>
@@ -254,5 +258,7 @@
       </div>
     </div>
   }
+
+
 </div>
 <app-footer></app-footer>

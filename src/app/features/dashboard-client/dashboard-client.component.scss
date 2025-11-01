@@ -210,6 +210,8 @@
 
 .dropdown-body {
   max-height: 400px;
+  box-sizing: border-box;
+
 }
 
 .dropdown-footer {
@@ -240,10 +242,12 @@
   cursor: pointer;
 
   &:hover {
+  box-sizing: border-box;
     background: $gray-light;
   }
 
   &.unread {
+    background: $gray-light;
     background: lighten($primary-yellow, 47%);
   }
 
@@ -319,6 +323,7 @@
   border: none;
   width: 100%;
   cursor: pointer;
+  box-sizing: border-box;
 
   &:hover {
     background: $gray-light;

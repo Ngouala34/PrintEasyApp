@@ -6,6 +6,10 @@
   margin-top: 80px;
 }
 
+
+*{
+  box-sizing: border-box;
+}
 // Animation fade-in
 .fade-in {
   opacity: 0;
@@ -125,13 +129,13 @@
   background: rgba($white, 0.1);
   color: $white;
   border-radius :8px !important;
-
-
-  
-
 }
 
-
+@media (max-width: 768px) { 
+  .footer-grid{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 
 
