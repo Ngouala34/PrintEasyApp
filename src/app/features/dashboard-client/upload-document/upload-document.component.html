@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div class="validation-message error" *ngIf="orderForm.get('documentType')?.invalid && orderForm.get('documentType')?.touched">
+      <div class="validation-message error" *ngIf="orderForm.get('document_type_name')?.invalid && orderForm.get('document_type_name')?.touched">
         <i class="fas fa-exclamation-circle"></i>
         Veuillez sélectionner un type de document
       </div>
@@ -87,10 +87,10 @@
         <div class="files-list">
           <div *ngFor="let file of uploadedFiles; let i = index" class="file-item">
             <div class="file-icon">
-              <i class="fas fa-file-pdf" *ngIf="file.file.type === 'application/pdf'"></i>
-              <i class="fas fa-file-image" *ngIf="file.file.type.startsWith('image/')"></i>
-              <i class="fas fa-file-word" *ngIf="file.file.type.includes('word')"></i>
-              <i class="fas fa-file" *ngIf="!file.file.type.startsWith('image/') && file.file.type !== 'application/pdf' && !file.file.type.includes('word')"></i>
+              <i class="fas fa-file-pdf" *ngIf="file.document.type === 'application/pdf'"></i>
+              <i class="fas fa-file-image" *ngIf="file.document.type.startsWith('image/')"></i>
+              <i class="fas fa-file-word" *ngIf="file.document.type.includes('word')"></i>
+              <i class="fas fa-file" *ngIf="!file.document.type.startsWith('image/') && file.document.type !== 'application/pdf' && !file.document.type.includes('word')"></i>
             </div>
             <div class="file-info">
               <p class="file-name">{{ file.name }}</p>
@@ -122,21 +122,21 @@
         
         <!-- Format -->
         <div class="form-group">
-          <label for="format" class="form-label">
+          <label for="option_format" class="form-label">
             <i class="fas fa-ruler-combined"></i>
             Format <span class="required">*</span>
           </label>
           <select 
-            id="format" 
-            formControlName="format" 
+            id="option_format" 
+            formControlName="option_format" 
             class="form-control"
-            [class.invalid]="orderForm.get('format')?.invalid && orderForm.get('format')?.touched">
+            [class.invalid]="orderForm.get('option_format')?.invalid && orderForm.get('option_format')?.touched">
             <option value="">Sélectionner un format</option>
             <option *ngFor="let format of formats" [value]="format.value">
               {{ format.label }}
             </option>
           </select>
-          <div class="validation-message error" *ngIf="orderForm.get('format')?.invalid && orderForm.get('format')?.touched">
+          <div class="validation-message error" *ngIf="orderForm.get('option_format')?.invalid && orderForm.get('option_format')?.touched">
             <i class="fas fa-exclamation-circle"></i>
             Veuillez sélectionner un format
           </div>
@@ -160,7 +160,7 @@
               [class.invalid]="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
             <div class="validation-message error" *ngIf="orderForm.get('customLength')?.invalid && orderForm.get('customLength')?.touched">
               <i class="fas fa-exclamation-circle"></i>
-              La longueur doit être superieure à 1 cm 
+              La longueur doit être supérieure à 1 cm 
             </div>
           </div>
           <div class="form-group">
@@ -179,7 +179,7 @@
               [class.invalid]="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
             <div class="validation-message error" *ngIf="orderForm.get('customWidth')?.invalid && orderForm.get('customWidth')?.touched">
               <i class="fas fa-exclamation-circle"></i>
-              La largeur doit être superieure à 1 cm 
+              La largeur doit être supérieure à 1 cm 
             </div>
           </div>
         </div>
@@ -191,15 +191,15 @@
             Impression <span class="required">*</span>
           </label>
           <div class="radio-group">
-            <label class="radio-option" [class.selected]="orderForm.get('sides')?.value === 'single'">
-              <input type="radio" value="single" formControlName="sides">
+            <label class="radio-option" [class.selected]="orderForm.get('option_sides')?.value === 'single'">
+              <input type="radio" value="single" formControlName="option_sides">
               <div class="radio-content">
                 <i class="fas fa-file"></i>
                 <span>Recto simple</span>
               </div>
             </label>
-            <label class="radio-option" [class.selected]="orderForm.get('sides')?.value === 'double'">
-              <input type="radio" value="double" formControlName="sides">
+            <label class="radio-option" [class.selected]="orderForm.get('option_sides')?.value === 'double'">
+              <input type="radio" value="double" formControlName="option_sides">
               <div class="radio-content">
                 <i class="fas fa-copy"></i>
                 <span>Recto-Verso</span>
@@ -208,25 +208,47 @@
           </div>
         </div>
 
-                <!-- Support -->
+        <!-- Support -->
         <div class="form-group full-width">
-          <label for="support" class="form-label">
+          <label for="option_paper" class="form-label">
             <i class="fas fa-file-invoice"></i>
             Support d'impression <span class="required">*</span>
           </label>
           <select 
-            id="support" 
-            formControlName="support" 
+            id="option_paper" 
+            formControlName="option_paper" 
             class="form-control"
-            [class.invalid]="orderForm.get('support')?.invalid && orderForm.get('support')?.touched">
+            [class.invalid]="orderForm.get('option_paper')?.invalid && orderForm.get('option_paper')?.touched">
             <option value="">Sélectionner un support</option>
             <option *ngFor="let paper of paperSupports" [value]="paper.id">
               {{ paper.name }} - {{ paper.description }}
             </option>
           </select>
-          <div class="validation-message error" *ngIf="orderForm.get('support')?.invalid && orderForm.get('support')?.touched">
+          <div class="validation-message error" *ngIf="orderForm.get('option_paper')?.invalid && orderForm.get('option_paper')?.touched">
             <i class="fas fa-exclamation-circle"></i>
             Veuillez sélectionner un support d'impression
+          </div>
+        </div>
+
+        <!-- Reliure -->
+        <div class="form-group full-width">
+          <label for="option_binding" class="form-label">
+            <i class="fas fa-book"></i>
+            Reliure 
+          </label>
+          <select 
+            id="option_binding" 
+            formControlName="option_binding" 
+            class="form-control"
+            [class.invalid]="orderForm.get('option_binding')?.invalid && orderForm.get('option_binding')?.touched">
+            <option value="">Sélectionner un type de reliure</option>
+            <option *ngFor="let binding of paperbinding" [value]="binding.id">
+              {{ binding.name }} - {{ binding.description }}
+            </option>
+          </select>
+          <div class="validation-message error" *ngIf="orderForm.get('option_binding')?.invalid && orderForm.get('option_binding')?.touched">
+            <i class="fas fa-exclamation-circle"></i>
+            Veuillez sélectionner un type de reliure
           </div>
         </div>
 
@@ -237,15 +259,15 @@
             Couleur <span class="required">*</span>
           </label>
           <div class="radio-group">
-            <label class="radio-option" [class.selected]="orderForm.get('color')?.value === 'bw'">
-              <input type="radio" value="bw" formControlName="color">
+            <label class="radio-option" [class.selected]="orderForm.get('option_color')?.value === 'bw'">
+              <input type="radio" value="bw" formControlName="option_color">
               <div class="radio-content">
                 <i class="fas fa-adjust"></i>
                 <span>Noir & Blanc</span>
               </div>
             </label>
-            <label class="radio-option" [class.selected]="orderForm.get('color')?.value === 'color'">
-              <input type="radio" value="color" formControlName="color">
+            <label class="radio-option" [class.selected]="orderForm.get('option_color')?.value === 'color'">
+              <input type="radio" value="color" formControlName="option_color">
               <div class="radio-content">
                 <i class="fas fa-fill-drip"></i>
                 <span>Couleur</span>
@@ -254,11 +276,9 @@
           </div>
         </div>
 
-
-
         <!-- Nombre d'exemplaires -->
         <div class="form-group">
-          <label for="quantity" class="form-label">
+          <label for="number_of_pages" class="form-label">
             <i class="fas fa-hashtag"></i>
             Nombre d'exemplaires <span class="required">*</span>
           </label>
@@ -267,14 +287,14 @@
               type="button" 
               class="qty-btn"
               (click)="decrementQuantity()"
-              [disabled]="orderForm.get('quantity')?.value <= 1"
+              [disabled]="orderForm.get('number_of_pages')?.value <= 1"
               aria-label="Diminuer la quantité">
               <i class="fas fa-minus"></i>
             </button>
             <input 
               type="number" 
-              id="quantity" 
-              formControlName="quantity" 
+              id="number_of_pages" 
+              formControlName="number_of_pages" 
               class="qty-input"
               min="1"
               max="10000"
@@ -288,11 +308,11 @@
               <i class="fas fa-plus"></i>
             </button>
           </div>
-          <div class="validation-message error" *ngIf="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
+          <div class="validation-message error" *ngIf="orderForm.get('number_of_pages')?.invalid && orderForm.get('number_of_pages')?.touched">
             <i class="fas fa-exclamation-circle"></i>
             La quantité doit être entre 1 et 10 000
           </div>
-          <p class="quantity-hint" *ngIf="orderForm.get('quantity')?.value >= 20 && orderForm.get('quantity')?.valid">
+          <p class="quantity-hint" *ngIf="orderForm.get('number_of_pages')?.value >= 20 && orderForm.get('number_of_pages')?.valid">
             <i class="fas fa-tag"></i>
             Réduction applicable à partir de 20 exemplaires !
           </p>
@@ -300,19 +320,19 @@
 
         <!-- Instructions supplémentaires -->
         <div class="form-group full-width">
-          <label for="additionalNotes" class="form-label">
+          <label for="note" class="form-label">
             <i class="fas fa-sticky-note"></i>
             Instructions supplémentaires
           </label>
           <textarea 
-            id="additionalNotes" 
-            formControlName="additionalNotes" 
+            id="note" 
+            formControlName="note" 
             class="form-control textarea"
             placeholder="Ex: Impression avec reliure spirale, découpe spécifique, zone d'impression particulière..."
             rows="4"
             maxlength="500"></textarea>
           <div class="textarea-counter">
-            {{ orderForm.get('additionalNotes')?.value?.length || 0 }}/700 caractères
+            {{ orderForm.get('note')?.value?.length || 0 }}/500 caractères
           </div>
         </div>
 
@@ -320,7 +340,7 @@
     </section>
 
     <!-- ÉTAPE 4: Livraison -->
-    <section class="form-section" *ngIf="orderForm.get('support')?.value && orderForm.get('support')?.valid">
+    <section class="form-section" *ngIf="orderForm.get('option_paper')?.value && orderForm.get('option_paper')?.valid">
       <div class="section-header">
         <div class="section-number">4</div>
         <div>
@@ -330,8 +350,8 @@
       </div>
 
       <div class="delivery-options">
-        <label class="delivery-card" [class.selected]="orderForm.get('deliveryType')?.value === 'pickup'">
-          <input type="radio" value="pickup" formControlName="deliveryType">
+        <label class="delivery-card" [class.selected]="orderForm.get('option_delivery')?.value === 'pickup'">
+          <input type="radio" value="pickup" formControlName="option_delivery">
           <div class="delivery-content">
             <i class="fas fa-store delivery-icon"></i>
             <h3 class="delivery-name">Retrait en magasin</h3>
@@ -339,8 +359,8 @@
           </div>
         </label>
 
-        <label class="delivery-card" [class.selected]="orderForm.get('deliveryType')?.value === 'delivery'">
-          <input type="radio" value="delivery" formControlName="deliveryType">
+        <label class="delivery-card" [class.selected]="orderForm.get('option_delivery')?.value === 'delivery'">
+          <input type="radio" value="delivery" formControlName="option_delivery">
           <div class="delivery-content">
             <i class="fas fa-truck delivery-icon"></i>
             <h3 class="delivery-name">Livraison à domicile</h3>
@@ -357,70 +377,70 @@
         </h3>
         <div class="delivery-grid">
           <div class="form-group">
-            <label for="city" class="form-label">
+            <label for="delivery_city" class="form-label">
               Ville <span class="required">*</span>
             </label>
             <select 
-              id="city" 
-              formControlName="city" 
+              id="delivery_city" 
+              formControlName="delivery_city" 
               class="form-control"
-              [class.invalid]="orderForm.get('city')?.invalid && orderForm.get('city')?.touched">
+              [class.invalid]="orderForm.get('delivery_city')?.invalid && orderForm.get('delivery_city')?.touched">
               <option value="">Sélectionner une ville</option>
               <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
             </select>
-            <div class="validation-message error" *ngIf="orderForm.get('city')?.invalid && orderForm.get('city')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('delivery_city')?.invalid && orderForm.get('delivery_city')?.touched">
               <i class="fas fa-exclamation-circle"></i>
               Veuillez sélectionner une ville
             </div>
           </div>
 
           <div class="form-group">
-            <label for="neighborhood" class="form-label">
+            <label for="delivery_neighborhood" class="form-label">
               Quartier <span class="required">*</span>
             </label>
             <input 
               type="text" 
-              id="neighborhood" 
-              formControlName="neighborhood" 
+              id="delivery_neighborhood" 
+              formControlName="delivery_neighborhood" 
               class="form-control"
               placeholder="Ex: Bastos"
-              [class.invalid]="orderForm.get('neighborhood')?.invalid && orderForm.get('neighborhood')?.touched">
-            <div class="validation-message error" *ngIf="orderForm.get('neighborhood')?.invalid && orderForm.get('neighborhood')?.touched">
+              [class.invalid]="orderForm.get('delivery_neighborhood')?.invalid && orderForm.get('delivery_neighborhood')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('delivery_neighborhood')?.invalid && orderForm.get('delivery_neighborhood')?.touched">
               <i class="fas fa-exclamation-circle"></i>
               Veuillez saisir votre quartier
             </div>
           </div>
 
           <div class="form-group full-width">
-            <label for="address" class="form-label">
+            <label for="delivery_address" class="form-label">
               Adresse précise <span class="required">*</span>
             </label>
             <input 
               type="text" 
-              id="address" 
-              formControlName="address" 
+              id="delivery_address" 
+              formControlName="delivery_address" 
               class="form-control"
               placeholder="Ex: Rue des fleurs, après le carrefour..."
-              [class.invalid]="orderForm.get('address')?.invalid && orderForm.get('address')?.touched">
-            <div class="validation-message error" *ngIf="orderForm.get('address')?.invalid && orderForm.get('address')?.touched">
+              [class.invalid]="orderForm.get('delivery_address')?.invalid && orderForm.get('delivery_address')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('delivery_address')?.invalid && orderForm.get('delivery_address')?.touched">
               <i class="fas fa-exclamation-circle"></i>
               Veuillez saisir votre adresse
             </div>
           </div>
 
           <div class="form-group">
-            <label for="phone" class="form-label">
+            <label for="delivery_phone" class="form-label">
               Numéro de téléphone <span class="required">*</span>
             </label>
             <input 
               type="tel" 
-              id="phone" 
-              formControlName="phone" 
+              id="delivery_phone" 
+              formControlName="delivery_phone" 
               class="form-control"
               placeholder="6XXXXXXXX (9 chiffres)"
               maxlength="9"
-              [class.invalid]="orderForm.get('phone')?.invalid && orderForm.get('phone')?.touched">
-            <div class="validation-message error" *ngIf="orderForm.get('phone')?.invalid && orderForm.get('phone')?.touched">
+              [class.invalid]="orderForm.get('delivery_phone')?.invalid && orderForm.get('delivery_phone')?.touched">
+            <div class="validation-message error" *ngIf="orderForm.get('delivery_phone')?.invalid && orderForm.get('delivery_phone')?.touched">
               <i class="fas fa-exclamation-circle"></i>
               Format: 6XXXXXXXX (9 chiffres)
             </div>
@@ -430,7 +450,7 @@
     </section>
 
     <!-- Récapitulatif et prix -->
-    <section class="summary-section" *ngIf="orderForm.get('deliveryType')?.value && orderForm.get('deliveryType')?.valid">
+    <section class="summary-section" *ngIf="orderForm.get('option_delivery')?.value && orderForm.get('option_delivery')?.valid">
       <div class="summary-card">
         <h2 class="summary-title">
           <i class="fas fa-receipt"></i>
@@ -458,13 +478,13 @@
           <div class="summary-row">
             <span class="label">Impression:</span>
             <span class="value">
-              {{ orderForm.get('sides')?.value === 'single' ? 'Recto simple' : 'Recto-Verso' }}
+              {{ orderForm.get('option_sides')?.value === 'single' ? 'Recto simple' : 'Recto-Verso' }}
             </span>
           </div>
           <div class="summary-row">
             <span class="label">Couleur:</span>
             <span class="value">
-              {{ orderForm.get('color')?.value === 'color' ? 'Couleur' : 'Noir & Blanc' }}
+              {{ orderForm.get('option_color')?.value === 'color' ? 'Couleur' : 'Noir & Blanc' }}
             </span>
           </div>
           <div class="summary-row">
@@ -472,17 +492,29 @@
             <span class="value">{{ getPaperSupportName() }}</span>
           </div>
           <div class="summary-row">
-            <span class="label">Quantité:</span>
-            <span class="value">{{ orderForm.get('quantity')?.value }} exemplaires</span>
+            <span class="label">Reliure:</span>
+            <span class="value">
+              <!-- {{ orderForm.get('option_binding')?.value ? (paperbinding.find(b => b.id === orderForm.get('option_binding')?.value)?.name || 'Aucune') : 'Aucune' }} -->
+            </span>
           </div>
-          <div class="summary-row" *ngIf="orderForm.get('additionalNotes')?.value">
+          <div class="summary-row">
+            <span class="label">Quantité:</span>
+            <span class="value">{{ orderForm.get('number_of_pages')?.value }} exemplaires</span>
+          </div>
+          <div class="summary-row" *ngIf="orderForm.get('note')?.value">
             <span class="label">Instructions:</span>
-            <span class="value additional-notes">{{ orderForm.get('additionalNotes')?.value }}</span>
+            <span class="value additional-notes">{{ orderForm.get('note')?.value }}</span>
           </div>
           <div class="summary-row">
             <span class="label">Livraison:</span>
             <span class="value">
-              {{ orderForm.get('deliveryType')?.value === 'pickup' ? 'Retrait en magasin' : 'Livraison à domicile' }}
+              {{ orderForm.get('option_delivery')?.value === 'pickup' ? 'Retrait en magasin' : 'Livraison à domicile' }}
+            </span>
+          </div>
+          <div class="summary-row" *ngIf="isDelivery">
+            <span class="label">Adresse de livraison:</span>
+            <span class="value">
+              {{ orderForm.get('delivery_city')?.value }}, {{ orderForm.get('delivery_neighborhood')?.value }}, {{ orderForm.get('delivery_address')?.value }}
             </span>
           </div>
         </div>
@@ -491,7 +523,7 @@
           <div class="price-breakdown">
             <div class="price-row">
               <span class="label">Sous-total:</span>
-              <span class="price">{{ basePrice | number:'1.0-0' }} FCFA</span>
+              <span class="price">{{ (basePrice * (orderForm.get('number_of_pages')?.value || 1)) | number:'1.0-0' }} FCFA</span>
             </div>
             <div class="price-row" *ngIf="discount > 0">
               <span class="label">Remise:</span>

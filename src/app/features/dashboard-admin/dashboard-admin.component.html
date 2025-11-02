@@ -1,1 +1,204 @@
-<p>dashboard-admin works!</p>
+<!-- src/app/features/dashboard-client/dashboard-client-layout.component.html -->
+<div class="dashboard-container">
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="navbar-left">
+
+      <a routerLink="/" class="brand">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="8" fill="#f0e222"/>
+          <path d="M12 12h16v4H12z" fill="#0e0734"/>
+          <path d="M12 20h16v4H12z" fill="#0e0734"/>
+          <path d="M12 28h10v4H12z" fill="#0e0734"/>
+        </svg>
+        <span class="brand-text">PrintEasy</span>
+      </a>
+    </div>
+
+    <div class="navbar-right">
+      <!-- Quick Actions -->
+      <a routerLink="/dashboard-client/upload-document" class="btn-new-order">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Nouvelle impréssion</span>
+      </a>
+
+      <!-- Notifications -->
+      <div class="navbar-item">
+        <button class="icon-btn" (click)="toggleNotifications()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9zM13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          @if (unreadCount > 0) {
+            <span class="badge">{{ unreadCount }}</span>
+          }
+
+        </button>
+
+        @if (showNotifications()) {
+          <div class="dropdown notifications-dropdown">
+            <div class="dropdown-header">
+              <h3>Notifications</h3>
+              <!-- <span class="count">{{ notifications.filter(n => !n.read).length }} nouvelles</span> -->
+            </div>
+            <div class="dropdown-body">
+              @for (notif of notifications; track notif.id) {
+                <div class="notification-item" [class.unread]="!notif.read">
+                  <div class="notif-content">
+                    <p>{{ notif.message }}</p>
+                    <span class="notif-time">{{ notif.time }}</span>
+                  </div>
+                  @if (!notif.read) {
+                    <div class="unread-dot"></div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="dropdown-footer">
+              <a routerLink="/dashboard-client/notifications">Voir toutes les notifications</a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- User Menu -->
+      <div class="navbar-item">
+        <button class="user-btn" (click)="toggleUserMenu()">
+        <span class="user-avatar">
+          <img *ngIf="userProfil?.profile_picture; else showInitials" [src]="userProfil?.profile_picture" />
+        </span>
+
+        <ng-template #showInitials>
+          <span class="user-initials">
+            {{ (userProfil?.first_name?.charAt(0) || '') + (userProfil?.last_name?.charAt(0) || '') }}
+          </span>
+        </ng-template>
+
+          <span class="user-name">{{ userProfil?.first_name }}</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        @if (showUserMenu()) {
+          <div class="dropdown user-dropdown">
+            <div class="dropdown-header">
+              <div class="user-info">
+              <span class="user-avatar">
+                <img *ngIf="userProfil?.profile_picture; else showInitials" [src]="userProfil?.profile_picture" />
+              </span>
+
+              <ng-template #showInitials>
+                <span class="user-initials">
+                  {{ (userProfil?.first_name?.charAt(0) || '') + (userProfil?.last_name?.charAt(0) || '') }}
+                </span>
+              </ng-template>
+
+                <div>
+                  <div class="user-name-large">{{ userProfil?.full_name }}</div>
+                  <div class="user-email">{{ userProfil?.email }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-body">
+              <a routerLink="/dashboard-client/profil" class="dropdown-item">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                  <path d="M4 18a6 6 0 0112 0" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Mon Profil
+              </a>
+              <a routerLink="/dashboard-client/aide" class="dropdown-item">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                  <path d="M10 14v.01M10 6v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Aide
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item danger" (click)="logout()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M13 16l4-4-4-4M17 12H9M9 2H7a2 2 0 00-2 2v12a2 2 0 002 2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+ <!-- Bouton menu burger -->
+      <div class="sideBarMenu">
+        <button class="menu-toggle" (click)="toggleSideMenu()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- 🌟 Menu déroulant -->
+        <div class="side-menu" [class.open]="showMenu">
+          <nav class="menu-items">
+            @for (item of menuItems; track item.route) {
+              <a 
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: item.exact || false}"
+                class="menu-item"
+                (click)="closeMenu()">
+                <span class="icon">
+                  <i [class]="'fa-solid ' + item.icon"></i>
+                </span>
+                <span class="label">{{ item.label }}</span>
+                @if (item.badge) {
+                  <span class="badge">{{ item.badge }}</span>
+                }
+              </a>
+            }
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed()">
+
+    <div class="sidebar-footer">
+      <button class="collapse-btn" (click)="toggleSidebar()">
+        <i 
+          class="fa-solid fa-chevron-left" 
+          [class.rotated]="sidebarCollapsed()">
+        </i>
+      </button>
+    </div>    
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+        <div 
+          [routerLink]="item.route"
+          [routerLinkActiveOptions]="{exact: item.exact || false}"
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="nav-icon">
+            <i [class]="'fa-solid ' + item.icon"></i>
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+          @if (item.badge) {
+            <span class="nav-badge">{{ item.badge }}</span>
+          }
+        </div>
+      }
+    </nav>
+
+
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed()">
+    <router-outlet></router-outlet>
+  </main>
+</div>

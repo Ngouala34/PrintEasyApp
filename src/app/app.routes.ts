@@ -4,7 +4,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   //  Landing & Auth
 
-  //canActivate: [AuthGuard]
+  //canActivate: [AuthGuard] 
 
   { path: '', loadComponent: () => import('./features/landing-pages/landing/landing.component').then(m => m.LandingComponent) },
   { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
@@ -17,7 +17,7 @@ export const routes: Routes = [
 
   //  Dashboard client (layout + enfants)
   {
-    path: 'dashboard-client',canActivate: [AuthGuard],
+    path: 'dashboard-client',
     loadComponent: () => import('./features/dashboard-client/dashboard-client.component').then(m => m.DashboardClientComponent),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

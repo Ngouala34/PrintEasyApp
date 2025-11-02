@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { OrderService } from '../../../core/services/order.service';
+import { IOrderData } from '../../../core/models/order';
 
 // Interfaces
 interface DocumentType {
@@ -10,7 +12,7 @@ interface DocumentType {
 }
 
 interface UploadedFile {
-  file: File;
+  document: File;
   name: string;
   size: string;
   preview?: string;
@@ -23,21 +25,22 @@ interface PaperSupport {
 }
 
 interface OrderData {
-  documentType: string;
-  files: UploadedFile[];
-  format: string;
+  note?: string;
+  number_of_pages: number;
+  document_type_name: string;
+  option_format: string;
+  option_color: string;
+  option_paper: string;
+  option_sides: string;
+  option_delivery: string;
+  option_binding: string;
+  delivery_city?: string;
+  delivery_neighborhood?: string;
+  delivery_phone?: string;
   customLength?: number;
   customWidth?: number;
-  sides: string;
-  color: string;
-  support: string;
-  quantity: number;
-  additionalNotes?: string;
-  deliveryType: string;
-  city?: string;
-  neighborhood?: string;
-  address?: string;
-  phone?: string;
+  document: UploadedFile[];
+  delivery_address?: string;
   totalPrice: number;
   basePrice: number;
   discount: number;
@@ -59,14 +62,23 @@ export class UploadDocumentComponent implements OnInit {
   isSubmitting = false;
 
   // Types de documents avec images
-  documentTypes: DocumentType[] = [
-    { id: 'business-card', name: 'Carte de visite', image: 'assets/images/visitCard.jpg' },
-    { id: 'flyer', name: 'Flyer', image: 'assets/images/Flyers.jpg' },
-    { id: 'poster', name: 'Affiche', image: 'assets/images/poster.jpg' },
-    { id: 'brochure', name: 'Brochure', image: 'assets/images/brochure.jpg' },
-    { id: 'document', name: 'Document', image: 'assets/images/document.jpg' },
-    { id: 'banner', name: 'Bannière', image: 'assets/images/rollUp3.jpg' }
-  ];
+// Mettre à jour les types de documents selon l'API
+documentTypes: DocumentType[] = [
+  { id: 'CARTE_DE_VISITE', name: 'Carte de visite', image: 'assets/images/visitCard.jpg' },
+  { id: 'flyer', name: 'Flyer', image: 'assets/images/Flyers.jpg' },
+  { id: 'AFFICHE', name: 'Affiche', image: 'assets/images/poster.jpg' },
+  { id: 'BROCHURE', name: 'Brochure', image: 'assets/images/brochure.jpg' },
+  { id: 'DOCUMENT', name: 'Document', image: 'assets/images/document.jpg' },
+  { id: 'BANNIERE', name: 'Bannière', image: 'assets/images/rollUp3.jpg' }
+];
+
+// Ajouter l'option de finition (option_finish)
+finishOptions = [
+  { id: 'standard', name: 'Finition standard', description: 'Finition normale' },
+  { id: 'glossy', name: 'Brillant', description: 'Finition brillante' },
+  { id: 'matt', name: 'Mat', description: 'Finition mate' },
+  { id: 'laminated', name: 'Plastifié', description: 'Protection plastique' }
+];
 
   // Formats standards
   formats = [
@@ -89,14 +101,25 @@ export class UploadDocumentComponent implements OnInit {
     { id: 'canvas', name: 'Toile canvas', description: 'Pour bannières' }
   ];
 
+  // Types de reliure
+  paperbinding: PaperSupport[] = [
+    { id: 'none', name: 'Aucune', description: 'Pas de reliure' },
+    { id: 'stapled', name: 'Agrafée', description: 'Reliure par agrafes' },
+    { id: 'spiral', name: 'Spirale', description: 'Reliure spirale' },
+    { id: 'perfect', name: 'Dos carré collé', description: 'Reliure professionnelle' }
+  ];
+
   // Villes du Cameroun (principales)
   cities = [
     'Yaoundé', 'Douala', 'Bafoussam','Mbouda', 'Garoua', 'Maroua', 
     'Bamenda', 'Ngaoundéré', 'Bertoua', 'Ebolowa', 'Kribi',
     'Limbé', 'Buéa', 'Kumba', 'Dschang', 'Foumban'
   ];
+  isLoading: any;
+  successMessage: any;
+  errorMessage: any;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private orderService: OrderService) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -104,35 +127,35 @@ export class UploadDocumentComponent implements OnInit {
   }
 
   // Initialisation du formulaire
-  initForm(): void {
-    this.orderForm = this.fb.group({
-      // Étape 1: Type de document
-      documentType: ['', Validators.required],
+initForm(): void {
+  this.orderForm = this.fb.group({
+    // Étape 1: Type de document
+    document_type_name: ['', Validators.required],
 
-      // Étape 2: Fichiers (géré séparément)
+    // Étape 3: Configuration
+    option_format: ['', Validators.required],
+    customLength: [{ value: '', disabled: true }, [Validators.min(1)]],
+    customWidth: [{ value: '', disabled: true }, [Validators.min(1)]],
+    option_sides: ['single', Validators.required],
+    option_color: ['color', Validators.required],
+    option_paper: ['', Validators.required],
+    number_of_pages: [1, [Validators.required, Validators.min(1), Validators.max(10000)]],
+    note: ['', [Validators.maxLength(500)]],
+    option_finish: [''], // Nouveau champ
+    option_binding: [''],
 
-      // Étape 3: Configuration
-      format: ['', Validators.required],
-      customLength: [{ value: '', disabled: true }, [Validators.min(1)]],
-      customWidth: [{ value: '', disabled: true }, [Validators.min(1)]],
-      sides: ['single', Validators.required],
-      color: ['color', Validators.required],
-      support: ['', Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1), Validators.max(10000)]],
-      additionalNotes: ['', [Validators.maxLength(700)]],
-
-      // Étape 4: Livraison
-      deliveryType: ['pickup', Validators.required],
-      city: [''],
-      neighborhood: [''],
-      address: [''],
-      phone: ['']
-    }, { validators: this.customDimensionsValidator });
-  }
+    // Étape 4: Livraison
+    option_delivery: ['pickup', Validators.required],
+    delivery_city: [''],
+    delivery_neighborhood: [''],
+    delivery_address: [''],
+    delivery_phone: ['']
+  }, { validators: this.customDimensionsValidator });
+}
 
   // Validateur personnalisé pour les dimensions
   customDimensionsValidator(control: AbstractControl) {
-    const format = control.get('format');
+    const format = control.get('option_format');
     const customLength = control.get('customLength');
     const customWidth = control.get('customWidth');
 
@@ -150,7 +173,7 @@ export class UploadDocumentComponent implements OnInit {
   // Écoute des changements du formulaire
   setupFormListeners(): void {
     // Afficher/masquer les champs personnalisés selon le format
-    this.orderForm.get('format')?.valueChanges.subscribe(format => {
+    this.orderForm.get('option_format')?.valueChanges.subscribe(format => {
       const customLengthControl = this.orderForm.get('customLength');
       const customWidthControl = this.orderForm.get('customWidth');
 
@@ -172,11 +195,11 @@ export class UploadDocumentComponent implements OnInit {
     });
 
     // Afficher/masquer les champs de livraison
-    this.orderForm.get('deliveryType')?.valueChanges.subscribe(type => {
-      const cityControl = this.orderForm.get('city');
-      const neighborhoodControl = this.orderForm.get('neighborhood');
-      const addressControl = this.orderForm.get('address');
-      const phoneControl = this.orderForm.get('phone');
+    this.orderForm.get('option_delivery')?.valueChanges.subscribe(type => {
+      const cityControl = this.orderForm.get('delivery_city');
+      const neighborhoodControl = this.orderForm.get('delivery_neighborhood');
+      const addressControl = this.orderForm.get('delivery_address');
+      const phoneControl = this.orderForm.get('delivery_phone');
 
       if (type === 'delivery') {
         cityControl?.setValidators([Validators.required]);
@@ -200,7 +223,7 @@ export class UploadDocumentComponent implements OnInit {
     });
 
     // Validation en temps réel de la quantité
-    this.orderForm.get('quantity')?.valueChanges.subscribe(() => {
+    this.orderForm.get('number_of_pages')?.valueChanges.subscribe(() => {
       this.validateQuantity();
     });
   }
@@ -208,7 +231,7 @@ export class UploadDocumentComponent implements OnInit {
   // Sélection du type de document
   selectDocumentType(typeId: string): void {
     this.selectedDocType = typeId;
-    this.orderForm.patchValue({ documentType: typeId });
+    this.orderForm.patchValue({ document_type_name: typeId });
   }
 
   // Gestion du drag & drop
@@ -246,55 +269,55 @@ export class UploadDocumentComponent implements OnInit {
   }
 
   // Traitement des fichiers
-  handleFiles(files: FileList): void {
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+handleFiles(files: FileList): void {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
 
-      // Validation du type
-      const allowedTypes = [
-        'application/pdf', 
-        'image/jpeg', 
-        'image/png', 
-        'image/jpg',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ];
-      
-      if (!allowedTypes.includes(file.type)) {
-        alert(`Format non supporté: ${file.name}. Formats acceptés: PDF, JPG, PNG, DOC, DOCX`);
-        continue;
-      }
-
-      // Validation de la taille (max 50 MB)
-      if (file.size > 100 * 1024 * 1024) {
-        alert(`Fichier trop volumineux: ${file.name}. Taille maximum: 100 MB`);
-        continue;
-      }
-
-      // Vérifier si le fichier n'est pas déjà uploadé
-      if (this.uploadedFiles.some(f => f.name === file.name && f.size === this.formatFileSize(file.size))) {
-        alert(`Le fichier ${file.name} est déjà uploadé.`);
-        continue;
-      }
-
-      const uploadedFile: UploadedFile = {
-        file: file,
-        name: file.name,
-        size: this.formatFileSize(file.size)
-      };
-
-      // Aperçu pour les images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          uploadedFile.preview = e.target?.result as string;
-        };
-        reader.readAsDataURL(file);
-      }
-
-      this.uploadedFiles.push(uploadedFile);
+    // Validation du type
+    const allowedTypes = [
+      'application/pdf', 
+      'image/jpeg', 
+      'image/png', 
+      'image/jpg',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert(`Format non supporté: ${file.name}. Formats acceptés: PDF, JPG, PNG, DOC, DOCX`);
+      continue;
     }
+
+    // Validation de la taille (max 100 MB)
+    if (file.size > 100 * 1024 * 1024) {
+      alert(`Fichier trop volumineux: ${file.name}. Taille maximum: 100 MB`);
+      continue;
+    }
+
+    // Vérifier si le fichier n'est pas déjà uploadé
+    if (this.uploadedFiles.some(f => f.name === file.name && f.size === this.formatFileSize(file.size))) {
+      alert(`Le fichier ${file.name} est déjà uploadé.`);
+      continue;
+    }
+
+    const uploadedFile: UploadedFile = {
+      document: file, // Le vrai fichier File
+      name: file.name,
+      size: this.formatFileSize(file.size)
+    };
+
+    // Aperçu pour les images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedFile.preview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    this.uploadedFiles.push(uploadedFile);
   }
+}
 
   // Supprimer un fichier
   removeFile(index: number): void {
@@ -321,11 +344,11 @@ export class UploadDocumentComponent implements OnInit {
       value = 10000;
     }
     
-    this.orderForm.patchValue({ quantity: value });
+    this.orderForm.patchValue({ number_of_pages: value });
   }
 
   validateQuantity(): void {
-    const quantityControl = this.orderForm.get('quantity');
+    const quantityControl = this.orderForm.get('number_of_pages');
     if (quantityControl) {
       let value = quantityControl.value;
       if (value < 1) {
@@ -337,28 +360,28 @@ export class UploadDocumentComponent implements OnInit {
   }
 
   incrementQuantity(): void {
-    const currentValue = this.orderForm.get('quantity')?.value || 0;
+    const currentValue = this.orderForm.get('number_of_pages')?.value || 0;
     if (currentValue < 10000) {
-      this.orderForm.patchValue({ quantity: currentValue + 1 });
+      this.orderForm.patchValue({ number_of_pages: currentValue + 1 });
     }
   }
 
   decrementQuantity(): void {
-    const currentValue = this.orderForm.get('quantity')?.value || 0;
+    const currentValue = this.orderForm.get('number_of_pages')?.value || 0;
     if (currentValue > 1) {
-      this.orderForm.patchValue({ quantity: currentValue - 1 });
+      this.orderForm.patchValue({ number_of_pages: currentValue - 1 });
     }
   }
 
   // Calcul des prix
   calculateBasePrice(): number {
     const formValue = this.orderForm.value;
-    if (!formValue.documentType || !formValue.format || !formValue.support) return 0;
+    if (!formValue.document_type_name || !formValue.option_format || !formValue.option_paper) return 0;
 
     // Prix de base selon le type de document
     let basePrice = 1000; // Prix de base en FCFA
     
-    const docType = formValue.documentType;
+    const docType = formValue.document_type_name;
     if (docType === 'business-card') basePrice = 50;
     else if (docType === 'flyer') basePrice = 500;
     else if (docType === 'poster') basePrice = 2500;
@@ -366,7 +389,7 @@ export class UploadDocumentComponent implements OnInit {
     else if (docType === 'banner') basePrice = 10000;
     
     // Ajustement selon le format
-    const format = formValue.format;
+    const format = formValue.option_format;
     if (format === 'a0') basePrice *= 4;
     else if (format === 'a1') basePrice *= 3;
     else if (format === 'a2') basePrice *= 2;
@@ -379,17 +402,17 @@ export class UploadDocumentComponent implements OnInit {
     }
     
     // Ajustement recto-verso
-    if (formValue.sides === 'double') {
+    if (formValue.option_sides === 'double') {
       basePrice *= 1.6;
     }
     
     // Ajustement couleur
-    if (formValue.color === 'color') {
+    if (formValue.option_color === 'color') {
       basePrice *= 1.3;
     }
     
     // Ajustement support
-    const support = formValue.support;
+    const support = formValue.option_paper;
     if (support === 'premium') basePrice *= 1.3;
     else if (support === 'glossy') basePrice *= 1.5;
     else if (support === 'matt') basePrice *= 1.4;
@@ -413,12 +436,12 @@ export class UploadDocumentComponent implements OnInit {
   }
 
   get discount(): number {
-    const quantity = this.orderForm.get('quantity')?.value || 1;
+    const quantity = this.orderForm.get('number_of_pages')?.value || 1;
     return this.calculateDiscount(quantity, this.basePrice);
   }
 
   get totalPrice(): number {
-    const quantity = this.orderForm.get('quantity')?.value || 1;
+    const quantity = this.orderForm.get('number_of_pages')?.value || 1;
     const baseTotal = this.basePrice * quantity;
     const discountedTotal = baseTotal - this.discount;
     const deliveryCost = this.isDelivery ? 2000 : 0;
@@ -428,11 +451,11 @@ export class UploadDocumentComponent implements OnInit {
 
   // Getters pour l'affichage
   get isCustomFormat(): boolean {
-    return this.orderForm.get('format')?.value === 'custom';
+    return this.orderForm.get('option_format')?.value === 'custom';
   }
 
   get isDelivery(): boolean {
-    return this.orderForm.get('deliveryType')?.value === 'delivery';
+    return this.orderForm.get('option_delivery')?.value === 'delivery';
   }
 
   getDocumentTypeName(): string {
@@ -441,85 +464,102 @@ export class UploadDocumentComponent implements OnInit {
   }
 
   getFormatLabel(): string {
-    const format = this.formats.find(f => f.value === this.orderForm.get('format')?.value);
+    const format = this.formats.find(f => f.value === this.orderForm.get('option_format')?.value);
     return format ? format.label : 'Non spécifié';
   }
 
   getPaperSupportName(): string {
-    const support = this.paperSupports.find(p => p.id === this.orderForm.get('support')?.value);
+    const support = this.paperSupports.find(p => p.id === this.orderForm.get('option_paper')?.value);
     return support ? support.name : 'Non spécifié';
   }
 
-  // Préparation des données pour l'envoi
-  prepareOrderData(): OrderData {
-    const formValue = this.orderForm.value;
+// Préparation des données pour l'envoi
+// Préparer les données selon le format API
+prepareOrderData(): IOrderData {
+  const formValue = this.orderForm.value;
+  
+  const orderData: IOrderData = {
+    document_type_name: this.selectedDocType, // Utiliser l'ID exact de l'API
+    files: this.uploadedFiles,
+    option_format: formValue.option_format,
+    customLength: formValue.customLength,
+    customWidth: formValue.customWidth,
+    option_sides: formValue.option_sides,
+    option_color: formValue.option_color,
+    option_paper: formValue.option_paper,
+    number_of_pages: formValue.number_of_pages,
+    note: formValue.note,
+    option_finish: formValue.option_finish, // Nouveau champ
+    option_binding: formValue.option_binding,
+    option_delivery: formValue.option_delivery,
+    delivery_city: formValue.delivery_city,
+    delivery_neighborhood: formValue.delivery_neighborhood,
+    delivery_address: formValue.delivery_address,
+    delivery_phone: formValue.delivery_phone,
+    totalPrice: this.totalPrice,
+    basePrice: this.basePrice,
+    discount: this.discount,
+    timestamp: new Date()
+  };
+
+  console.log('Données préparées pour API:', orderData);
+  return orderData;
+}
+
+
+// Soumission du formulaire
+async onSubmit(): Promise<void> {
+  // Marquer tous les champs comme touchés pour afficher les erreurs
+  this.markAllFieldsAsTouched();
+
+  // Validation
+  if (this.orderForm.invalid) {
+    alert('Veuillez corriger les erreurs dans le formulaire avant de soumettre.');
+    return;
+  }
+
+  if (this.uploadedFiles.length === 0) {
+    alert('Veuillez uploader au moins un fichier.');
+    return;
+  }
+
+  this.isSubmitting = true;
+
+  try {
+    // Préparation des données
+    const orderData = this.prepareOrderData();
+
+    // Envoi au service
+    this.orderService.sendFile(orderData).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        console.log('Réponse API:', response);
+        
+        alert(`Commande envoyée avec succès !\nMontant total: ${this.totalPrice.toLocaleString('fr-FR')} FCFA`);
+        
+        // Réinitialiser le formulaire
+        this.resetForm();
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        console.error('Erreur API détaillée:', error);
+        
+        if (error.status === 404) {
+          alert('Erreur 404: L\'endpoint /order/ n\'existe pas. Vérifiez l\'URL de l\'API.');
+        } else if (error.status === 400) {
+          alert('Erreur 400: Données invalides. Vérifiez le format des données envoyées.');
+        } else {
+          alert(`Erreur ${error.status}: Une erreur est survenue lors de l'envoi de votre commande.`);
+        }
+      }
+    });
     
-    return {
-      documentType: formValue.documentType,
-      files: this.uploadedFiles,
-      format: formValue.format,
-      customLength: formValue.customLength,
-      customWidth: formValue.customWidth,
-      sides: formValue.sides,
-      color: formValue.color,
-      support: formValue.support,
-      quantity: formValue.quantity,
-      additionalNotes: formValue.additionalNotes,
-      deliveryType: formValue.deliveryType,
-      city: formValue.city,
-      neighborhood: formValue.neighborhood,
-      address: formValue.address,
-      phone: formValue.phone,
-      totalPrice: this.totalPrice,
-      basePrice: this.basePrice,
-      discount: this.discount,
-      timestamp: new Date()
-    };
+  } catch (error) {
+    console.error('Erreur lors de la soumission:', error);
+    this.isSubmitting = false;
+    alert('Une erreur est survenue lors de la préparation des données.');
   }
-
-  // Soumission du formulaire
-  async onSubmit(): Promise<void> {
-    // Marquer tous les champs comme touchés pour afficher les erreurs
-    this.markAllFieldsAsTouched();
-
-    // Validation
-    if (this.orderForm.invalid) {
-      alert('Veuillez corriger les erreurs dans le formulaire avant de soumettre.');
-      return;
-    }
-
-    if (this.uploadedFiles.length === 0) {
-      alert('Veuillez uploader au moins un fichier.');
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    try {
-      // Préparation des données
-      const orderData = this.prepareOrderData();
-
-      // Simulation d'envoi (remplacer par un appel API réel)
-      console.log('Commande soumise:', orderData);
-      
-      // TODO: Intégrer avec le service backend
-      // await this.orderService.createOrder(orderData).toPromise();
-      
-      // Simulation de délai
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert(`Commande envoyée avec succès !\nMontant total: ${this.totalPrice.toLocaleString('fr-FR')} FCFA\n\nUn email de confirmation vous a été envoyé.`);
-      
-      // Réinitialiser le formulaire
-      this.resetForm();
-      
-    } catch (error) {
-      console.error('Erreur lors de la soumission:', error);
-      alert('Une erreur est survenue lors de l\'envoi de votre commande. Veuillez réessayer.');
-    } finally {
-      this.isSubmitting = false;
-    }
-  }
+}
 
   // Marquer tous les champs comme touchés
   markAllFieldsAsTouched(): void {
@@ -532,10 +572,10 @@ export class UploadDocumentComponent implements OnInit {
   // Réinitialiser le formulaire
   resetForm(): void {
     this.orderForm.reset({
-      sides: 'single',
-      color: 'color',
-      deliveryType: 'pickup',
-      quantity: 1
+      option_sides: 'single',
+      option_color: 'color',
+      option_delivery: 'pickup',
+      number_of_pages: 1
     });
     this.uploadedFiles = [];
     this.selectedDocType = '';
