@@ -83,9 +83,9 @@ export class LoginComponent implements OnDestroy {
           this.loginAttempts = 0;
           this.handleSuccessfulLogin(response);
           
-          // 🔧 Décoder le token et rediriger selon le rôle
+          //  Décoder le token et rediriger selon le rôle
           const userRole = this.authService.getUserRoleFromToken(response.access);
-          console.log(`🎯 Rôle détecté: ${userRole}`);
+          console.log(` Rôle détecté: ${userRole}`);
           this.handleRedirection(userRole);
         },
         error: (error) => {
@@ -164,7 +164,7 @@ export class LoginComponent implements OnDestroy {
       this.authService.setRememberMe(true);
     }
 
-    console.log('✅ Login successful, preparing redirection...');
+    console.log(' Login successful, preparing redirection...');
   }
 
   /**
@@ -299,7 +299,7 @@ export class LoginComponent implements OnDestroy {
       case 'admin':
       case 'super_admin':
       case 'administrator':
-        this.router.navigate(['/dashboard-admin/dashboard']);
+        this.router.navigate(['/dashboard-admin/dashboard-printer']);
         break;
       case 'client':
       case 'user':

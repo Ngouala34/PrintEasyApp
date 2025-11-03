@@ -2,17 +2,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface OrderHistory {
-  id: string;
-  orderNumber: string;
-  date: Date;
-  status: 'delivered' | 'cancelled';
-  service: string;
-  quantity: number;
-  total: number;
-  invoiceUrl?: string;
-}
+import { OrderService } from '../../../core/services/order.service';
+import { 
+  IOrderResponse, 
+  OrderSummary, 
+  OrderOptions, 
+  OrderUser 
+} from '../../../core/models/order';
 
 @Component({
   selector: 'app-historique',
@@ -22,62 +18,57 @@ interface OrderHistory {
   styleUrls: ['./historique.component.scss']
 })
 export class HistoriqueComponent implements OnInit {
-  orders = signal<OrderHistory[]>([]);
-  filteredOrders = signal<OrderHistory[]>([]);
+  orders = signal<OrderSummary[]>([]);
+  filteredOrders = signal<OrderSummary[]>([]);
   searchQuery = signal('');
   selectedStatus = signal<string>('all');
   selectedMonth = signal<string>('all');
+  selectedOrder = signal<OrderSummary | null>(null);
+
+  constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
   loadOrders(): void {
-    // Simuler le chargement depuis API
-    const mockOrders: OrderHistory[] = [
-      {
-        id: '1',
-        orderNumber: 'ORD-2025-010',
-        date: new Date('2025-09-28'),
-        status: 'delivered',
-        service: 'Affiches A3',
-        quantity: 20,
-        total: 20000,
-        invoiceUrl: '#'
+    this.orderService.loadOrders().subscribe({
+      next: (data: IOrderResponse[]) => {
+        const formattedOrders = data.map(order => this.formatOrder(order));
+        this.orders.set(formattedOrders);
+        this.filteredOrders.set(formattedOrders);
       },
-      {
-        id: '2',
-        orderNumber: 'ORD-2025-009',
-        date: new Date('2025-09-15'),
-        status: 'delivered',
-        service: 'Flyers A6',
-        quantity: 1000,
-        total: 30000,
-        invoiceUrl: '#'
-      },
-      {
-        id: '3',
-        orderNumber: 'ORD-2025-008',
-        date: new Date('2025-08-22'),
-        status: 'delivered',
-        service: 'Cartes de visite',
-        quantity: 200,
-        total: 10000,
-        invoiceUrl: '#'
-      },
-      {
-        id: '4',
-        orderNumber: 'ORD-2025-007',
-        date: new Date('2025-08-10'),
-        status: 'cancelled',
-        service: 'Brochure A4',
-        quantity: 50,
-        total: 15000
+      error: (error) => {
+        console.error('Erreur lors du chargement des commandes:', error);
       }
-    ];
+    });
+  }
 
-    this.orders.set(mockOrders);
-    this.filteredOrders.set(mockOrders);
+  private formatOrder(order: IOrderResponse): OrderSummary {
+    return {
+      id: order.id,
+      orderNumber: order.order_number,
+      date: new Date(order.created_at),
+      status: order.status,
+      service: order.document_type,
+      quantity: order.quantity,
+      total: parseFloat(order.total_price),
+      documentType: order.document_type,
+      documentUrl: order.document_url,
+      options: order.options,
+      deliveryInfo: {
+        city: order.delivery_city,
+        neighborhood: order.delivery_neighborhood,
+        address: order.delivery_address,
+        phone: order.delivery_phone
+      },
+      note: order.note || undefined,
+      numberOfPages: order.number_of_pages,
+      unitPrice: order.unit_price,
+      user: order.user,
+      createdAt: order.created_at,
+      updatedAt: order.updated_at
+    };
   }
 
   filterOrders(): void {
@@ -88,7 +79,9 @@ export class HistoriqueComponent implements OnInit {
     if (query) {
       filtered = filtered.filter(order =>
         order.orderNumber.toLowerCase().includes(query) ||
-        order.service.toLowerCase().includes(query)
+        order.service.toLowerCase().includes(query) ||
+        order.documentType.toLowerCase().includes(query) ||
+        order.deliveryInfo.city.toLowerCase().includes(query)
       );
     }
 
@@ -121,9 +114,23 @@ export class HistoriqueComponent implements OnInit {
     this.filterOrders();
   }
 
-  downloadInvoice(order: OrderHistory): void {
+  showOrderDetails(order: OrderSummary): void {
+    this.selectedOrder.set(order);
+  }
+
+  closeOrderDetails(): void {
+    this.selectedOrder.set(null);
+  }
+
+  downloadDocument(order: OrderSummary): void {
+    if (order.documentUrl) {
+      window.open(order.documentUrl, '_blank');
+    }
+  }
+
+  downloadInvoice(order: OrderSummary): void {
     console.log('Téléchargement facture:', order.orderNumber);
-    // Implémenter le téléchargement
+    // Implémenter le téléchargement de la facture
   }
 
   getTotalSpent(): number {
@@ -134,9 +141,21 @@ export class HistoriqueComponent implements OnInit {
 
   getStatusBadge(status: string) {
     const badges = {
+      pending: { label: 'En attente', color: '#f59e0b', icon: 'fa-clock' },
+      processing: { label: 'En traitement', color: '#3b82f6', icon: 'fa-cogs' },
       delivered: { label: 'Livrée', color: '#10b981', icon: 'fa-check-circle' },
       cancelled: { label: 'Annulée', color: '#ef4444', icon: 'fa-times-circle' }
     };
-    return badges[status as keyof typeof badges];
+    return badges[status as keyof typeof badges] || { label: status, color: '#6b7280', icon: 'fa-question' };
+  }
+
+  getOrderOptionsText(options: OrderOptions): string {
+    return [
+      options.option_color,
+      options.option_format,
+      options.option_paper,
+      options.option_sides,
+      options.option_delivery
+    ].filter(opt => opt).join(' • ');
   }
 }

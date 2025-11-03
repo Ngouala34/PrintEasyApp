@@ -1,61 +1,27 @@
-// export interface IOrderData {
-//   type_document: string;                    
-//   format: 'A0'|'A1'|'A2'|'A3' | 'A4' | 'autre';    
-//   cote: 'recto_verso' | 'recto_simple';     
-//   couleur: 'noir_et_blanc' | 'couleur';
-//   support_impression: string;                
-//   quantite: number;
-//   description?: string;
-//   livraison: 'non' | 'oui';
-//   prix_total: number;
-//   prix_unitaire: number;
-//   reduction: number;
-//   delais: Date;
-//   files:{
-//         file: File;
-//         name: string;
-//         size: string;
-//         document_number:number
-//     }; 
-//   format_client?: {
-//         lengueur: number;   // en cm
-//         largeur: number;    // en cm
-//     } ;
-//   address_livraison?:{
-//         ville: string;
-//         quartier: string;
-//         address: string;
-//         telephone: string;
-//     };
-// }
-
-
-export interface IOrderResponse {
-  note?: string | null;                    // Optionnel
-  quantity?: number;                       // Défaut: 1
-  number_of_pages?: number;                // Défaut: 1
-  document_type_name: string;              // Obligatoire (minLength: 1)
-  option_format?: string | null;           // Optionnel
-  option_color?: string | null;            // Optionnel
-  option_paper?: string | null;            // Optionnel
-  option_sides?: string | null;            // Optionnel
-  option_delivery?: string | null;         // Optionnel
-  option_finish?: string | null;           // Optionnel
-  option_binding?: string | null;          // Optionnel
-  delivery_city?: string | null;           // Optionnel (maxLength: 100)
-  delivery_neighborhood?: string | null;   // Optionnel (maxLength: 150)
-  delivery_address?: string | null;        // Optionnel (maxLength: 300)
-  delivery_phone?: string | null;          // Optionnel (maxLength: 30)
+// src/app/core/models/order.ts
+export interface OrderUser {
+  id: number;
+  full_name: string;
+  email: string;
 }
 
-interface UploadedFile {
+export interface OrderOptions {
+  option_color?: string;
+  option_delivery?: string;
+  option_format?: string;
+  option_paper?: string;
+  option_sides?: string;
+  option_finish?: string;
+  option_binding?: string;
+}
+
+export interface UploadedFile {
   document: File;
   name: string;
   size: string;
   preview?: string;
 }
 
-// models/order.ts
 export interface IOrderData {
   note?: string;
   number_of_pages: number;
@@ -65,7 +31,7 @@ export interface IOrderData {
   option_paper: string;
   option_sides: string;
   option_delivery: string;
-  option_finish?: string; // Nouveau champ
+  option_finish?: string;
   option_binding: string;
   delivery_city?: string;
   delivery_neighborhood?: string;
@@ -78,4 +44,51 @@ export interface IOrderData {
   basePrice: number;
   discount: number;
   timestamp: Date;
+}
+
+export interface IOrderResponse {
+  id: number;
+  order_number: string;
+  user: OrderUser;
+  document_type: string;
+  price: string;
+  document_url: string;
+  note: string | null;
+  quantity: number;
+  number_of_pages: number;
+  options: OrderOptions;
+  delivery_city: string;
+  delivery_neighborhood: string;
+  delivery_address: string;
+  delivery_phone: string;
+  unit_price: string;
+  total_price: string;
+  status: 'pending' | 'processing' | 'delivered' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderSummary {
+  id: number;
+  orderNumber: string;
+  date: Date;
+  status: 'pending' | 'processing' | 'delivered' | 'cancelled';
+  service: string;
+  quantity: number;
+  total: number;
+  documentType: string;
+  documentUrl: string;
+  options: OrderOptions;
+  deliveryInfo: {
+    city: string;
+    neighborhood: string;
+    address: string;
+    phone: string;
+  };
+  note?: string;
+  numberOfPages: number;
+  unitPrice: string;
+  user: OrderUser;
+  createdAt: string;
+  updatedAt: string;
 }

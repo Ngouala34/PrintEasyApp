@@ -10,32 +10,24 @@ export class AuthInterceptor implements HttpInterceptor {
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
   constructor(private authService: AuthService) {
-    console.log('🔄 AuthInterceptor initialisé');
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log('🚀 INTERCEPTEUR ACTIVÉ - URL:', request.url);
     
     // Ajouter le token aux requêtes API (sauf login/register/refresh)
     if (this.shouldAddToken(request)) {
       const token = this.authService.getToken();
-      console.log('🔑 Token disponible:', token ? 'OUI' : 'NON');
       
       if (token) {
         request = this.addToken(request, token);
-        console.log('✅ Header Authorization AJOUTÉ');
-        console.log('📨 Authorization Header:', request.headers.get('Authorization')?.substring(0, 30) + '...');
       }
     } else {
-      console.log('➡️ URL exclue - Pas de token ajouté:', request.url);
     }
 
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.log('❌ Erreur HTTP:', error.status, error.url);
         
         if (error.status === 401 && this.authService.getRefreshToken()) {
-          console.log('🔄 Déclenchement rafraîchissement token...');
           return this.handle401Error(request, next);
         }
         

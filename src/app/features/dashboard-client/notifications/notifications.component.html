@@ -1,1 +1,162 @@
-<p>notifications works!</p>
+<!-- src/app/features/notifications/notifications.component.html -->
+<div class="notifications-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="fas fa-bell"></i>
+        Notifications
+        @if (getUnreadCount() > 0) {
+          <span class="unread-count">{{ getUnreadCount() }}</span>
+        }
+      </h1>
+      <p class="page-subtitle">Restez informé de l'état de vos commandes</p>
+    </div>
+    
+    <div class="header-actions">
+      @if (getUnreadCount() > 0) {
+        <button class="btn-secondary" (click)="markAllAsRead()">
+          <i class="fas fa-check-double"></i>
+          Tout marquer comme lu
+        </button>
+      }
+      @if (notifications().length > 0) {
+        <button class="btn-outline" (click)="clearAll()">
+          <i class="fas fa-trash"></i>
+          Tout effacer
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Filters & Search -->
+  <div class="filters-section">
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="selectedFilter() === 'all'"
+        (click)="onFilterChange('all')">
+        <i class="fas fa-layer-group"></i>
+        Toutes
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="selectedFilter() === 'unread'"
+        (click)="onFilterChange('unread')">
+        <i class="fas fa-envelope"></i>
+        Non lues
+        @if (getUnreadCount() > 0) {
+          <span class="tab-badge">{{ getUnreadCount() }}</span>
+        }
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="selectedFilter() === 'order'"
+        (click)="onFilterChange('order')">
+        <i class="fas fa-print"></i>
+        Commandes
+      </button>
+    </div>
+
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher une notification..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($any($event.target).value)"
+        class="search-input">
+    </div>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="notifications-container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Chargement des notifications...</p>
+      </div>
+    } @else if (showEmptyState()) {
+      <div class="empty-state">
+        <i class="fas fa-bell-slash"></i>
+        <h3>Aucune notification</h3>
+        <p>
+          @if (searchQuery() || selectedFilter() !== 'all') {
+            Aucune notification ne correspond à vos critères
+          } @else {
+            Vous n'avez aucune notification pour le moment
+          }
+        </p>
+        @if (searchQuery() || selectedFilter() !== 'all') {
+          <button class="btn-primary" (click)="searchQuery.set(''); selectedFilter.set('all'); filterNotifications()">
+            <i class="fas fa-redo"></i>
+            Réinitialiser les filtres
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="notifications-list">
+        @for (notification of filteredNotifications(); track notification.id) {
+          <div 
+            class="notification-card" 
+            [class.unread]="!notification.read"
+            [class.has-action]="notification.orderId || notification.actionUrl">
+            
+            <div class="notification-icon">
+              <i 
+                [class]="'fas ' + getNotificationIcon(notification)"
+                [style.color]="getNotificationBadge(notification).color">
+              </i>
+            </div>
+
+            <div class="notification-content" (click)="navigateToAction(notification)">
+              <div class="notification-header">
+                <h4 class="notification-title">{{ notification.title }}</h4>
+                <span class="notification-time">{{ formatDate(notification.createdAt) }}</span>
+              </div>
+              
+              <p class="notification-message">{{ notification.message }}</p>
+              
+              <div class="notification-footer">
+                <span 
+                  class="notification-badge"
+                  [style.background]="getNotificationBadge(notification).color + '20'"
+                  [style.color]="getNotificationBadge(notification).color">
+                  {{ getNotificationBadge(notification).label }}
+                </span>
+                
+                @if (notification.orderNumber) {
+                  <span class="order-reference">
+                    <i class="fas fa-hashtag"></i>
+                    {{ notification.orderNumber }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <div class="notification-actions">
+              @if (!notification.read) {
+                <button 
+                  class="btn-action mark-read"
+                  (click)="markAsRead(notification)"
+                  title="Marquer comme lu">
+                  <i class="fas fa-check"></i>
+                </button>
+              }
+              <button 
+                class="btn-action delete"
+                (click)="deleteNotification(notification.id)"
+                title="Supprimer">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            @if (!notification.read) {
+              <div class="unread-indicator"></div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,446 @@
+// src/app/features/notifications/notifications.component.scss
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.notifications-page {
+  padding: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+
+  @include responsive(md) {
+    padding: $spacing-3xl;
+  }
+}
+
+// Page Header
+.page-header {
+  @include flex-between;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  @include heading-primary;
+  font-size: $font-size-2xl;
+  margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  i {
+    color: $primary-yellow;
+  }
+
+  @include responsive(md) {
+    font-size: $font-size-3xl;
+  }
+}
+
+.unread-count {
+  @include flex-center;
+  min-width: 24px;
+  height: 24px;
+  background: $error;
+  color: $white;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  margin-left: $spacing-sm;
+}
+
+.page-subtitle {
+  color: $gray-dark;
+  font-size: $font-size-base;
+}
+
+.header-actions {
+  display: flex;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+
+  @include responsive(md) {
+    flex-wrap: nowrap;
+  }
+}
+
+.btn-secondary, .btn-outline {
+  @include button-base;
+  font-size: $font-size-sm;
+  padding: $spacing-md $spacing-lg;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.btn-outline {
+  @include button-outline;
+}
+
+// Filters Section
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  box-sizing: border-box;
+
+  @include responsive(md) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.filter-tabs {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  @include flex-center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: $gray-light;
+  border: none;
+  border-radius: $radius-lg;
+  font-weight: $font-weight-medium;
+  color: $gray-dark;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+
+  &:hover {
+    background: darken($gray-light, 5%);
+    color: $primary-dark;
+  }
+
+  &.active {
+    background: $primary-yellow;
+    color: $primary-dark;
+  }
+
+  i {
+    font-size: $font-size-sm;
+  }
+}
+
+.tab-badge {
+  @include flex-center;
+  min-width: 20px;
+  height: 20px;
+  background: $error;
+  color: $white;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  margin-left: $spacing-xs;
+}
+
+.search-box {
+  position: relative;
+  min-width: 300px;
+
+  i {
+    position: absolute;
+    left: $spacing-lg;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $gray-medium;
+    pointer-events: none;
+  }
+}
+
+.search-input {
+  @include input-base;
+  padding-left: 3rem;
+  box-sizing: border-box;
+
+}
+
+// Notifications Container
+.notifications-container {
+  flex: 1;
+}
+
+.loading-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-3xl;
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+
+  p {
+    color: $gray-dark;
+    margin: 0;
+  }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $gray-light;
+  border-top: 3px solid $primary-yellow;
+  border-radius: $radius-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-lg;
+  padding: $spacing-3xl;
+  background: $white;
+  border-radius: $radius-xl;
+  text-align: center;
+  box-shadow: $shadow-sm;
+
+  i {
+    font-size: 4rem;
+    color: $gray-medium;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    font-size: $font-size-xl;
+    color: $primary-dark;
+    margin: 0;
+  }
+
+  p {
+    color: $gray-medium;
+    margin: 0;
+  }
+}
+
+.btn-primary {
+  @include button-primary;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+// Notifications List
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.notification-card {
+  @include card;
+  display: flex;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+  position: relative;
+  transition: all $transition-base;
+
+  &.unread {
+    border-left-color: $primary-yellow;
+    background: lighten($primary-yellow, 42%);
+  }
+
+  &.has-action {
+    cursor: pointer;
+
+    .notification-content:hover {
+      .notification-title {
+        color: $primary-yellow;
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.unread-indicator {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: $primary-yellow;
+  border-radius: $radius-full;
+}
+
+.notification-icon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $gray-light;
+  border-radius: $radius-lg;
+  flex-shrink: 0;
+
+  i {
+    font-size: $font-size-lg;
+  }
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-header {
+  @include flex-between;
+  margin-bottom: $spacing-sm;
+  gap: $spacing-md;
+}
+
+.notification-title {
+  font-family: $font-heading;
+  font-weight: $font-weight-semibold;
+  color: $primary-dark;
+  margin: 0;
+  font-size: $font-size-base;
+  @include truncate(1);
+}
+
+.notification-time {
+  font-size: $font-size-xs;
+  color: $gray-medium;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.notification-message {
+  color: $gray-dark;
+  margin: 0 0 $spacing-md 0;
+  line-height: 1.5;
+  @include truncate(2);
+}
+
+.notification-footer {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.notification-badge {
+  @include badge($primary-dark);
+  font-size: $font-size-xs;
+  padding: $spacing-xs $spacing-sm;
+}
+
+.order-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: $gray-light;
+  color: $gray-dark;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  i {
+    color: $primary-yellow;
+    font-size: $font-size-xs;
+  }
+}
+
+.notification-actions {
+  display: flex;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.btn-action {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  background: transparent;
+  color: $gray-medium;
+
+  &:hover {
+    background: $gray-light;
+    
+    &.mark-read {
+      color: $success;
+    }
+    
+    &.delete {
+      color: $error;
+    }
+  }
+
+  i {
+    font-size: $font-size-sm;
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-md) {
+  .notifications-page {
+    padding: $spacing-lg;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    
+    button {
+      flex: 1;
+    }
+  }
+
+  .filters-section {
+    flex-direction: column;
+  }
+
+  .search-box {
+    min-width: 100%;
+  }
+
+  .notification-card {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .notification-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-xs;
+  }
+
+  .notification-actions {
+    align-self: flex-end;
+  }
+
+  .unread-indicator {
+    top: $spacing-md;
+    left: $spacing-md;
+    transform: none;
+  }
+}

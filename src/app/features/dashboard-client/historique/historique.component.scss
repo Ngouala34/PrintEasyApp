@@ -250,7 +250,7 @@
   box-shadow: $shadow-sm;
 
   i {
-    font-size: 4rem;
+    font-size: 1.5rem;
     color: $gray-medium;
   }
 
@@ -295,5 +295,192 @@
     .filter-select {
       width: 100%;
     }
+  }
+}
+
+
+// Ajoutez à la fin de votre fichier historique.component.scss
+
+// Modal Styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: $spacing-lg;
+}
+
+.modal-content {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-2xl;
+  border-bottom: 1px solid $gray-light;
+
+  h2 {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: $font-size-xl;
+    color: $primary-dark;
+  }
+}
+
+.btn-close {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  color: $gray-dark;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $gray-light;
+    color: $primary-dark;
+  }
+}
+
+.modal-body {
+  padding: $spacing-2xl;
+}
+
+.details-grid {
+  display: grid;
+  gap: $spacing-2xl;
+}
+
+.detail-section {
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-family: $font-heading;
+    font-size: $font-size-lg;
+    color: $primary-dark;
+    margin-bottom: $spacing-lg;
+    margin-top: 0;
+
+    i {
+      color: $primary-yellow;
+    }
+  }
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm 0;
+  border-bottom: 1px solid $gray-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.detail-label {
+  font-weight: $font-weight-medium;
+  color: $primary-dark;
+  flex: 1;
+}
+
+.detail-value {
+  color: $gray-dark;
+  flex: 1;
+  text-align: right;
+}
+
+.total-row {
+  border-top: 2px solid $gray-medium;
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+
+  .detail-label {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-lg;
+  }
+
+  .total-price {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-lg;
+    color: $primary-dark;
+  }
+}
+
+.note-content {
+  background: $gray-light;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  color: $gray-dark;
+  line-height: 1.5;
+}
+
+.btn-secondary {
+  @include button-secondary;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+// Additional table styles
+.service-info {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.options-text {
+  font-size: $font-size-xs;
+  color: $gray-medium;
+  line-height: 1.3;
+}
+
+.delivery-info {
+  font-size: $font-size-sm;
+  color: $gray-dark;
+}
+
+// Responsive modal
+@media (max-width: $breakpoint-md) {
+  .modal-overlay {
+    padding: $spacing-md;
+  }
+
+  .modal-content {
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: $spacing-xl;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-xs;
+  }
+
+  .detail-value {
+    text-align: left;
+    width: 100%;
   }
 }

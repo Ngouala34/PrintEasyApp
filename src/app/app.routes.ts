@@ -17,7 +17,7 @@ export const routes: Routes = [
 
   //  Dashboard client (layout + enfants)
   {
-    path: 'dashboard-client',
+    path: 'dashboard-client',canActivate: [AuthGuard] ,
     loadComponent: () => import('./features/dashboard-client/dashboard-client.component').then(m => m.DashboardClientComponent),
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -31,4 +31,21 @@ export const routes: Routes = [
 
     ]
   },
+
+{
+  path: 'dashboard-admin',
+  loadComponent: () =>
+    import('./features/dashboard-admin/dashboard-admin.component')
+      .then(m => m.DashboardAdminComponent),
+  children: [
+    { path: '', redirectTo: 'dashboard-printer', pathMatch: 'full' },
+    {
+      path: 'dashboard-printer',
+      loadComponent: () =>
+        import('./features/dashboard-admin/dashboard-printer/dashboard-printer.component')
+          .then(m => m.DashboardPrinterComponent)
+    }
+  ]
+}
+
 ];

@@ -58,41 +58,41 @@ export class DashboardAdminComponent {
   menuItems = [
     {
       icon: 'fa-th-large',
-      label: 'Tableau de bord',
-      route: '/dashboard-client/dashboard',
+      label: 'Tableau',
+      route: '/dashboard-admin/dashboard-printer',
       exact: true
     },
     {
       icon: 'fa-box',
       label: 'commandes',
-      route: '/dashboard-client/upload-document',
+      route: '/dashboard-admin/upload-document',
     },
     {
       icon: 'fa-history',
       label: 'Historique',
-      route: '/dashboard-client/historique'
+      route: '/dashboard-admin/historique'
     },
     {
       icon: 'fa-bell',
       label: 'Notifications',
-      route: '/dashboard-client/notifications',
+      route: '/dashboard-admin/notifications',
       badge: 5
     },
     {
       icon: 'fa-comments',
       label: 'Discussion',
-      route: '/dashboard-client/discussion',
+      route: '/dashboard-admin/discussion',
       badge: 2
     },
     {
       icon: 'fa-user',
       label: 'Mon Profil',
-      route: '/dashboard-client/profil'
+      route: '/dashboard-admin/profil'
     },
     {
       icon: 'fa-question-circle',
       label: 'Aide',
-      route: '/dashboard-client/aide'
+      route: '/dashboard-admin/aide'
     }
   ];
 

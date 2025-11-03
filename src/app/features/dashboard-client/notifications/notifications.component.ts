@@ -1,136 +1,246 @@
-// src/app/features/dashboard-client/notifications/notifications.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+// src/app/features/notifications/notifications.component.ts
+import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../../core/services/notification.service';
 
-interface Notification {
-  id: number;
-  type: 'success' | 'info' | 'warning' | 'error';
+export interface Notification {
+  id: string;
   title: string;
   message: string;
-  time: Date;
+  type: 'info' | 'success' | 'warning' | 'error' | 'order';
+  icon: string;
   read: boolean;
-  actionLink?: string;
+  createdAt: Date;
+  orderId?: string;
+  orderNumber?: string;
+  actionUrl?: string;
 }
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
+  private notificationService = inject(NotificationService);
+
   notifications = signal<Notification[]>([]);
-  selectedFilter = signal<'all' | 'unread'>('all');
+  filteredNotifications = signal<Notification[]>([]);
+  selectedFilter = signal<'all' | 'unread' | 'order'>('all');
+  searchQuery = signal('');
+  isLoading = signal(false);
+  showEmptyState = signal(false);
+
+  // Données simulées pour les démonstrations
+  private mockNotifications: Notification[] = [
+    {
+      id: '1',
+      title: 'Commande livrée',
+      message: 'Votre commande CMD00001 a été livrée avec succès à votre adresse.',
+      type: 'success',
+      icon: 'fa-check-circle',
+      read: false,
+      createdAt: new Date('2024-01-15T10:30:00'),
+      orderId: '1',
+      orderNumber: 'CMD00001',
+      actionUrl: '/orders/1'
+    },
+    {
+      id: '2',
+      title: 'Impression en cours',
+      message: 'Votre document "Rapport Annuel" est en cours d\'impression.',
+      type: 'order',
+      icon: 'fa-print',
+      read: false,
+      createdAt: new Date('2024-01-15T09:15:00'),
+      orderId: '2',
+      orderNumber: 'CMD00002'
+    },
+    {
+      id: '3',
+      title: 'Retard de livraison',
+      message: 'Votre commande CMD00003 rencontre un retard imprévu. Délai estimé: +2 jours.',
+      type: 'warning',
+      icon: 'fa-clock',
+      read: true,
+      createdAt: new Date('2024-01-14T16:45:00'),
+      orderId: '3',
+      orderNumber: 'CMD00003'
+    },
+    {
+      id: '4',
+      title: 'Nouvelle offre spéciale',
+      message: 'Profitez de -20% sur toutes les impressions en couleur cette semaine !',
+      type: 'info',
+      icon: 'fa-tag',
+      read: true,
+      createdAt: new Date('2024-01-14T14:20:00')
+    },
+    {
+      id: '5',
+      title: 'Problème de fichier',
+      message: 'Le fichier "Presentation.pdf" de votre commande CMD00004 nécessite une résolution plus élevée.',
+      type: 'error',
+      icon: 'fa-exclamation-triangle',
+      read: false,
+      createdAt: new Date('2024-01-14T11:10:00'),
+      orderId: '4',
+      orderNumber: 'CMD00004'
+    }
+  ];
 
   ngOnInit(): void {
     this.loadNotifications();
   }
 
+  ngOnDestroy(): void {
+    // Nettoyage si nécessaire
+  }
+
   loadNotifications(): void {
-    const mockNotifications: Notification[] = [
-      {
-        id: 1,
-        type: 'success',
-        title: 'Commande prête',
-        message: 'Votre commande #ORD-002 (Cartes de visite) est prête à être retirée',
-        time: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        read: false,
-        actionLink: '/dashboard-client/commandes'
-      },
-      {
-        id: 2,
-        type: 'info',
-        title: 'Commande en cours',
-        message: 'Votre commande #ORD-001 (Flyers A5) est actuellement en impression',
-        time: new Date(Date.now() - 5 * 60 * 60 * 1000),
-        read: false
-      },
-      {
-        id: 3,
-        type: 'warning',
-        title: 'Confirmation requise',
-        message: 'N\'oubliez pas de confirmer la réception de votre commande #ORD-002',
-        time: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        read: true
-      },
-      {
-        id: 4,
-        type: 'success',
-        title: 'Promotion',
-        message: 'Nouvelle promotion : -15% sur les flyers jusqu\'à la fin du mois !',
-        time: new Date(Date.now() - 48 * 60 * 60 * 1000),
-        read: true,
-        actionLink: '/services'
-      },
-      {
-        id: 5,
-        type: 'info',
-        title: 'Points fidélité',
-        message: 'Vous avez gagné 150 points de fidélité sur votre dernière commande',
-        time: new Date(Date.now() - 72 * 60 * 60 * 1000),
-        read: true
+    this.isLoading.set(true);
+    
+    // Simulation du chargement
+    setTimeout(() => {
+      this.notifications.set(this.mockNotifications);
+      this.filterNotifications();
+      this.isLoading.set(false);
+      this.showEmptyState.set(this.filteredNotifications().length === 0);
+    }, 1000);
+  }
+
+  filterNotifications(): void {
+    let filtered = this.notifications();
+
+    // Filtre par type
+    if (this.selectedFilter() !== 'all') {
+      if (this.selectedFilter() === 'unread') {
+        filtered = filtered.filter(notification => !notification.read);
+      } else if (this.selectedFilter() === 'order') {
+        filtered = filtered.filter(notification => notification.type === 'order');
       }
-    ];
-
-    this.notifications.set(mockNotifications);
-  }
-
-  filteredNotifications() {
-    if (this.selectedFilter() === 'unread') {
-      return this.notifications().filter(n => !n.read);
     }
-    return this.notifications();
+
+    // Filtre par recherche
+    const query = this.searchQuery().toLowerCase();
+    if (query) {
+      filtered = filtered.filter(notification =>
+        notification.title.toLowerCase().includes(query) ||
+        notification.message.toLowerCase().includes(query) ||
+        (notification.orderNumber && notification.orderNumber.toLowerCase().includes(query))
+      );
+    }
+
+    // Tri par date (plus récent en premier)
+    filtered = filtered.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    this.filteredNotifications.set(filtered);
+    this.showEmptyState.set(filtered.length === 0);
   }
 
-  markAsRead(id: number): void {
-    this.notifications.update(notifications =>
-      notifications.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+  onFilterChange(filter: 'all' | 'unread' | 'order'): void {
+    this.selectedFilter.set(filter);
+    this.filterNotifications();
+  }
+
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+    this.filterNotifications();
+  }
+
+  markAsRead(notification: Notification): void {
+    if (!notification.read) {
+      const updatedNotifications = this.notifications().map(n =>
+        n.id === notification.id ? { ...n, read: true } : n
+      );
+      this.notifications.set(updatedNotifications);
+      this.filterNotifications();
+      
+      // Ici, vous appelleriez votre service pour mettre à jour en base
+      this.notificationService.markAsRead(notification.id).subscribe();
+    }
   }
 
   markAllAsRead(): void {
-    this.notifications.update(notifications =>
-      notifications.map(n => ({ ...n, read: true }))
-    );
+    const updatedNotifications = this.notifications().map(notification => ({
+      ...notification,
+      read: true
+    }));
+    this.notifications.set(updatedNotifications);
+    this.filterNotifications();
+    
+    // Appel au service pour marquer toutes comme lues
+    this.notificationService.markAllAsRead().subscribe();
   }
 
-  deleteNotification(id: number): void {
-    this.notifications.update(notifications =>
-      notifications.filter(n => n.id !== id)
-    );
+  deleteNotification(notificationId: string): void {
+    const updatedNotifications = this.notifications().filter(n => n.id !== notificationId);
+    this.notifications.set(updatedNotifications);
+    this.filterNotifications();
+    
+    // Appel au service pour supprimer
+    this.notificationService.deleteNotification(notificationId).subscribe();
   }
 
-  getNotificationIcon(type: string): string {
-    const icons = {
-      success: 'fa-check-circle',
-      info: 'fa-info-circle',
-      warning: 'fa-exclamation-triangle',
-      error: 'fa-times-circle'
+  clearAll(): void {
+    this.notifications.set([]);
+    this.filteredNotifications.set([]);
+    this.showEmptyState.set(true);
+    
+    // Appel au service pour tout supprimer
+    this.notificationService.clearAll().subscribe();
+  }
+
+  getNotificationIcon(notification: Notification): string {
+    return notification.icon;
+  }
+
+  getNotificationBadge(notification: Notification): { label: string, color: string } {
+    const badges = {
+      info: { label: 'Information', color: '#3b82f6' },
+      success: { label: 'Succès', color: '#10b981' },
+      warning: { label: 'Attention', color: '#f59e0b' },
+      error: { label: 'Erreur', color: '#ef4444' },
+      order: { label: 'Commande', color: '#0e0734' }
     };
-    return icons[type as keyof typeof icons];
+    return badges[notification.type];
   }
 
-  getNotificationColor(type: string): string {
-    const colors = {
-      success: '#10b981',
-      info: '#3b82f6',
-      warning: '#f59e0b',
-      error: '#ef4444'
-    };
-    return colors[type as keyof typeof colors];
+  getUnreadCount(): number {
+    return this.notifications().filter(n => !n.read).length;
   }
 
-  getTimeAgo(date: Date): string {
+  formatDate(date: Date): string {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-    if (diffHours < 1) return 'À l\'instant';
-    if (diffHours < 24) return `Il y a ${diffHours}h`;
+    if (diffMins < 1) return 'À l\'instant';
+    if (diffMins < 60) return `Il y a ${diffMins} min`;
+    if (diffHours < 24) return `Il y a ${diffHours} h`;
     if (diffDays === 1) return 'Hier';
-    if (diffDays < 7) return `Il y a ${diffDays} jours`;
-    return date.toLocaleDateString('fr-FR');
+    if (diffDays < 7) return `Il y a ${diffDays} j`;
+    
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short'
+    });
+  }
+
+  navigateToAction(notification: Notification): void {
+    if (notification.actionUrl) {
+      // Navigation vers l'URL d'action
+      window.open(notification.actionUrl, '_self');
+    } else if (notification.orderId) {
+      // Navigation vers les détails de la commande
+      window.open(`/orders/${notification.orderId}`, '_self');
+    }
+    
+    this.markAsRead(notification);
   }
 }

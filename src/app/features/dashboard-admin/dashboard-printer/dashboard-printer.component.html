@@ -1,0 +1,323 @@
+<!-- src/app/components/dashboard-printer/dashboard-printer.component.html -->
+<div class="dashboard-printer">
+  <!-- Bandeau KPI -->
+  <section class="kpi-section" role="region" aria-label="Indicateurs clés de performance">
+    <div class="kpi-grid" *ngIf="kpis">
+      <div class="kpi-card" tabindex="0" role="button" aria-label="Commandes en attente">
+        <div class="kpi-icon kpi-icon--pending">
+          <i class="fas fa-clock" aria-hidden="true"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpis.pendingOrders }}</div>
+          <div class="kpi-label">En attente</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" tabindex="0" role="button" aria-label="Commandes en cours d'impression">
+        <div class="kpi-icon kpi-icon--progress">
+          <i class="fas fa-print" aria-hidden="true"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpis.inProgress }}</div>
+          <div class="kpi-label">En impression</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" tabindex="0" role="button" aria-label="Commandes terminées ce mois">
+        <div class="kpi-icon kpi-icon--completed">
+          <i class="fas fa-check-circle" aria-hidden="true"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpis.completedThisMonth }}</div>
+          <div class="kpi-label">Terminées (30j)</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" tabindex="0" role="button" aria-label="Livraisons prévues aujourd'hui">
+        <div class="kpi-icon kpi-icon--delivery">
+          <i class="fas fa-truck" aria-hidden="true"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ kpis.deliveriesToday }}</div>
+          <div class="kpi-label">Livraisons du jour</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" tabindex="0" role="button" aria-label="Revenus du mois en cours">
+        <div class="kpi-icon kpi-icon--revenue">
+          <i class="fas fa-euro-sign" aria-hidden="true"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">{{ formatCurrency(kpis.monthlyRevenue) }}</div>
+          <div class="kpi-label">Revenus du mois</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activité du jour et Alertes -->
+  <section class="main-content">
+    <div class="content-grid">
+      <!-- Activité du jour -->
+      <div class="activity-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fas fa-calendar-day" aria-hidden="true"></i>
+            Activité du jour
+          </h2>
+          <div class="filter-buttons">
+            <button 
+              class="filter-btn" 
+              [class.active]="selectedFilter === 'all'"
+              (click)="filterOrders('all')"
+              aria-label="Afficher toutes les commandes">
+              Toutes
+            </button>
+            <button 
+              class="filter-btn" 
+              [class.active]="selectedFilter === 'pending'"
+              (click)="filterOrders('pending')"
+              aria-label="Afficher les commandes en attente">
+              En attente
+            </button>
+            <button 
+              class="filter-btn" 
+              [class.active]="selectedFilter === 'in-progress'"
+              (click)="filterOrders('in-progress')"
+              aria-label="Afficher les commandes en cours">
+              En cours
+            </button>
+            <button 
+              class="filter-btn" 
+              [class.active]="selectedFilter === 'delayed'"
+              (click)="filterOrders('delayed')"
+              aria-label="Afficher les commandes en retard">
+              En retard
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="orders-table" role="table" aria-label="Liste des commandes du jour">
+            <thead>
+              <tr>
+                <th (click)="sortBy('ref')" role="columnheader" tabindex="0">
+                  Référence
+                  <i class="fas fa-sort" aria-hidden="true"></i>
+                </th>
+                <th (click)="sortBy('client')" role="columnheader" tabindex="0">
+                  Client
+                  <i class="fas fa-sort" aria-hidden="true"></i>
+                </th>
+                <th>Type</th>
+                <th>Format</th>
+                <th>Quantité</th>
+                <th>Statut</th>
+                <th (click)="sortBy('eta')" role="columnheader" tabindex="0">
+                  ETA
+                  <i class="fas fa-sort" aria-hidden="true"></i>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of filteredOrders" [attr.data-priority]="order.priority">
+                <td class="ref-cell">
+                  <span class="ref-badge">{{ order.ref }}</span>
+                  <span class="priority-indicator" [ngClass]="getPriorityClass(order.priority)" 
+                        *ngIf="order.priority !== 'normal'">
+                    <i class="fas fa-flag" aria-hidden="true"></i>
+                  </span>
+                </td>
+                <td class="client-cell">{{ order.client }}</td>
+                <td>{{ order.type }}</td>
+                <td>{{ order.format }}</td>
+                <td class="qty-cell">{{ order.quantity }}</td>
+                <td>
+                  <span class="status-chip" [ngClass]="getStatusClass(order.status)">
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </td>
+                <td class="eta-cell">{{ formatTime(order.eta) }}</td>
+                <td class="actions-cell">
+                  <button 
+                    class="action-btn action-btn--start" 
+                    *ngIf="order.status === 'pending'"
+                    (click)="onStartOrder(order.id)"
+                    [attr.aria-label]="'Démarrer la commande ' + order.ref">
+                    <i class="fas fa-play" aria-hidden="true"></i>
+                  </button>
+                  <button 
+                    class="action-btn action-btn--complete" 
+                    *ngIf="order.status === 'in-progress'"
+                    (click)="onCompleteOrder(order.id)"
+                    [attr.aria-label]="'Marquer comme terminée la commande ' + order.ref">
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                  </button>
+                  <button 
+                    class="action-btn action-btn--download"
+                    (click)="onDownloadFile(order.id)"
+                    [attr.aria-label]="'Télécharger le fichier de la commande ' + order.ref">
+                    <i class="fas fa-download" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Priorités et Alertes -->
+      <div class="alerts-section">
+        <h2 class="section-title">
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+          Priorités & Alertes
+        </h2>
+        <div class="alerts-list" role="list" aria-label="Liste des alertes">
+          <div class="alert-item" 
+               *ngFor="let alert of alerts" 
+               [ngClass]="getAlertClass(alert.severity)"
+               role="listitem">
+            <div class="alert-icon">
+              <i class="fas" 
+                 [class.fa-clock]="alert.type === 'delayed'"
+                 [class.fa-flag]="alert.type === 'priority'"
+                 [class.fa-ban]="alert.type === 'blocked'"
+                 aria-hidden="true"></i>
+            </div>
+            <div class="alert-content">
+              <div class="alert-ref">{{ alert.ref }}</div>
+              <div class="alert-client">{{ alert.client }}</div>
+              <div class="alert-message">{{ alert.message }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistiques visuelles -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <!-- Graphique types de documents -->
+      <div class="chart-card">
+        <h3 class="chart-title">Répartition par type</h3>
+        <div class="chart-placeholder">
+          <canvas id="documentChart" aria-label="Graphique de répartition par type de document"></canvas>
+          <div class="chart-legend">
+            <div class="legend-item" *ngFor="let stat of documentStats">
+              <span class="legend-color"></span>
+              <span class="legend-label">{{ stat.type }}</span>
+              <span class="legend-value">{{ stat.count }} ({{ stat.percentage }}%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique revenus -->
+      <div class="chart-card">
+        <h3 class="chart-title">Évolution des revenus</h3>
+        <div class="chart-placeholder">
+          <canvas id="revenueChart" aria-label="Graphique d'évolution des revenus mensuels"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Productivité et qualité -->
+  <section class="productivity-section">
+    <div class="productivity-grid">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value" *ngIf="productivity">{{ productivity.avgProductionTime }}h</div>
+          <div class="metric-label">Temps moyen production</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--warning">
+          <i class="fas fa-redo" aria-hidden="true"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value" *ngIf="productivity">{{ productivity.reprintRate }}%</div>
+          <div class="metric-label">Taux de réimpression</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon metric-icon--success">
+          <i class="fas fa-award" aria-hidden="true"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value" *ngIf="productivity">{{ productivity.punctualityRate }}%</div>
+          <div class="metric-label">Taux de ponctualité</div>
+        </div>
+      </div>
+
+      <!-- Timeline des livraisons -->
+      <div class="timeline-card">
+        <h3 class="timeline-title">Dernières livraisons</h3>
+        <div class="timeline-list">
+          <div class="timeline-item" *ngFor="let delivery of recentDeliveries">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-ref">{{ delivery.ref }}</div>
+              <div class="timeline-client">{{ delivery.client }}</div>
+              <div class="timeline-time">{{ formatDateTime(delivery.timestamp) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stock court -->
+  <section class="stock-section" *ngIf="stockLevels.length > 0">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fas fa-boxes" aria-hidden="true"></i>
+        Niveaux de stock critiques
+      </h2>
+      <button class="btn-outline" (click)="onOrderSupplies()" aria-label="Commander des consommables">
+        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+        Commander consommables
+      </button>
+    </div>
+    <div class="stock-grid">
+      <div class="stock-item" 
+           *ngFor="let stock of stockLevels"
+           [attr.data-status]="getStockStatus(stock)">
+        <div class="stock-info">
+          <div class="stock-name">{{ stock.item }}</div>
+          <div class="stock-level">
+            {{ stock.current }} {{ stock.unit }}
+            <span class="stock-threshold">/ {{ stock.threshold }}</span>
+          </div>
+        </div>
+        <div class="stock-bar">
+          <div class="stock-fill" 
+               [style.width.%]="(stock.current / stock.threshold) * 100"
+               [attr.aria-valuenow]="stock.current"
+               [attr.aria-valuemin]="0"
+               [attr.aria-valuemax]="stock.threshold"
+               role="progressbar"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer actions -->
+  <footer class="dashboard-footer">
+    <button class="btn-primary" (click)="onNewManualTicket()" aria-label="Créer un nouveau ticket manuel">
+      <i class="fas fa-plus" aria-hidden="true"></i>
+      Nouveau ticket manuel
+    </button>
+    <button class="btn-secondary" (click)="onViewAllOrders()" aria-label="Voir toutes les commandes">
+      <i class="fas fa-list" aria-hidden="true"></i>
+      Voir toutes les commandes
+    </button>
+  </footer>
+</div>

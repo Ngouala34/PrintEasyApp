@@ -42,7 +42,7 @@ export class OrderService {
       delivery_phone: data.delivery_phone || null
     };
 
-    console.log('📦 Données orderData:', orderData);
+    console.log(' Données orderData:', orderData);
 
     // 3. Ajouter chaque champ individuellement dans FormData
     // Au lieu d'envoyer un JSON, on envoie chaque champ séparément
@@ -54,15 +54,24 @@ export class OrderService {
     });
 
     // Debug: Vérifier le contenu de FormData
-    console.log('🔍 Contenu de FormData:');
+    console.log(' Contenu de FormData:');
     for (let pair of (formData as any).entries()) {
       console.log(pair[0] + ': ', pair[1]);
     }
 
     return this.http.post<IOrderResponse>(`${this.apiUrl}orders/`, formData).pipe(
       catchError(error => {
-        console.error('❌ Erreur API détaillée:', error);
-        console.error('❌ Réponse erreur:', error.error);
+        console.error(' Erreur API détaillée:', error);
+        console.error(' Réponse erreur:', error.error);
+        throw error;
+      })
+    );
+  }
+
+  loadOrders(): Observable<IOrderResponse[]> {
+    return this.http.get<IOrderResponse[]>(`${this.apiUrl}orders/`).pipe(
+      catchError(error => {
+        console.error('Erreur API lors du chargement des commandes:', error);
         throw error;
       })
     );
