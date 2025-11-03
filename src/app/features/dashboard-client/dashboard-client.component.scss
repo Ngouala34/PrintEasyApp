@@ -2,6 +2,11 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
+
+.section{
+  display: flex;
+  justify-content: center;
+}
 .dashboard-container {
   display: grid;
   grid-template-rows: 70px 1fr;
@@ -10,7 +15,7 @@
     "navbar navbar"
     "sidebar content";
   height: 100vh;
-  overflow: hidden;
+  position: fixed;  
 }
 
 // Navbar
@@ -21,6 +26,7 @@
   background: $white;
   border-bottom: 1px solid $gray-light;
   z-index: $z-sticky;
+  
 }
 
 .navbar-left {
@@ -210,6 +216,7 @@
 
 .dropdown-body {
   max-height: 400px;
+  overflow-y: auto;
 }
 
 .dropdown-footer {
@@ -304,6 +311,7 @@
 .user-email {
   font-size: $font-size-xs;
   color: $gray-medium;
+  
 }
 
 .dropdown-item {
@@ -464,7 +472,7 @@
   background: $gray-light;
   transition: all $transition-base;
   margin-left: -4rem;
-
+  overflow-y: auto;
 
   &.sidebar-collapsed {
     margin-left: -220px;

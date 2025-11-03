@@ -1,12 +1,16 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+*{
+  box-sizing: border-box;
+}
+
 .dashboard-page {
   padding: $spacing-2xl;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: $spacing-2xl;
-
   @include responsive(md) {
     padding: $spacing-3xl;
   }
@@ -244,7 +248,6 @@
   background: $gray-light;
   border-radius: $radius-lg;
   transition: all $transition-base;
-  overflow: hidden;
 
   &:hover {
     background: lighten($primary-yellow, 47%);
@@ -521,7 +524,6 @@
   height: 6px;
   background: $gray-light;
   border-radius: $radius-full;
-  overflow: hidden;
 }
 
 .progress-fill {
@@ -684,4 +686,56 @@
   .detail-value {
     text-align: left;
   }
+}
+
+@media (max-width : 1355px){
+
+  // Dashboard Grid
+.dashboard-grid {
+  display: flex;
+  gap: $spacing-2xl;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+
+}
+
+.sidebar-sections {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: $spacing-xl;
+  width: 100%;
+
+
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 2rem;
+}
+
+// Section Card
+.section-card {
+  width: 100%;
+  padding: $spacing-xl;
+  box-shadow: $shadow-sm;
+}
+
+}
+
+@media (max-width : 769px){
+  .dashboard-page {
+    padding: $spacing-md;
+  }
+
+  // KPIs Grid
+  .kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+  }
+
 }

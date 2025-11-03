@@ -66,7 +66,7 @@ export class UploadDocumentComponent implements OnInit {
 documentTypes: DocumentType[] = [
   { id: 'CARTE_DE_VISITE', name: 'Carte de visite', image: 'assets/images/visitCard.jpg' },
   { id: 'flyer', name: 'Flyer', image: 'assets/images/Flyers.jpg' },
-  { id: 'AFFICHE', name: 'Affiche', image: 'assets/images/poster.jpg' },
+  { id: 'AFFICHE', name: 'Affiche', image: 'assets/images/affiche.jpg' },
   { id: 'BROCHURE', name: 'Brochure', image: 'assets/images/brochure.jpg' },
   { id: 'DOCUMENT', name: 'Document', image: 'assets/images/document.jpg' },
   { id: 'BANNIERE', name: 'Bannière', image: 'assets/images/rollUp3.jpg' }
