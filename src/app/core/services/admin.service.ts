@@ -1,6 +1,6 @@
 // src/app/services/printer-dashboard.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
 export interface KPIData {
   pendingOrders: number;
@@ -8,6 +8,12 @@ export interface KPIData {
   completedThisMonth: number;
   deliveriesToday: number;
   monthlyRevenue: number;
+}
+
+export interface RevenueByType {
+  type: string;
+  revenue: number;
+  count: number;
 }
 
 export interface OrderActivity {
@@ -315,4 +321,18 @@ export class PrinterDashboardService {
     console.log(`Téléchargement du fichier pour la commande ${orderId}`);
     // Dans un cas réel, faire un appel API pour télécharger le fichier
   }
+
+  getRevenueByType(): Observable<RevenueByType[]> {
+  // Données simulées - à remplacer par votre appel API
+  const revenueByType: RevenueByType[] = [
+    { type: 'Flyers', revenue: 8450, count: 45 },
+    { type: 'Cartes de visite', revenue: 6230, count: 38 },
+    { type: 'Affiches', revenue: 5120, count: 25 },
+    { type: 'Brochures', revenue: 3890, count: 18 },
+    { type: 'Stickers', revenue: 2950, count: 14 },
+    { type: 'Dépliants', revenue: 2180, count: 12 },
+    { type: 'Catalogues', revenue: 1850, count: 8 }
+  ];
+  return of(revenueByType);
+}
 }

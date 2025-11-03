@@ -3,20 +3,31 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+*{
+  box-sizing: border-box;
+}
 .dashboard-printer {
-  @include container;
   padding-top: $spacing-xl;
   padding-bottom: $spacing-3xl;
+  padding-left: $spacing-2xl;
+  padding-right: $spacing-2xl;
+  overflow-y: hidden;
 
   // KPI Section
   .kpi-section {
     margin-bottom: $spacing-2xl;
+
+    
   }
 
   .kpi-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $spacing-lg;
+    display:flex;
+    flex-direction: row;
+    flex-wrap:wrap ;
+    justify-content: space-between;
+    box-sizing: border-box;
+    gap: 1rem;
+    width: 100%;
 
     @include responsive(sm) {
       grid-template-columns: repeat(2, 1fr);
@@ -33,9 +44,9 @@
 
   .kpi-card {
     @include card;
-    @include flex-between;
     cursor: pointer;
-    padding: $spacing-lg;
+    box-sizing: border-box;
+    padding: $spacing-md;
 
     &:focus-visible {
       outline: 3px solid $primary-yellow;
@@ -97,6 +108,10 @@
   // Main Content
   .main-content {
     margin-bottom: $spacing-2xl;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: hidden;
   }
 
   .content-grid {
@@ -115,6 +130,8 @@
     border-radius: $radius-xl;
     padding: $spacing-xl;
     box-shadow: $shadow-md;
+    overflow: scroll;
+
   }
 
   .section-header {
@@ -169,7 +186,6 @@
 
   // Table
   .table-container {
-    overflow-x: auto;
     margin: 0 (-$spacing-xl);
     padding: 0 $spacing-xl;
   }
@@ -179,6 +195,8 @@
     border-collapse: separate;
     border-spacing: 0;
     font-size: $font-size-sm;
+    overflow: scroll;
+
 
     thead {
       background: $gray-light;
@@ -224,7 +242,6 @@
 
         &[data-priority="urgent"],
         &[data-priority="rush"] {
-          border-left: 3px solid $error;
         }
       }
 
@@ -368,7 +385,8 @@
 
   .alerts-list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: $spacing-md;
   }
 
@@ -377,8 +395,8 @@
     gap: $spacing-md;
     padding: $spacing-md;
     border-radius: $radius-md;
-    border-left: 4px solid;
     transition: all $transition-fast;
+    flex-direction: row;
 
     &.alert-high {
       background: lighten($error, 45%);
@@ -447,12 +465,17 @@
 
   // Stats Section
   .stats-section {
-    margin-bottom: $spacing-2xl;
+    margin-bottom: $spacing-xl;
+    background-color:#fbfbfb;
+    border-radius: $radius-xl;
+    padding: 1rem;
   }
 
   .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap:wrap ;
     gap: $spacing-xl;
 
     @include responsive(lg) {
@@ -463,8 +486,11 @@
   .chart-card {
     background: $white;
     border-radius: $radius-xl;
-    padding: $spacing-xl;
+    padding:0.5rem;
     box-shadow: $shadow-md;
+    box-sizing: border-box;
+    min-width: 350px;
+    transition: all $transition-base;
   }
 
   .chart-title {
@@ -587,7 +613,6 @@
     background: $white;
     border-radius: $radius-xl;
     padding: $spacing-lg;
-    box-shadow: $shadow-md;
     grid-column: 1 / -1;
 
     @include responsive(lg) {
@@ -599,11 +624,13 @@
     @include heading-primary;
     font-size: $font-size-base;
     margin: 0 0 $spacing-md 0;
+        display: flex;
+    flex-direction: row;
   }
 
   .timeline-list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: $spacing-md;
   }
 
@@ -630,7 +657,8 @@
     background: $primary-yellow;
     border: 3px solid lighten($primary-yellow, 35%);
     flex-shrink: 0;
-    margin-top: 4px;
+    margin-top: 4px;    display: flex;
+    flex-direction: row;
   }
 
   .timeline-content {
@@ -732,7 +760,6 @@
     height: 8px;
     background: $gray-light;
     border-radius: $radius-full;
-    overflow: hidden;
   }
 
   .stock-fill {
@@ -794,3 +821,209 @@
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+// src/app/components/dashboard-printer/dashboard-printer.component.scss
+
+// Styles pour les charts
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem 0;
+
+}
+
+.stats-grid {
+  margin-bottom: 2rem;
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.chart-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-container {
+  position: relative;
+  height: 150px;
+  width: 100%;
+}
+
+// Styles existants pour le reste du dashboard
+.kpi-section {
+  margin-bottom: 2rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.kpi-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  
+  &--pending { background: #f59e0b; }
+  &--progress { background: #3b82f6; }
+  &--completed { background: #10b981; }
+  &--delivery { background: #8b5cf6; }
+  &--revenue { background: #f0e222; color: #333; }
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.kpi-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+// ... autres styles existants
+
+
+
+// Ajoutez ces styles dans votre fichier SCSS
+.revenue-by-type-section {
+  margin: 3rem 0;
+
+  .chart-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+
+    &:hover {
+      box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+      width: 100%;
+    }
+      background-color: red !important  ;
+
+  }
+
+  .chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    
+
+    @media (max-width: 768px) {
+      height: 500px; // Plus grand sur mobile pour les barres horizontales
+    }
+
+    @media (max-width: 480px) {
+      height: 450px;
+    }
+  }
+}
+
+// Ajustement de la grille des statistiques pour 3 graphiques
+.stats-grid {
+  gap: 3rem;
+
+  @media (max-width: 1024px) {
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    gap: 1rem;
+  }
+}
+
+
+
+  @media (max-width: 768px) {
+
+  .dashboard-printer {
+    padding-left: $spacing-lg;
+    padding-right: $spacing-lg;
+
+
+    .kpi-grid{
+      grid-template-columns: repeat(2, 1fr);
+      .kpi-card{
+        font-size: smaller;
+        width: 13rem;
+      }
+    }
+
+    .chart-card {
+       width: 80%;
+    }
+  }
+
+
+  }
+
+    @media (max-width: 481px) {
+
+  .dashboard-printer {
+    padding-left: $spacing-sm;
+    padding-right: $spacing-sm;
+    background-color: red;
+
+
+    .kpi-grid{
+      grid-template-columns: repeat(2, 1fr);
+      .kpi-card{
+        font-size: 1rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: $spacing-md;
+      }
+    }
+
+    .chart-card {
+       width: 40%;
+    }
+  }
+  }

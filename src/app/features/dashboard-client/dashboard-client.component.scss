@@ -461,7 +461,6 @@
 // Main Content
 .main-content {
   grid-area: content;
-  overflow-y: auto;
   background: $gray-light;
   transition: all $transition-base;
   margin-left: -4rem;
