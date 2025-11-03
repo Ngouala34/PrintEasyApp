@@ -39,19 +39,14 @@ export class DashboardAdminComponent {
     const refreshToken = this.authService.getRefreshToken();
 
     if (!accessToken) {
-      console.warn(' Aucun access token trouvé !');
       // Optionnel : rediriger vers login
       return;
     }
 
     if (this.authService.isTokenExpired(accessToken)) {
-      console.warn(' Le token est expiré !');
       // Optionnel : tenter un refresh ou rediriger vers login
       return;
     }
-
-    console.log(' Token présent et valide :', accessToken);
-    console.log('Refresh token :', refreshToken);
 
 
   }
