@@ -703,7 +703,6 @@
 .sidebar-sections {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   gap: $spacing-xl;
   width: 100%;
 
@@ -737,5 +736,20 @@
     grid-template-columns: repeat(2, 1fr);
 
   }
+
+  .sidebar-sections {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: $spacing-xl;
+    width: 100%;
+  }
+  .stats-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+}
+
 
 }

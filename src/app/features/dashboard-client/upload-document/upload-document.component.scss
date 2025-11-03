@@ -1,6 +1,10 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+* {
+  box-sizing: border-box;
+}
+
 .upload-document-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f5f5 0%, #f0f2f5 100%);
@@ -10,11 +14,11 @@
     padding: $spacing-3xl $spacing-xl;
   }
 
+
   // ============ EN-TÊTE DE PAGE ============
   .page-header {
     text-align: center;
     margin-bottom: $spacing-3xl;
-    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     
@@ -962,4 +966,13 @@
   .form-section {
     animation: slideIn 0.5s ease-out;
   }
+}
+
+@media (max-width : 1024px) {
+  .upload-document-container {
+    width: 100%;
+    background-color: red !important;
+
+  }
+
 }
