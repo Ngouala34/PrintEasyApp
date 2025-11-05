@@ -1,6 +1,9 @@
 // src/app/services/printer-dashboard.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { IOrderResponse } from '../models/order';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface KPIData {
   pendingOrders: number;
@@ -23,7 +26,8 @@ export interface OrderActivity {
   type: string;
   format: string;
   quantity: number;
-  status: 'pending' | 'in-progress' | 'completed' | 'delayed';
+  status: 'pending' | 'completed' | 'cancelled' | 'in_progress' | 'printed' | 'delivered' ;
+
   eta: Date;
   priority: 'normal' | 'urgent' | 'rush';
 }
@@ -73,18 +77,19 @@ export interface StockLevel {
 })
 export class PrinterDashboardService {
 
-
+    private apiUrl = environment.apiUrl;
+  
 
 
 
   
   // BehaviorSubjects pour données réactives
   private kpisSubject = new BehaviorSubject<KPIData>({
-    pendingOrders: 23,
-    inProgress: 8,
-    completedThisMonth: 147,
-    deliveriesToday: 12,
-    monthlyRevenue: 18450
+    pendingOrders: 0,
+    inProgress: 0,
+    completedThisMonth: 0,
+    deliveriesToday: 0,
+    monthlyRevenue: 0
   });
 
   private ordersSubject = new BehaviorSubject<OrderActivity[]>([
@@ -106,7 +111,7 @@ export class PrinterDashboardService {
       type: 'Cartes de visite',
       format: '85x55mm',
       quantity: 500,
-      status: 'in-progress',
+      status: 'in_progress',
       eta: new Date(Date.now() + 7200000),
       priority: 'rush'
     },
@@ -122,24 +127,13 @@ export class PrinterDashboardService {
       priority: 'normal'
     },
     {
-      id: '4',
-      ref: 'CMD-2024-1237',
-      client: 'Sport Center',
-      type: 'Affiches',
-      format: 'A3',
-      quantity: 50,
-      status: 'in-progress',
-      eta: new Date(Date.now() + 14400000),
-      priority: 'normal'
-    },
-    {
       id: '5',
       ref: 'CMD-2024-1238',
       client: 'École Primaire',
       type: 'Brochures',
       format: 'A5',
       quantity: 300,
-      status: 'delayed',
+      status: 'pending',
       eta: new Date(Date.now() - 3600000),
       priority: 'urgent'
     },
@@ -233,7 +227,7 @@ export class PrinterDashboardService {
     { item: 'Papier A3 Mat', current: 5, threshold: 10, unit: 'ramettes' }
   ]);
 
-  constructor() {}
+  constructor(private http : HttpClient) {}
 
   // Observables publics
   getKpis(): Observable<KPIData> {
@@ -268,53 +262,78 @@ export class PrinterDashboardService {
     return this.stockLevelsSubject.asObservable();
   }
 
-  // Actions sur les commandes
-  startOrder(orderId: string): void {
-    const orders = this.ordersSubject.value;
-    const updatedOrders = orders.map(order => 
-      order.id === orderId ? { ...order, status: 'in-progress' as const } : order
-    );
-    this.ordersSubject.next(updatedOrders);
+startOrder(orderId: string): Observable<IOrderResponse> {
+  return this.http.patch<IOrderResponse>(
+    `${this.apiUrl}orders/${orderId}/start_production/`, 
+    {} // aucun body requis
+  ).pipe(
+    tap(updatedOrder => {
+      // Transformer en OrderActivity
+      const formattedOrder = this.formatOrderActivity(updatedOrder);
 
-    // Mise à jour des KPIs
-    const kpis = this.kpisSubject.value;
-    this.kpisSubject.next({
-      ...kpis,
-      pendingOrders: kpis.pendingOrders - 1,
-      inProgress: kpis.inProgress + 1
-    });
-  }
+      // Mettre à jour la liste locale
+      const orders = this.ordersSubject.value.map(order =>
+        order.id === formattedOrder.id ? formattedOrder : order
+      );
+      this.ordersSubject.next(orders);
 
-  completeOrder(orderId: string): void {
-    const orders = this.ordersSubject.value;
-    const updatedOrders = orders.map(order => 
-      order.id === orderId ? { ...order, status: 'completed' as const } : order
-    );
-    this.ordersSubject.next(updatedOrders);
+      // Mettre à jour les KPI localement
+      const kpis = this.kpisSubject.value;
+      this.kpisSubject.next({
+        ...kpis,
+        pendingOrders: Math.max(0, kpis.pendingOrders - 1),
+        inProgress: kpis.inProgress + 1
+      });
+    })
+  );
+}
 
-    // Mise à jour des KPIs
-    const kpis = this.kpisSubject.value;
-    this.kpisSubject.next({
-      ...kpis,
-      inProgress: kpis.inProgress - 1,
-      completedThisMonth: kpis.completedThisMonth + 1
-    });
+// Méthode de transformation
+private formatOrderActivity(order: IOrderResponse): OrderActivity {
+  return {
+    id: order.id,
+    ref: order.order_number,
+    client: order.user.full_name,
+    type: order.document_type,
+    format: order.options?.option_format || 'N/A',
+    quantity: order.quantity,
+    status: order.status,
+    eta: new Date(order.created_at),
+    priority: order.priority || 'normal',
+  };
+}
 
-    // Ajout aux livraisons récentes
-    const order = orders.find(o => o.id === orderId);
-    // if (order) {
-    //   const deliveries = this.recentDeliveriesSubject.value;
-    //   this.recentDeliveriesSubject.next([
-    //     {
-    //       ref: order.ref,
-    //       client: order.client,
-    //       timestamp: new Date(),
-    //       status: 'completed'
-    //     },
-    //     ...deliveries
-    //   ].slice(0, 5)); // Garder seulement les 5 dernières
-    // }
-  }
+
+completeOrder(orderId: string): Observable<IOrderResponse> {
+  return this.http.patch<IOrderResponse>(
+    `${this.apiUrl}orders/${orderId}/mark_printed/`,
+    {} // aucun body requis
+  ).pipe(
+    tap(updatedOrder => {
+      // Transformer en OrderActivity pour le signal
+      const formattedOrder = this.formatOrderActivity(updatedOrder);
+
+      // Mettre à jour la liste locale
+      const orders = this.ordersSubject.value.map(order =>
+        order.id === formattedOrder.id ? formattedOrder : order
+      );
+      this.ordersSubject.next(orders);
+
+      // Mettre à jour les KPIs localement
+      const kpis = this.kpisSubject.value;
+      this.kpisSubject.next({
+        ...kpis,
+        inProgress: Math.max(0, kpis.inProgress - 1),
+        completedThisMonth: kpis.completedThisMonth + 1
+      });
+
+      // Ajouter à recent deliveries (optionnel, garder max 5)
+      const deliveries = this.recentDeliveriesSubject.value;
+
+    })
+  );
+}
+
 
   downloadFile(orderId: string): void {
     // Simulation de téléchargement

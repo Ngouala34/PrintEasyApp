@@ -44,8 +44,16 @@ export const routes: Routes = [
       loadComponent: () =>
         import('./features/dashboard-admin/dashboard-printer/dashboard-printer.component')
           .then(m => m.DashboardPrinterComponent)
+    },
+    {
+      path: 'document-detail/:id',
+      loadComponent: () =>
+        import('./features/dashboard-admin/document-detail/document-detail.component')
+          .then(m => m.DocumentDetailComponent)
     }
   ]
 }
+
+
 
 ];

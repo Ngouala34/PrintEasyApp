@@ -46,33 +46,57 @@ export interface IOrderData {
   timestamp: Date;
 }
 
+
+
 export interface IOrderResponse {
-  id: number;
+  id: string;
   order_number: string;
   user: OrderUser;
   document_type: string;
   price: string;
-  document_url: string;
+  document_url: string ;
   note: string | null;
   quantity: number;
   number_of_pages: number;
   options: OrderOptions;
-  delivery_city: string;
-  delivery_neighborhood: string;
-  delivery_address: string;
-  delivery_phone: string;
+  delivery_city: string | null;
+  delivery_neighborhood: string | null;
+  delivery_address: string | null;
+  delivery_phone: string | null;
   unit_price: string;
   total_price: string;
-  status: 'pending' | 'processing' | 'delivered' | 'cancelled';
-  created_at: string;
-  updated_at: string;
+  status: 'pending' | 'cancelled' | 'in_progress' | 'printed' | 'delivered' ;
+  created_at: Date; // ou Date si tu préfères le convertir
+  updated_at: Date; // idem
+  priority: 'normal' | 'urgent' | 'rush';
 }
 
-export interface OrderSummary {
+export interface OrderUser {
   id: number;
+  full_name: string;
+  email: string;
+}
+
+export interface OrderOptions {
+  option_binding?: string;
+  option_color?: string;
+  option_delivery?: string;
+  option_format?: string;
+  option_paper?: string;
+  option_sides?: string;
+}
+
+
+
+
+
+
+export interface OrderSummary {
+  id: string;
   orderNumber: string;
   date: Date;
-  status: 'pending' | 'processing' | 'delivered' | 'cancelled';
+  status: 'pending'| 'cancelled' | 'in_progress' | 'printed' | 'delivered' ;
+
   service: string;
   quantity: number;
   total: number;
@@ -80,15 +104,15 @@ export interface OrderSummary {
   documentUrl: string;
   options: OrderOptions;
   deliveryInfo: {
-    city: string;
-    neighborhood: string;
-    address: string;
-    phone: string;
+    city: string | null;
+    neighborhood: string | null;
+    address: string | null;
+    phone: string | null;
   };
   note?: string;
   numberOfPages: number;
   unitPrice: string;
   user: OrderUser;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

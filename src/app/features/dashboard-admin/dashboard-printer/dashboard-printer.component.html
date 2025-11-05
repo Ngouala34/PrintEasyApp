@@ -19,7 +19,7 @@
         </div>
         <div class="kpi-content">
           <div class="kpi-value">{{ kpis.inProgress }}</div>
-          <div class="kpi-label">En impression</div>
+          <div class="kpi-label">En impression</div>  
         </div>
       </div>
 
@@ -82,10 +82,17 @@
             </button>
             <button 
               class="filter-btn" 
-              [class.active]="selectedFilter === 'in-progress'"
-              (click)="filterOrders('in-progress')"
+              [class.active]="selectedFilter === 'in_progress'"
+              (click)="filterOrders('in_progress')"
               aria-label="Afficher les commandes en cours">
               En cours
+            </button>
+            <button 
+              class="filter-btn" 
+              [class.active]="selectedFilter === 'printed'"
+              (click)="filterOrders('printed')"
+              aria-label="Afficher les commandes terminées">
+              Terminées
             </button>
             <button 
               class="filter-btn" 
@@ -109,57 +116,65 @@
                   Client
                   <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
-                <th>Type</th>
+                <th (click)="sortBy('type')" role="columnheader" tabindex="0">
+                  Type
+                  <i class="fas fa-sort" aria-hidden="true"></i>
+                </th>
                 <th>Format</th>
                 <th>Quantité</th>
                 <th>Statut</th>
                 <th (click)="sortBy('eta')" role="columnheader" tabindex="0">
-                  ETA
+                  Date
                   <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of filteredOrders" [attr.data-priority]="order.priority">
+              <tr *ngFor="let order of filteredOrders | slice:0:6" [attr.data-priority]="order.priority || 'normal'">
                 <td class="ref-cell">
-                  <span class="ref-badge">{{ order.ref }}</span>
-                  <span class="priority-indicator" [ngClass]="getPriorityClass(order.priority)" 
-                        *ngIf="order.priority !== 'normal'">
+                  <span class="ref-badge">{{ order.order_number }}</span>
+                  <span class="priority-indicator" [ngClass]="getPriorityClass(order.priority)">
                     <i class="fas fa-flag" aria-hidden="true"></i>
                   </span>
                 </td>
-                <td class="client-cell">{{ order.client }}</td>
-                <td>{{ order.type }}</td>
-                <td>{{ order.format }}</td>
+                <td class="client-cell">{{ order.user.full_name }}</td>
+                <td>{{ order.document_type }}</td>
+                <td>{{ order.options.option_format || 'N/A' }}</td>
                 <td class="qty-cell">{{ order.quantity }}</td>
                 <td>
                   <span class="status-chip" [ngClass]="getStatusClass(order.status)">
                     {{ getStatusLabel(order.status) }}
                   </span>
                 </td>
-                <td class="eta-cell">{{ formatTime(order.eta) }}</td>
+
+                <td class="eta-cell">{{ formatTime(order.created_at) }}</td>
                 <td class="actions-cell">
                   <button 
                     class="action-btn action-btn--start" 
-                    *ngIf="order.status === 'pending'"
                     (click)="onStartOrder(order.id)"
-                    [attr.aria-label]="'Démarrer la commande ' + order.ref">
+                    [disabled]="order.status === 'in_progress' || order.status === 'printed'"
+                    [attr.aria-label]="'Démarrer la commande ' + order.order_number">
                     <i class="fas fa-play" aria-hidden="true"></i>
                   </button>
                   <button 
                     class="action-btn action-btn--complete" 
-                    *ngIf="order.status === 'in-progress'"
                     (click)="onCompleteOrder(order.id)"
-                    [attr.aria-label]="'Marquer comme terminée la commande ' + order.ref">
+                    [disabled]="order.status === 'printed'"
+                    [attr.aria-label]="'Marquer comme terminée la commande ' + order.order_number">
                     <i class="fas fa-check" aria-hidden="true"></i>
                   </button>
                   <button 
                     class="action-btn action-btn--download"
-                    (click)="onDownloadFile(order.id)"
-                    [attr.aria-label]="'Télécharger le fichier de la commande ' + order.ref">
-                    <i class="fas fa-download" aria-hidden="true"></i>
+                    (click)="onViewOrderDetails(order.id)">
+                    <i class="fas fa-eye" aria-hidden="true"></i>
                   </button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredOrders.length === 0">
+                <td colspan="8" class="empty-state">
+                  <i class="fas fa-inbox" aria-hidden="true"></i>
+                  <p>Aucune commande {{ selectedFilter !== 'all' ? getStatusLabel(selectedFilter) : '' }}</p>
                 </td>
               </tr>
             </tbody>
@@ -247,10 +262,6 @@
     </div>
   </div>
 </section>
-
-
-
-
 
   <!-- Footer actions -->
   <footer class="dashboard-footer">

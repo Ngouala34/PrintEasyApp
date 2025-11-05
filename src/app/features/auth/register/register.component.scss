@@ -606,3 +606,11 @@ input[type="checkbox"]:focus {
 
     }
   }
+  
+  @media (max-width : 480px){
+    .auth-card {
+      width: 100%;
+      padding: 1rem;
+
+    }
+  }

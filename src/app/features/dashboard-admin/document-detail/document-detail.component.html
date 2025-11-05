@@ -1,0 +1,117 @@
+<div class="document-detail-container" *ngIf="!isLoading(); else loading">
+  <!-- Header principal -->
+  <header class="detail-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="onGoBack()">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+      <h1>Commande <span>#{{ order()?.order_number }}</span></h1>
+      <span class="status-badge" [ngClass]="statusClass()">{{ statusLabel() }}</span>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-generate" (click)="generateInvoice()">
+        <i class="fas fa-file-invoice"></i>
+        Générer la facture
+      </button>
+    </div>
+  </header>
+
+  <!-- Section des actions -->
+  <section class="action-section">
+    <button class="btn-primary" [disabled]="!canStartProduction()" (click)="onStartProduction()">
+      <i class="fas fa-play-circle"></i> Démarrer la production
+    </button>
+    <button class="btn-success" [disabled]="!canMarkAsPrinted()" (click)="onMarkAsPrinted()">
+      <i class="fas fa-check-circle"></i> Marquer comme imprimé
+    </button>
+    <button class="btn-secondary" [disabled]="!hasDocument()" (click)="onDownloadFile()">
+      <i class="fas fa-download"></i> Télécharger
+    </button>
+    <button class="btn-outline" (click)="onShowNoteForm()">
+      <i class="fas fa-comment-alt"></i> Ajouter une note
+    </button>
+  </section>
+
+  <!-- Contenu principal -->
+  <div class="details-grid">
+    <!-- Carte infos générales -->
+    <div class="detail-card">
+      <h2><i class="fas fa-info-circle"></i> Informations générales</h2>
+      <div class="info-pair"><span>Type :</span> <strong>{{ order()?.document_type }}</strong></div>
+      <div class="info-pair"><span>Quantité :</span> {{ order()?.quantity }}</div>
+      <div class="info-pair"><span>Pages :</span> {{ order()?.number_of_pages }}</div>
+      <div class="info-pair"><span>Prix unitaire :</span> {{ formatPrice(order()?.unit_price || 0) }}</div>
+      <div class="info-pair highlight"><span>Total :</span> {{ formatPrice(order()?.total_price || 0) }}</div>
+      <div class="info-pair"><span>Créée le :</span> {{ formattedCreatedAt() }}</div>
+      <div class="info-pair"><span>Mise à jour :</span> {{ formattedUpdatedAt() }}</div>
+    </div>
+
+    <!-- Carte client -->
+    <div class="detail-card">
+      <h2><i class="fas fa-user"></i> Informations client</h2>
+      <div class="info-pair"><span>Nom :</span> {{ order()?.user?.full_name }}</div>
+      <div class="info-pair"><span>Email :</span> 
+        <a [href]="'mailto:' + order()?.user?.email">{{ order()?.user?.email }}</a>
+      </div>
+      <div class="info-pair"><span>ID :</span> #{{ order()?.user?.id }}</div>
+    </div>
+
+    <!-- Carte options -->
+    <div class="detail-card">
+      <h2><i class="fas fa-cog"></i> Options d'impression</h2>
+      <ul class="options-list">
+        <li><i class="fas fa-palette"></i> Couleur : <strong>{{ order()?.options?.option_color }}</strong></li>
+        <li><i class="fas fa-expand-arrows-alt"></i> Format : {{ order()?.options?.option_format }}</li>
+        <li><i class="fas fa-file-alt"></i> Papier : {{ order()?.options?.option_paper }}</li>
+        <li><i class="fas fa-copy"></i> Recto/Verso : {{ order()?.options?.option_sides }}</li>
+        <li><i class="fas fa-book"></i> Reliure : {{ order()?.options?.option_binding }}</li>
+        <li><i class="fas fa-truck"></i> Livraison : {{ order()?.options?.option_delivery }}</li>
+      </ul>
+    </div>
+
+    <!-- Carte livraison -->
+    <div class="detail-card" *ngIf="hasDeliveryInfo()">
+      <h2><i class="fas fa-map-marker-alt"></i> Livraison</h2>
+      <div class="info-pair"><span>Adresse :</span> {{ order()?.delivery_address }}</div>
+      <div class="info-pair"><span>Quartier :</span> {{ order()?.delivery_neighborhood }}</div>
+      <div class="info-pair"><span>Ville :</span> {{ order()?.delivery_city }}</div>
+      <div class="info-pair">
+        <span>Téléphone :</span>
+        <a [href]="'tel:' + order()?.delivery_phone">{{ order()?.delivery_phone }}</a>
+      </div>
+    </div>
+
+    <!-- Carte notes -->
+    <div class="detail-card note-card">
+      <h2><i class="fas fa-sticky-note"></i> Notes</h2>
+      <div *ngIf="!isAddingNote() && order()?.note; else noNote">
+        <p class="note-text">{{ order()?.note }}</p>
+        <button class="btn-edit" (click)="onShowNoteForm()"><i class="fas fa-edit"></i> Modifier</button>
+      </div>
+      <ng-template #noNote>
+        <p class="empty-note">Aucune note pour cette commande</p>
+      </ng-template>
+
+      <div *ngIf="isAddingNote()" class="note-form">
+        <textarea [(ngModel)]="noteText" placeholder="Ajoutez une note..." rows="4"></textarea>
+        <div class="note-actions">
+          <button class="btn-primary" (click)="onSaveNote()"><i class="fas fa-save"></i> Enregistrer</button>
+          <button class="btn-outline" (click)="onCancelNote()"><i class="fas fa-times"></i> Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton WhatsApp flottant -->
+  <button class="whatsapp-float" (click)="openWhatsApp()">
+    <i class="fab fa-whatsapp"></i>
+  </button>
+</div>
+
+<ng-template #loading>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des détails...</p>
+  </div>
+</ng-template>

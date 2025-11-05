@@ -1,9 +1,13 @@
+
 // src/app/components/dashboard-printer/dashboard-printer.component.ts
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
 import { KPIData, OrderActivity, Alert, DocumentTypeStats, RevenueData, ProductivityMetrics, RecentDelivery, StockLevel, PrinterDashboardService } from '../../../core/services/admin.service';
 import { Chart, registerables, ChartConfiguration, TooltipItem } from 'chart.js';
+import { IOrderResponse, OrderSummary } from '../../../core/models/order';
+import { OrderService } from '../../../core/services/order.service';
+import { Router, RouterOutlet } from '@angular/router';
 
 // Enregistrer tous les composants de Chart.js
 Chart.register(...registerables);
@@ -18,16 +22,19 @@ export interface RevenueByType {
 @Component({
   selector: 'app-dashboard-printer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './dashboard-printer.component.html',
   styleUrls: ['./dashboard-printer.component.scss']
 })
 export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
-  // Données du dashboard
+  // Données du dashboard - utiliser les données réelles
+  realOrders: IOrderResponse[] = [];
+  orders = signal<OrderSummary[]>([]);
+  
+  // Données du service PrinterDashboardService (pour les autres sections)
   kpis: KPIData | null = null;
-  todayOrders: OrderActivity[] = [];
   alerts: Alert[] = [];
   documentStats: DocumentTypeStats[] = [];
   revenueData: RevenueData[] = [];
@@ -37,8 +44,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   stockLevels: StockLevel[] = [];
 
   // Filtres et tri pour les commandes
-  selectedFilter: 'all' | 'pending' | 'in-progress' | 'delayed' = 'all';
-  sortColumn: 'ref' | 'client' | 'eta' | 'priority' = 'eta';
+  selectedFilter: 'all' | 'pending' | 'in_progress' | 'delayed' | 'printed' | 'cancelled' = 'all';
+  sortColumn: 'ref' | 'client' | 'eta' | 'priority' | 'type' = 'eta';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   // Charts
@@ -50,14 +57,25 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   private chartsReady = false;
   private isMobile = false;
 
-  constructor(private dashboardService: PrinterDashboardService) {
+  constructor(
+    private router: Router,
+    private dashboardService: PrinterDashboardService, 
+    private orderService: OrderService
+  ) {
     this.checkScreenSize();
   }
 
   ngOnInit(): void {
     // Charger toutes les données du dashboard
+    this.loadAllData();
+  }
+
+  private loadAllData(): void {
+    // Charger les commandes réelles en premier
+    this.loadRealOrders();
+    
+    // Charger les autres données du dashboard
     this.loadKpis();
-    this.loadOrders();
     this.loadAlerts();
     this.loadDocumentStats();
     this.loadRevenueData();
@@ -65,6 +83,156 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
     this.loadProductivity();
     this.loadRecentDeliveries();
     this.loadStockLevels();
+  }
+
+  private loadRealOrders(): void {
+    this.orderService.loadOrders()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: IOrderResponse[]) => {
+          this.realOrders = data;
+          const formattedOrders = data.map(order => this.formatOrder(order));
+          this.orders.set(formattedOrders);
+          
+          // Recalculer les KPIs basés sur les vraies données
+          this.calculateRealKPIs();
+          
+          // Recalculer les stats de documents
+          this.calculateDocumentStats();
+          
+          console.log('Commandes chargées:', data.length);
+        },
+        error: (error) => {
+          console.error(' Erreur lors du chargement des commandes:', error);
+        }
+      });
+  }
+
+  private formatOrder(order: IOrderResponse): OrderSummary {
+    return {
+      id: order.id,
+      orderNumber: order.order_number,
+      date: new Date(order.created_at),
+      status: order.status,
+      service: order.document_type,
+      quantity: order.quantity,
+      total: parseFloat(order.total_price) || 0,
+      documentType: order.document_type,
+      documentUrl: order.document_url,
+      options: order.options,
+      deliveryInfo: {
+        city: order.delivery_city,
+        neighborhood: order.delivery_neighborhood,
+        address: order.delivery_address,
+        phone: order.delivery_phone
+      },
+      note: order.note || undefined,
+      numberOfPages: order.number_of_pages,
+      unitPrice: order.unit_price,
+      user: order.user,
+      createdAt: new Date(order.created_at),
+      updatedAt: new Date(order.updated_at)
+    };
+  }
+
+  // Calculer les KPIs basés sur les vraies données
+  private calculateRealKPIs(): void {
+    if (this.realOrders.length === 0) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const pendingOrders = this.realOrders.filter(o => o.status === 'pending').length;
+    const inProgress = this.realOrders.filter(o => o.status === 'in_progress').length;
+    
+    const completedThisMonth = this.realOrders.filter(o => {
+      const orderDate = new Date(o.created_at);
+      return o.status === 'printed' && orderDate >= thirtyDaysAgo;
+    }).length;
+
+    // Livraisons du jour (orders avec livraison prévue aujourd'hui)
+    const deliveriesToday = this.realOrders.filter(o => {
+      const orderDate = new Date(o.created_at);
+      return orderDate.toDateString() === today.toDateString();
+    }).length;
+
+    // Revenus du mois en cours
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const monthlyRevenue = this.realOrders
+      .filter(o => {
+        const orderDate = new Date(o.created_at);
+        return orderDate.getMonth() === currentMonth && 
+               orderDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, order) => sum + (parseFloat(order.total_price) || 0), 0);
+
+    this.kpis = {
+      pendingOrders,
+      inProgress,
+      completedThisMonth,
+      deliveriesToday,
+      monthlyRevenue
+    };
+  }
+
+  // Calculer les statistiques de documents basées sur les vraies données
+  private calculateDocumentStats(): void {
+    if (this.realOrders.length === 0) return;
+
+    const typeCount: { [key: string]: number } = {};
+    
+    this.realOrders.forEach(order => {
+      const type = order.document_type || 'Autre';
+      typeCount[type] = (typeCount[type] || 0) + 1;
+    });
+
+    const total = this.realOrders.length;
+    this.documentStats = Object.entries(typeCount)
+      .map(([type, count]) => ({
+        type,
+        count,
+        percentage: Math.round((count / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    // Recalculer les revenus par type
+    this.calculateRevenueByType();
+    
+    // Réinitialiser les charts si prêts
+    if (this.chartsReady) {
+      this.initChartsIfReady();
+    }
+  }
+
+  // Calculer les revenus par type de document
+  private calculateRevenueByType(): void {
+    if (this.realOrders.length === 0) return;
+
+    const typeRevenue: { [key: string]: { revenue: number; count: number } } = {};
+    
+    this.realOrders.forEach(order => {
+      const type = order.document_type || 'Autre';
+      const revenue = parseFloat(order.total_price) || 0;
+      
+      if (!typeRevenue[type]) {
+        typeRevenue[type] = { revenue: 0, count: 0 };
+      }
+      
+      typeRevenue[type].revenue += revenue;
+      typeRevenue[type].count += 1;
+    });
+
+    this.revenueByType = Object.entries(typeRevenue)
+      .map(([type, data]) => ({
+        type,
+        revenue: data.revenue,
+        count: data.count
+      }))
+      .sort((a, b) => b.revenue - a.revenue);
   }
 
   ngAfterViewInit(): void {
@@ -99,19 +267,10 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
     this.isMobile = window.innerWidth < 768;
   }
 
-  // Chargement des données
+  // Chargement des données du PrinterDashboardService (pour les autres sections)
   private loadKpis(): void {
-    this.dashboardService.getKpis()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(kpis => this.kpis = kpis);
-  }
-
-  private loadOrders(): void {
-    this.dashboardService.getTodayOrders()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(orders => {
-        this.todayOrders = orders;
-      });
+    // Les KPIs réels sont calculés à partir des orders, pas besoin du service
+    // Mais on garde la méthode pour la compatibilité
   }
 
   private loadAlerts(): void {
@@ -121,12 +280,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private loadDocumentStats(): void {
-    this.dashboardService.getDocumentStats()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(stats => {
-        this.documentStats = stats;
-        this.initChartsIfReady();
-      });
+    // Les stats sont calculées à partir des vraies commandes
+    // On garde la méthode pour la compatibilité
   }
 
   private loadRevenueData(): void {
@@ -139,17 +294,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private loadRevenueByType(): void {
-    // Données simulées pour les revenus par type de document
-    this.revenueByType = [
-      { type: 'Flyers', revenue: 8450, count: 45 },
-      { type: 'Cartes de visite', revenue: 6230, count: 38 },
-      { type: 'Affiches', revenue: 5120, count: 25 },
-      { type: 'Brochures', revenue: 3890, count: 18 },
-      { type: 'Stickers', revenue: 2950, count: 14 },
-      { type: 'Dépliants', revenue: 2180, count: 12 },
-      { type: 'Catalogues', revenue: 1850, count: 8 }
-    ];
-    this.initChartsIfReady();
+    // Les revenus par type sont calculés à partir des vraies commandes
+    // On garde la méthode pour la compatibilité
   }
 
   private loadProductivity(): void {
@@ -196,7 +342,6 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
 
   // Initialisation des graphiques avec design amélioré
   private initDocumentChart(): void {
-    // Détruire le chart existant
     if (this.documentChart) {
       this.documentChart.destroy();
     }
@@ -210,13 +355,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
           datasets: [{
             data: this.documentStats.map(s => s.count),
             backgroundColor: [
-              '#6366F1', // Indigo
-              '#10B981', // Emerald
-              '#F59E0B', // Amber
-              '#EF4444', // Red
-              '#8B5CF6', // Violet
-              '#06B6D4', // Cyan
-              '#F97316'  // Orange
+              '#6366F1', '#10B981', '#F59E0B', '#EF4444', 
+              '#8B5CF6', '#06B6D4', '#F97316'
             ],
             borderColor: '#ffffff',
             borderWidth: 3,
@@ -261,7 +401,6 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
                   const label = context.label || '';
                   const value = context.parsed;
                   const data = context.dataset.data;
-                  // Type-safe reduction
                   const total = data.reduce((sum: number, current: number) => sum + current, 0);
                   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
                   return `${label}: ${value} (${percentage}%)`;
@@ -281,7 +420,6 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private initRevenueChart(): void {
-    // Détruire le chart existant
     if (this.revenueChart) {
       this.revenueChart.destroy();
     }
@@ -392,7 +530,6 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private initRevenueByTypeChart(): void {
-    // Détruire le chart existant
     if (this.revenueByTypeChart) {
       this.revenueByTypeChart.destroy();
     }
@@ -404,7 +541,7 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
         data: {
           labels: this.revenueByType.map(d => d.type),
           datasets: [{
-            label: 'Revenus (€)',
+            label: 'Revenus (XAF)',
             data: this.revenueByType.map(d => d.revenue),
             backgroundColor: this.createBarGradient(ctx),
             borderColor: '#ffffff',
@@ -418,7 +555,7 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          indexAxis: this.isMobile ? 'y' : 'x', // Barres verticales sur desktop, horizontales sur mobile
+          indexAxis: this.isMobile ? 'y' : 'x',
           plugins: {
             legend: {
               display: false
@@ -526,16 +663,16 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
 
   private createBarGradient(ctx: HTMLCanvasElement): CanvasGradient[] {
     const colors = [
-      'rgba(99, 102, 241, 0.8)',   // Indigo
-      'rgba(16, 185, 129, 0.8)',   // Emerald
-      'rgba(245, 158, 11, 0.8)',   // Amber
-      'rgba(239, 68, 68, 0.8)',    // Red
-      'rgba(139, 92, 246, 0.8)',   // Violet
-      'rgba(6, 182, 212, 0.8)',    // Cyan
-      'rgba(249, 115, 22, 0.8)'    // Orange
+      'rgba(99, 102, 241, 0.8)',
+      'rgba(16, 185, 129, 0.8)',
+      'rgba(245, 158, 11, 0.8)',
+      'rgba(239, 68, 68, 0.8)',
+      'rgba(139, 92, 246, 0.8)',
+      'rgba(6, 182, 212, 0.8)',
+      'rgba(249, 115, 22, 0.8)'
     ];
 
-    return colors.map((color, index) => {
+    return colors.map((color) => {
       const gradient = ctx.getContext('2d')!.createLinearGradient(0, 0, 0, 300);
       gradient.addColorStop(0, color);
       gradient.addColorStop(1, color.replace('0.8', '0.5'));
@@ -543,48 +680,91 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
     });
   }
 
-  // Actions sur les commandes
+  // Actions sur les commandes - Utiliser les vraies données
   onStartOrder(orderId: string): void {
-    this.dashboardService.startOrder(orderId);
+    this.dashboardService.startOrder(orderId).subscribe({
+      next: (updatedOrder) => {
+        //  Met à jour localement après succès de l’API
+        const index = this.realOrders.findIndex(o => o.id === updatedOrder.id);
+        if (index !== -1) {
+          this.realOrders[index] = updatedOrder;
+        }
+
+        //  Rafraîchir la vue
+        const formattedOrders = this.realOrders.map(order => this.formatOrder(order));
+        this.orders.set(formattedOrders);
+
+        // Recalculer les KPIs
+        this.calculateRealKPIs();
+
+        console.log(` Commande ${updatedOrder.order_number} passée en "in_progress"`);
+      },
+      error: (error) => {
+        console.error(' Erreur lors du changement de statut :', error);
+        alert('Une erreur est survenue lors du démarrage de la production.');
+      }
+    });
   }
 
-  onCompleteOrder(orderId: string): void {
-    this.dashboardService.completeOrder(orderId);
+
+  onCompleteOrder(orderId: string): void { 
+    this.dashboardService.completeOrder(orderId).subscribe({
+      next: () => {
+        console.log('Commande marquée comme imprimée et KPI mis à jour !');
+        // Les données locales et KPIs sont déjà mis à jour par le service
+      },
+      error: (err) => {
+        console.error('Erreur lors du marquage comme imprimé :', err);
+      }
+    });
   }
 
-  onDownloadFile(orderId: string): void {
-    this.dashboardService.downloadFile(orderId);
+
+  onViewOrderDetails(orderId: string): void {
+    const order = this.realOrders.find(o => o.id === orderId);
+    if (order) {
+      console.log('Détails de la commande :', order);
+      this.router.navigate(['/dashboard-admin/document-detail', orderId]);
+    } else {
+      console.error('Commande non trouvée avec l’ID :', orderId);
+    }
   }
 
-  // Filtrage et tri
-  filterOrders(filter: 'all' | 'pending' | 'in-progress' | 'delayed'): void {
+  // Filtrage et tri - Appliqué sur les vraies données
+  filterOrders(filter: 'all' | 'pending' | 'in_progress' | 'delayed' | 'printed' | 'cancelled'): void {
     this.selectedFilter = filter;
   }
 
-  get filteredOrders(): OrderActivity[] {
-    let filtered = this.todayOrders;
+  get filteredOrders(): IOrderResponse[] {
+    let filtered = [...this.realOrders];
     
+    // Appliquer le filtre
     if (this.selectedFilter !== 'all') {
       filtered = filtered.filter(order => order.status === this.selectedFilter);
     }
 
-    // Tri
+    // Appliquer le tri
     return filtered.sort((a, b) => {
       let comparison = 0;
       
       switch (this.sortColumn) {
         case 'ref':
-          comparison = a.ref.localeCompare(b.ref);
+          comparison = a.order_number.localeCompare(b.order_number);
           break;
         case 'client':
-          comparison = a.client.localeCompare(b.client);
+          comparison = a.user.full_name.localeCompare(b.user.full_name);
           break;
         case 'eta':
-          comparison = a.eta.getTime() - b.eta.getTime();
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+        case 'type':
+          comparison = a.document_type.localeCompare(b.document_type);
           break;
         case 'priority':
-          const priorityOrder = { 'rush': 0, 'urgent': 1, 'normal': 2 };
-          comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
+          const priorityOrder: { [key: string]: number } = { 'rush': 0, 'urgent': 1, 'normal': 2 };
+          const aPriority = a.priority || 'normal';
+          const bPriority = b.priority || 'normal';
+          comparison = (priorityOrder[aPriority] || 2) - (priorityOrder[bPriority] || 2);
           break;
       }
 
@@ -592,7 +772,7 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
     });
   }
 
-  sortBy(column: 'ref' | 'client' | 'eta' | 'priority'): void {
+  sortBy(column: 'ref' | 'client' | 'eta' | 'priority' | 'type'): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -602,33 +782,37 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   // Helpers pour le template
-  getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'pending': 'status-pending',
-      'in-progress': 'status-in-progress',
-      'completed': 'status-completed',
-      'delayed': 'status-delayed'
-    };
-    return statusMap[status] || 'status-pending';
-  }
+getStatusClass(status: string): string {
+  const statusMap: { [key: string]: string } = {
+    'pending': 'status-pending',
+    'in_progress': 'status-in-progress',
+    'printed': 'status-printed',
+    'delivered': 'status-delivered',
+    'cancelled': 'status-cancelled'
+  };
+  return statusMap[status] || 'status-pending';
+}
 
-  getStatusLabel(status: string): string {
-    const labelMap: { [key: string]: string } = {
-      'pending': 'En attente',
-      'in-progress': 'En cours',
-      'completed': 'Terminé',
-      'delayed': 'En retard'
-    };
-    return labelMap[status] || status;
-  }
 
-  getPriorityClass(priority: string): string {
+getStatusLabel(status: string): string {
+  const labelMap: { [key: string]: string } = {
+    'pending': 'En attente',
+    'in_progress': 'En cours',     // si ton API renvoie in_progress (underscore)
+    'printed': 'Imprimé',
+    'delivered': 'Livré',
+    'cancelled': 'Annulé'
+  };
+  return labelMap[status] || status;
+}
+
+
+  getPriorityClass(priority: string | undefined): string {
     const priorityMap: { [key: string]: string } = {
       'rush': 'priority-rush',
       'urgent': 'priority-urgent',
       'normal': 'priority-normal'
     };
-    return priorityMap[priority] || 'priority-normal';
+    return priorityMap[priority || 'normal'] || 'priority-normal';
   }
 
   getAlertClass(severity: string): string {
@@ -640,14 +824,14 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
     return severityMap[severity] || 'alert-medium';
   }
 
-  formatTime(date: Date): string {
+  formatTime(date: Date | string): string {
     return new Date(date).toLocaleTimeString('fr-FR', { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
   }
 
-  formatDateTime(date: Date): string {
+  formatDateTime(date: Date | string): string {
     return new Date(date).toLocaleString('fr-FR', { 
       day: '2-digit',
       month: 'short',
@@ -659,7 +843,7 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('fr-FR', { 
       style: 'currency', 
-      currency: 'xaf',
+      currency: 'XAF',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     }).format(value);
@@ -667,9 +851,9 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
 
   formatCurrencyCompact(value: number): string {
     if (value >= 1000000) {
-      return (value / 1000000).toFixed(1) + 'M €';
+      return (value / 1000000).toFixed(1) + 'M XAF';
     } else if (value >= 1000) {
-      return (value / 1000).toFixed(0) + 'k €';
+      return (value / 1000).toFixed(0) + 'k XAF';
     }
     return this.formatCurrency(value);
   }
@@ -692,4 +876,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   onViewAllOrders(): void {
     console.log('Voir toutes les commandes');
   }
+
+
+
+
 }

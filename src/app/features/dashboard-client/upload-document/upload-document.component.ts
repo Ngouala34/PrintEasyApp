@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { OrderService } from '../../../core/services/order.service';
 import { IOrderData } from '../../../core/models/order';
+import { Router } from '@angular/router';
 
 // Interfaces
 interface DocumentType {
@@ -64,7 +65,7 @@ export class UploadDocumentComponent implements OnInit {
   // Types de documents avec images
 // Mettre à jour les types de documents selon l'API
 documentTypes: DocumentType[] = [
-  { id: 'CARTE_DE_VISITE', name: 'Carte de visite', image: 'assets/images/visitCard.jpg' },
+  { id: 'carte de visite', name: 'Carte de visite', image: 'assets/images/visitCard.jpg' },
   { id: 'flyer', name: 'Flyer', image: 'assets/images/Flyers.jpg' },
   { id: 'AFFICHE', name: 'Affiche', image: 'assets/images/affiche.jpg' },
   { id: 'BROCHURE', name: 'Brochure', image: 'assets/images/brochure.jpg' },
@@ -119,7 +120,7 @@ finishOptions = [
   successMessage: any;
   errorMessage: any;
 
-  constructor(private fb: FormBuilder, private orderService: OrderService) {}
+  constructor(private fb: FormBuilder, private orderService: OrderService, private router : Router) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -533,12 +534,11 @@ async onSubmit(): Promise<void> {
     this.orderService.sendFile(orderData).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-        console.log('Réponse API:', response);
-        
-        alert(`Commande envoyée avec succès !\nMontant total: ${this.totalPrice.toLocaleString('fr-FR')} FCFA`);
-        
         // Réinitialiser le formulaire
         this.resetForm();
+        this.successMessage = 'Votre commande a été envoyée avec succès.';
+        this.router.navigate(['/dashboard-client/dashboard']); // Redirection après succès
+
       },
       error: (error) => {
         this.isSubmitting = false;

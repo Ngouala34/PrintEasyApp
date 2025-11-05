@@ -76,4 +76,10 @@ export class OrderService {
       })
     );
   }
+
+  getOrderById(orderId: number | string): Observable<IOrderResponse> {
+    return this.http.get<IOrderResponse>(`${this.apiUrl}/orders/${orderId}/`);
+  }
+
+  
 }

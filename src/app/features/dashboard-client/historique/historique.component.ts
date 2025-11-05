@@ -81,7 +81,7 @@ export class HistoriqueComponent implements OnInit {
         order.orderNumber.toLowerCase().includes(query) ||
         order.service.toLowerCase().includes(query) ||
         order.documentType.toLowerCase().includes(query) ||
-        order.deliveryInfo.city.toLowerCase().includes(query)
+        order.deliveryInfo.city!.toLowerCase().includes(query)
       );
     }
 

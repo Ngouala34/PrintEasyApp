@@ -1,0 +1,143 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+
+*{box-sizing: border-box;
+}
+.document-detail-container {
+  @include container;
+  padding: 2rem 0;
+
+  .detail-header {
+    @include flex-between;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+
+    h1 {
+      font-family: $font-heading;
+      color: $primary-dark;
+      font-size: 1.5rem;
+      span {
+        color: $primary-yellow;
+      }
+    }
+
+    .btn-back {
+      @include button-outline;
+      font-size: 0.9rem;
+    }
+
+    .btn-generate {
+      @include button-primary;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 30px;
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .action-section {
+    @include flex-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .detail-card {
+    @include card;
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: $primary-dark;
+      i {
+        color: $primary-yellow;
+        margin-right: 0.5rem;
+      }
+    }
+
+    .info-pair {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+      span {
+        color: $gray-dark;
+      }
+      &.highlight {
+        font-weight: 600;
+        color: $primary-dark;
+      }
+    }
+
+    .options-list {
+      list-style: none;
+      padding: 0;
+      li {
+        margin: 0.4rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: $gray-dark;
+        i {
+          color: $primary-yellow;
+        }
+      }
+    }
+
+    .note-form {
+      textarea {
+        @include input-base;
+        margin-bottom: 1rem;
+      }
+      .note-actions {
+        display: flex;
+        gap: 0.6rem;
+      }
+    }
+
+    .note-text {
+      background: $gray-light;
+      padding: 1rem;
+      border-radius: $radius-md;
+    }
+
+    .btn-edit {
+      margin-top: 0.5rem;
+      @include button-outline;
+      font-size: 0.9rem;
+    }
+  }
+
+  .whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    @include flex-center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      background: darken(#25D366, 5%);
+    }
+  }
+}
