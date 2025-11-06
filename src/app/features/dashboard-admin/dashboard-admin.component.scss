@@ -15,7 +15,6 @@
     "navbar navbar"
     "sidebar content";
   height: 100vh;
-  position: fixed;  
 }
 
 // Navbar
@@ -246,6 +245,7 @@
   transition: background $transition-fast;
   cursor: pointer;
 
+
   &:hover {
     background: $gray-light;
   }
@@ -325,7 +325,7 @@
   transition: all $transition-fast;
   background: transparent;
   border: none;
-  width: 100%;
+  max-width: 100%;
   cursor: pointer;
 
   &:hover {
@@ -341,9 +341,7 @@
     }
   }
 
-  svg {
-    flex-shrink: 0;
-  }
+
 }
 
 .dropdown-divider {
@@ -471,7 +469,7 @@
   grid-area: content;
   background: $gray-light;
   transition: all $transition-base;
-  margin-left: -4rem;
+  margin-left: -2.5rem;
   overflow-y: auto;
 
   &.sidebar-collapsed {
@@ -668,3 +666,43 @@
     }
   }
 }
+.dashboard-container {
+  flex: 1;          // si parent est flex
+  width: 100%;
+  margin: 0;
+  padding: 0;       // ou padding minimal si nécessaire
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

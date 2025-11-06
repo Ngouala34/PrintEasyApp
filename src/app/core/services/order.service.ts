@@ -81,5 +81,11 @@ export class OrderService {
     return this.http.get<IOrderResponse>(`${this.apiUrl}/orders/${orderId}/`);
   }
 
+  downloadOrder(orderId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/orders/${orderId}/download/`, {
+      responseType: 'blob'
+    });
+  }
+
   
 }

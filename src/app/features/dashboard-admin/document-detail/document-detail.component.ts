@@ -1,12 +1,10 @@
 // src/app/components/document-detail/document-detail.component.ts
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../../core/services/order.service';
 import { IOrderResponse } from '../../../core/models/order';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+
 
 
 @Component({
@@ -17,64 +15,48 @@ import autoTable from 'jspdf-autotable';
   styleUrls: ['./document-detail.component.scss']
 })
 export class DocumentDetailComponent implements OnInit {
-  // Utilisation des signals Angular pour la réactivité
+  @Input() orderId: string | number | null = null;
+  @Output() closeModal = new EventEmitter<void>();
+  @Output() orderUpdated = new EventEmitter<IOrderResponse>();
+
+  // Signals
   order = signal<IOrderResponse | null>(null);
-  isLoading = signal<boolean>(true);
+  isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
-  
-  // État pour l'ajout de note
+  activeTab = signal<'details' | 'options' | 'notes'>('details');
   isAddingNote = signal<boolean>(false);
   noteText = signal<string>('');
+  isGeneratingInvoice = signal<boolean>(false);
 
-  // Computed signals pour les traductions et états dérivés
-  statusLabel = computed(() => {
-    const status = this.order()?.status;
-    return this.translateStatus(status || '');
-  });
-
-  statusClass = computed(() => {
-    const status = this.order()?.status;
-    return this.getStatusClass(status || '');
-  });
-
-  // Vérifier si des informations de livraison existent
+  // Computed
+  statusLabel = computed(() => this.translateStatus(this.order()?.status || ''));
+  statusClass = computed(() => this.getStatusClass(this.order()?.status || ''));
+  statusIcon = computed(() => this.getStatusIcon(this.order()?.status || ''));
+  
   hasDeliveryInfo = computed(() => {
     const ord = this.order();
     return !!(ord?.delivery_address || ord?.delivery_city || ord?.delivery_phone);
   });
 
-  // Formater les dates
-  formattedCreatedAt = computed(() => {
-    const date = this.order()?.created_at;
-    return date ? this.formatDate(date) : '';
-
+  whatsappNumber = computed(() => {
+    const phone = this.order()?.delivery_phone;
+    return phone ? phone.replace(/[\s\-\(\)]/g, '') : null;
   });
 
-  formattedUpdatedAt = computed(() => {
-    const date = this.order()?.updated_at;
-    return date ? this.formatDate(date) : '';
-  });
+  canStartProduction = computed(() => this.order()?.status === 'pending');
+  canMarkAsPrinted = computed(() => this.order()?.status === 'in_progress');
+  hasDocument = computed(() => !!this.order()?.document_url);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private orderService: OrderService
-  ) {}
+  constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
-    // Récupérer l'ID de la commande depuis la route
-    const orderId = this.route.snapshot.paramMap.get('id');
-    
-    if (orderId) {
-      this.loadOrderDetails(orderId);
-    } else {
-      this.error.set('ID de commande non fourni');
-      this.isLoading.set(false);
+    if (this.orderId) {
+      this.loadOrderDetails(this.orderId.toString());
     }
   }
 
   /**
-   * Charger les détails de la commande depuis l'API
+   * Charger les détails de la commande
    */
   private loadOrderDetails(orderId: string): void {
     this.isLoading.set(true);
@@ -87,220 +69,293 @@ export class DocumentDetailComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Erreur lors du chargement de la commande:', err);
-        this.error.set('Impossible de charger les détails de la commande');
+        console.error('Erreur:', err);
+        this.error.set('Impossible de charger les détails');
         this.isLoading.set(false);
       }
     });
   }
 
   /**
-   * Action: Démarrer la production
+   * Fermer le modal
    */
-  onStartProduction(): void {
+  onClose(): void {
+    this.closeModal.emit();
+  }
+
+  /**
+   * Changer d'onglet
+   */
+  switchTab(tab: 'details' | 'options' | 'notes'): void {
+    this.activeTab.set(tab);
+  }
+
+  /**
+   * GÉNÉRATION DE FACTURE PDF avec jsPDF
+   */
+  async onGenerateInvoice(): Promise<void> {
     const currentOrder = this.order();
     if (!currentOrder) return;
 
-    // Confirmer l'action
-    if (!confirm('Voulez-vous vraiment démarrer la production de cette commande ?')) {
+    this.isGeneratingInvoice.set(true);
+
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      const margin = 20;
+      let y = 25;
+
+      // En-tête avec fond coloré
+      doc.setFillColor(14, 7, 52); // primary-dark
+      doc.rect(0, 0, pageWidth, 50, 'F');
+      
+      doc.setTextColor(240, 226, 34); // primary-yellow
+      doc.setFontSize(28);
+      doc.setFont('helvetica', 'bold');
+      doc.text('FACTURE', pageWidth / 2, y, { align: 'center' });
+      
+      y += 12;
+      doc.setFontSize(14);
+      doc.setTextColor(255, 255, 255);
+      doc.text(currentOrder.order_number, pageWidth / 2, y, { align: 'center' });
+      
+      y = 65;
+      doc.setTextColor(14, 7, 52);
+
+      // Informations en 2 colonnes
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('INFORMATIONS CLIENT', margin, y);
+      doc.text('DÉTAILS COMMANDE', pageWidth / 2 + 10, y);
+      
+      y += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      
+      // Colonne gauche - Client
+      doc.text(`${currentOrder.user.full_name}`, margin, y);
+      y += 5;
+      doc.setTextColor(100, 100, 100);
+      doc.text(currentOrder.user.email, margin, y);
+      y += 5;
+      doc.text(`ID Client: #${currentOrder.user.id}`, margin, y);
+      
+      // Colonne droite - Dates
+      const rightX = pageWidth / 2 + 10;
+      y = 73;
+      doc.setTextColor(14, 7, 52);
+      doc.text(`Date: ${this.formatDateShort(currentOrder.created_at.toString())}`, rightX, y);
+      y += 5;
+      doc.text(`Statut: ${this.statusLabel()}`, rightX, y);
+      y += 5;
+      doc.text(`Type: ${currentOrder.document_type}`, rightX, y);
+
+      y = 110;
+
+      // Tableau des articles
+      doc.setFillColor(245, 245, 245);
+      doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(14, 7, 52);
+      doc.text('DESCRIPTION', margin + 3, y + 6);
+      doc.text('QTÉ', pageWidth - 70, y + 6);
+      doc.text('PRIX UNITAIRE', pageWidth - 50, y + 6);
+      
+      y += 15;
+      doc.setFont('helvetica', 'normal');
+      doc.text(currentOrder.document_type, margin + 3, y);
+      doc.text(`${currentOrder.quantity}`, pageWidth - 70, y);
+      doc.text(this.formatPrice(currentOrder.unit_price), pageWidth - 50, y);
+      
+      y += 8;
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      const specs = `${currentOrder.options.option_format} • ${currentOrder.options.option_color} • ${currentOrder.options.option_paper}`;
+      doc.text(specs, margin + 3, y);
+
+      y += 15;
+
+      // Ligne de séparation
+      doc.setDrawColor(14, 7, 52);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      
+      y += 10;
+
+      // Total
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(14, 7, 52);
+      doc.text('TOTAL À PAYER', margin, y);
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // success
+      doc.text(this.formatPrice(currentOrder.total_price), pageWidth - margin, y, { align: 'right' });
+
+      // Livraison
+      if (this.hasDeliveryInfo()) {
+        y += 20;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(14, 7, 52);
+        doc.text('ADRESSE DE LIVRAISON', margin, y);
+        y += 7;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        
+        if (currentOrder.delivery_address) {
+          doc.text(currentOrder.delivery_address, margin, y);
+          y += 5;
+        }
+        if (currentOrder.delivery_city) {
+          doc.text(`${currentOrder.delivery_neighborhood || ''} ${currentOrder.delivery_city}`, margin, y);
+          y += 5;
+        }
+        if (currentOrder.delivery_phone) {
+          doc.text(`Tél: ${currentOrder.delivery_phone}`, margin, y);
+        }
+      }
+
+      // Pied de page
+      const footerY = doc.internal.pageSize.height - 15;
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('PrintEasy - Votre partenaire impression professionnelle', pageWidth / 2, footerY, { align: 'center' });
+
+      doc.save(`Facture_${currentOrder.order_number}.pdf`);
+      
+    } catch (error) {
+      console.error('Erreur PDF:', error);
+      alert('Erreur lors de la génération. Installez jsPDF: npm install jspdf');
+    } finally {
+      this.isGeneratingInvoice.set(false);
+    }
+  }
+
+  /**
+   * Ouvrir WhatsApp
+   */
+  onOpenWhatsApp(): void {
+    const number = this.whatsappNumber();
+    if (!number) {
+      alert('Aucun numéro de téléphone disponible');
       return;
     }
 
-    // Mettre à jour le statut localement (optimistic update)
+    const message = encodeURIComponent(
+      `Bonjour ${this.order()?.user.full_name}, concernant votre commande ${this.order()?.order_number}`
+    );
+    window.open(`https://wa.me/${number}?text=${message}`, '_blank');
+  }
+
+  /**
+   * Actions
+   */
+  onStartProduction(): void {
+    if (!confirm('Démarrer la production ?')) return;
+    
     this.order.update(order => 
       order ? { ...order, status: 'in_progress' } : null
     );
-
-    // TODO: Appeler l'API pour mettre à jour le statut
-    // this.orderService.updateOrderStatus(currentOrder.id, 'in_progress').subscribe(...)
     
-    console.log('Production démarrée pour la commande:', currentOrder.order_number);
+    const updated = this.order();
+    if (updated) this.orderUpdated.emit(updated);
   }
 
-  /**
-   * Action: Marquer comme imprimé
-   */
   onMarkAsPrinted(): void {
-    const currentOrder = this.order();
-    if (!currentOrder) return;
-
-    if (!confirm('Voulez-vous marquer cette commande comme imprimée ?')) {
-      return;
-    }
-
-    // Mise à jour optimiste
+    if (!confirm('Marquer comme imprimé ?')) return;
+    
     this.order.update(order => 
       order ? { ...order, status: 'printed' } : null
     );
-
-    // TODO: Appeler l'API
-    console.log('Commande marquée comme imprimée:', currentOrder.order_number);
+    
+    const updated = this.order();
+    if (updated) this.orderUpdated.emit(updated);
   }
 
-  /**
-   * Action: Télécharger le fichier
-   */
   onDownloadFile(): void {
-    const currentOrder = this.order();
-    if (!currentOrder?.document_url) {
-      alert('Aucun fichier disponible pour cette commande');
+    const url = this.order()?.document_url;
+    if (!url) {
+      alert('Aucun fichier disponible');
       return;
     }
-
-    // Ouvrir le fichier dans un nouvel onglet ou déclencher le téléchargement
-    window.open(currentOrder.document_url, '_blank');
-    console.log('Téléchargement du fichier:', currentOrder.document_url);
+    window.open(url, '_blank');
   }
 
-  /**
-   * Afficher le formulaire d'ajout de note
-   */
-  onShowNoteForm(): void {
-    this.isAddingNote.set(true);
-  }
-
-  /**
-   * Annuler l'ajout de note
-   */
-  onCancelNote(): void {
-    this.isAddingNote.set(false);
-    this.noteText.set(this.order()?.note || '');
-  }
-
-  /**
-   * Sauvegarder la note
-   */
   onSaveNote(): void {
-    const currentOrder = this.order();
-    if (!currentOrder) return;
-
     const note = this.noteText().trim();
-
-    // Mise à jour optimiste
-    this.order.update(order => 
-      order ? { ...order, note } : null
-    );
-
+    this.order.update(order => order ? { ...order, note } : null);
     this.isAddingNote.set(false);
-
-    // TODO: Appeler l'API pour sauvegarder la note
-    // this.orderService.updateOrderNote(currentOrder.id, note).subscribe(...)
     
-    console.log('Note sauvegardée pour la commande:', currentOrder.order_number, note);
+    const updated = this.order();
+    if (updated) this.orderUpdated.emit(updated);
   }
 
-  /**
-   * Retour à la liste des commandes
-   */
-  onGoBack(): void {
-    this.router.navigate(['/dashboard']); // Ajuster selon votre routing
-  }
-
-  /**
-   * Traduire le statut en français
-   */
+  // Helpers
   private translateStatus(status: string): string {
-    const translations: { [key: string]: string } = {
-      'pending': 'En attente',
-      'in_progress': 'En production',
-      'printed': 'Imprimé',
-      'delivered': 'Livré',
-      'cancelled': 'Annulé'
+    const map: Record<string, string> = {
+      pending: 'En attente',
+      in_progress: 'En production',
+      printed: 'Imprimé',
+      delivered: 'Livré',
+      cancelled: 'Annulé'
     };
-    return translations[status] || status;
+    return map[status] || status;
   }
 
-  /**
-   * Obtenir la classe CSS du statut
-   */
   private getStatusClass(status: string): string {
-    const classes: { [key: string]: string } = {
-      'pending': 'status-pending',
-      'in_progress': 'status-in-progress',
-      'printed': 'status-printed',
-      'delivered': 'status-delivered',
-      'cancelled': 'status-cancelled'
-    };
-    return classes[status] || 'status-pending';
+    return `status-${status}`;
   }
 
-  /**
-   * Formater une date ISO en format lisible
-   */
-  private formatDate(isoDate: Date): string {
-    const date = new Date(isoDate);
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: 'long',
+  private getStatusIcon(status: string): string {
+    const icons: Record<string, string> = {
+      pending: 'fa-clock',
+      in_progress: 'fa-spinner',
+      printed: 'fa-check-circle',
+      delivered: 'fa-truck',
+      cancelled: 'fa-times-circle'
+    };
+    return icons[status] || 'fa-question';
+  }
+
+  formatPrice(price: string | number): string {
+    const num = typeof price === 'string' ? parseFloat(price) : price;
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XAF'
+    }).format(num);
+  }
+
+  private formatDateShort(date: string): string {
+    return new Date(date).toLocaleDateString('fr-FR');
+  }
+
+  formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
   }
 
-  /**
-   * Formater un prix
-   */
-  formatPrice(price: string | number): string {
-    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XAF' // Adapter selon votre devise
-    }).format(numPrice);
+  download(orderId: string): void {
+    this.orderService.downloadOrder(orderId).subscribe({
+      next: (file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `commande_${orderId}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Erreur lors du téléchargement :', err);
+      }
+    });
   }
 
-  /**
-   * Vérifier si le bouton doit être désactivé selon le statut
-   */
-  canStartProduction(): boolean {
-    return this.order()?.status === 'pending';
-  }
-
-  canMarkAsPrinted(): boolean {
-    const status = this.order()?.status;
-    return status === 'in_progress';
-  }
-
-  hasDocument(): boolean {
-    return !!this.order()?.document_url;
-  }
-
-
-  generateInvoice(): void {
-  const order = this.order();
-  if (!order) return;
-
-  const doc = new jsPDF();
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('FACTURE DE COMMANDE', 14, 15);
-  doc.setFontSize(11);
-  doc.text(`Commande N°: ${order.order_number}`, 14, 25);
-  doc.text(`Client: ${order.user.full_name}`, 14, 32);
-  doc.text(`Email: ${order.user.email}`, 14, 39);
-
-  autoTable(doc, {
-    startY: 50,
-    head: [['Type', 'Quantité', 'Prix unitaire', 'Total']],
-    body: [
-      [
-        order.document_type,
-        order.quantity,
-        this.formatPrice(order.unit_price),
-        this.formatPrice(order.total_price)
-      ]
-    ],
-  });
-
-  doc.save(`facture_${order.order_number}.pdf`);
-}
-
-openWhatsApp(): void {
-  const phone = this.order()?.delivery_phone || '';
-  if (!phone) {
-    alert('Aucun numéro de livraison disponible.');
-    return;
-  }
-  window.open(`https://wa.me/${phone}`, '_blank');
-}
 }

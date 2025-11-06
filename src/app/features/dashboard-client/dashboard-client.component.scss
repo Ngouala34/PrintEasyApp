@@ -15,7 +15,6 @@
     "navbar navbar"
     "sidebar content";
   height: 100vh;
-  position: fixed;  
 }
 
 // Navbar
@@ -325,7 +324,7 @@
   transition: all $transition-fast;
   background: transparent;
   border: none;
-  width: 100%;
+  max-width: 100%;
   cursor: pointer;
 
   &:hover {

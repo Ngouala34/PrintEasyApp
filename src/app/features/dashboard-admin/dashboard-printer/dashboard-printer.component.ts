@@ -8,6 +8,7 @@ import { Chart, registerables, ChartConfiguration, TooltipItem } from 'chart.js'
 import { IOrderResponse, OrderSummary } from '../../../core/models/order';
 import { OrderService } from '../../../core/services/order.service';
 import { Router, RouterOutlet } from '@angular/router';
+import { DocumentDetailComponent } from "../document-detail/document-detail.component";
 
 // Enregistrer tous les composants de Chart.js
 Chart.register(...registerables);
@@ -22,7 +23,7 @@ export interface RevenueByType {
 @Component({
   selector: 'app-dashboard-printer',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, DocumentDetailComponent],
   templateUrl: './dashboard-printer.component.html',
   styleUrls: ['./dashboard-printer.component.scss']
 })
@@ -32,6 +33,8 @@ export class DashboardPrinterComponent implements OnInit, OnDestroy, AfterViewIn
   // Données du dashboard - utiliser les données réelles
   realOrders: IOrderResponse[] = [];
   orders = signal<OrderSummary[]>([]);
+  selectedOrderId: string | null = null;
+
   
   // Données du service PrinterDashboardService (pour les autres sections)
   kpis: KPIData | null = null;
@@ -877,6 +880,18 @@ getStatusLabel(status: string): string {
     console.log('Voir toutes les commandes');
   }
 
+  openDetailModal(orderId: string) {
+    this.selectedOrderId = orderId;
+  }
+
+  onCloseDetailModal() {
+    this.selectedOrderId = null;
+  }
+
+  onOrderUpdated(order: IOrderResponse) {
+    // Mettre à jour la liste des commandes
+    console.log('Commande mise à jour:', order);
+  }
 
 
 

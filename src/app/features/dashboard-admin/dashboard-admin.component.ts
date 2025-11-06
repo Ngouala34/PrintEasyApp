@@ -1,16 +1,18 @@
 // src/app/features/dashboard-client/dashboard-client-layout.component.ts
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Service } from '../../core/models/service';
 import { AuthService } from '../../core/services/auth.service';
 import { IUserProfile } from '../../core/models/user';
 import { UserService } from '../../core/services/user.service';
+import { DocumentDetailComponent } from "./document-detail/document-detail.component";
+import { INotification,  } from '../../core/models/order';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DocumentDetailComponent],
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.scss']
 })
@@ -18,9 +20,15 @@ export class DashboardAdminComponent {
   sidebarCollapsed = signal(false);
   showUserMenu = signal(false);
   showuSideBarElement = signal(false)
-  showNotifications = signal(false);
   showMenu= false;
-  userProfil? : IUserProfile
+  userProfil? : IUserProfile;
+    private notificationService = inject(NotificationService);
+  
+    notifications = signal<INotification[]>([]);
+    showNotifications = signal(false);
+    isLoading = signal(false);
+
+
 
 
   constructor(private router : Router, private authService : AuthService, private userService : UserService){
@@ -60,12 +68,12 @@ export class DashboardAdminComponent {
     {
       icon: 'fa-box',
       label: 'commandes',
-      route: '/dashboard-admin/upload-document',
+      route: '/dashboard-admin/commandes',
     },
     {
-      icon: 'fa-history',
-      label: 'Historique',
-      route: '/dashboard-admin/historique'
+      icon: 'fa-users',
+      label: 'Collaborateurs',
+      route: '/dashboard-admin/collaborateurs',
     },
     {
       icon: 'fa-bell',
@@ -91,11 +99,6 @@ export class DashboardAdminComponent {
     }
   ];
 
-  notifications = [
-    { id: 1, message: 'Votre commande #ORD-002 est prête', time: 'Il y a 2h', read: false },
-    { id: 2, message: 'Nouvelle promotion : -15% sur les flyers', time: 'Il y a 5h', read: false },
-    { id: 3, message: 'Commande #ORD-001 livrée', time: 'Hier', read: true }
-  ];
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update(v => !v);
@@ -110,13 +113,6 @@ export class DashboardAdminComponent {
     this.showUserMenu.update(v => !v);
     if (this.showNotifications()) {
       this.showNotifications.set(false);
-    }
-  }
-
-  toggleNotifications(): void {
-    this.showNotifications.update(v => !v);
-    if (this.showUserMenu()) {
-      this.showUserMenu.set(false);
     }
   }
 
@@ -136,11 +132,6 @@ export class DashboardAdminComponent {
       // Optionnel : mettre un user par défaut ou rediriger vers login si 401
     }
   });
-}
-
-
-  get unreadCount(): number {
-  return this.notifications.filter(n => !n.read).length;
 }
 
 showSidebarDropdown = false;
@@ -169,5 +160,35 @@ closeMenu() {
       this.showMenu = false;
     }
   }
+
+
+    loadNotifications(): void { 
+      this.isLoading.set(true);
+      this.notificationService.getNotifications().subscribe({
+        next: (data: INotification[]) => {
+          this.notifications.set(data);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Erreur lors du chargement des notifications:', error);
+          this.isLoading.set(false);
+        }
+      });
+    }
+  
+    toggleNotifications(): void {
+      this.showNotifications.set(!this.showNotifications());
+    }
+  
+    /** Nombre de notifications non lues */
+    get unreadCount(): number {
+      return this.notifications().filter(n => !n.is_read).length;
+    }
+  
+    /** Nombre total de notifications */
+    get notificationCount(): number {
+      return this.notifications().length;
+    }
+
 
 }

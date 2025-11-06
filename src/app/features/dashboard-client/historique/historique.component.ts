@@ -142,8 +142,8 @@ export class HistoriqueComponent implements OnInit {
   getStatusBadge(status: string) {
     const badges = {
       pending: { label: 'En attente', color: '#f59e0b', icon: 'fa-clock' },
-      processing: { label: 'En traitement', color: '#3b82f6', icon: 'fa-cogs' },
-      delivered: { label: 'Livrée', color: '#10b981', icon: 'fa-check-circle' },
+      in_progress: { label: 'En cours', color: '#3b82f6', icon: 'fa-cogs' },
+      printed: { label: 'imprimé', color: '#10b981', icon: 'fa-check-circle' },
       cancelled: { label: 'Annulée', color: '#ef4444', icon: 'fa-times-circle' }
     };
     return badges[status as keyof typeof badges] || { label: status, color: '#6b7280', icon: 'fa-question' };

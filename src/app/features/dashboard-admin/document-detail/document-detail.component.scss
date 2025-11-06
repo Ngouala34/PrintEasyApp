@@ -1,143 +1,700 @@
+// src/app/components/document-detail/document-detail.component.scss
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-
-*{box-sizing: border-box;
+*{
+    box-sizing: border-box;
 }
-.document-detail-container {
-  @include container;
-  padding: 2rem 0;
 
-  .detail-header {
-    @include flex-between;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
+// Backdrop avec effet blur
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba($primary-dark, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: $z-modal-backdrop;
+  animation: fadeIn 0.3s ease;
+}
 
-    h1 {
-      font-family: $font-heading;
-      color: $primary-dark;
-      font-size: 1.5rem;
-      span {
-        color: $primary-yellow;
-      }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Container du modal
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  // Loading state
+  .modal-loading,
+  .modal-error {
+    @include flex-center;
+    flex-direction: column;
+    gap: $spacing-lg;
+    background: $white;
+    padding: $spacing-3xl;
+    border-radius: $radius-xl;
+    box-shadow: $shadow-xl;
+    max-width: 400px;
+    width: 100%;
+    animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid $gray-light;
+      border-top-color: $primary-yellow;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
-    .btn-back {
-      @include button-outline;
-      font-size: 0.9rem;
+    i {
+      font-size: $font-size-5xl;
+      color: $error;
     }
 
-    .btn-generate {
+    h3 {
+      @include heading-primary;
+      font-size: $font-size-xl;
+      margin: 0;
+      text-align: center;
+    }
+
+    p {
+      color: $gray-dark;
+      text-align: center;
+      margin: 0;
+    }
+
+    .btn-close-error {
       @include button-primary;
-      font-weight: 600;
-      font-size: 1rem;
-      border-radius: 30px;
-      i {
-        font-size: 1.2rem;
-      }
+      margin-top: $spacing-md;
     }
   }
 
-  .action-section {
-    @include flex-between;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-bottom: 2rem;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
-  .details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
+}
 
-  .detail-card {
-    @include card;
-    h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: $primary-dark;
-      i {
-        color: $primary-yellow;
-        margin-right: 0.5rem;
-      }
-    }
+// Contenu du modal
+.modal-content {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-xl;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .info-pair {
-      display: flex;
-      justify-content: space-between;
-      margin: 0.4rem 0;
-      font-size: 0.95rem;
-      span {
-        color: $gray-dark;
-      }
-      &.highlight {
-        font-weight: 600;
-        color: $primary-dark;
-      }
-    }
+// Header du modal
+.modal-header {
+  position: relative;
+  background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 10%) 100%);
+  padding: $spacing-xl;
+  color: $white;
 
-    .options-list {
-      list-style: none;
-      padding: 0;
-      li {
-        margin: 0.4rem 0;
-        display: flex;
+  .header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-lg;
+    margin-right: 40px;
+
+    .order-info {
+      flex: 1;
+
+      .order-number-badge {
+        display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        color: $gray-dark;
+        gap: $spacing-sm;
+        background: rgba($primary-yellow, 0.15);
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $radius-full;
+        border: 2px solid $primary-yellow;
+        margin-bottom: $spacing-md;
+
         i {
           color: $primary-yellow;
+          font-size: $font-size-lg;
+        }
+
+        span {
+          color: $primary-yellow;
+          font-weight: $font-weight-bold;
+          font-size: $font-size-lg;
+          font-family: $font-heading;
+        }
+      }
+
+      .order-meta {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-xs;
+
+        .order-type {
+          font-size: $font-size-xl;
+          font-weight: $font-weight-bold;
+          color: $white;
+        }
+
+        .order-date {
+          font-size: $font-size-sm;
+          color: rgba($white, 0.8);
         }
       }
     }
 
-    .note-form {
-      textarea {
-        @include input-base;
-        margin-bottom: 1rem;
-      }
-      .note-actions {
-        display: flex;
-        gap: 0.6rem;
-      }
-    }
+    .status-area {
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-sm;
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $radius-full;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
 
-    .note-text {
-      background: $gray-light;
-      padding: 1rem;
-      border-radius: $radius-md;
-    }
-
-    .btn-edit {
-      margin-top: 0.5rem;
-      @include button-outline;
-      font-size: 0.9rem;
+        &.status-pending {
+          background: $warning;
+          color: $white;
+        }
+        &.status-in_progress {
+          background: $info;
+          color: $white;
+        }
+        &.status-printed {
+          background: $success;
+          color: $white;
+        }
+        &.status-delivered {
+          background: $primary-yellow;
+          color: $primary-dark;
+        }
+        &.status-cancelled {
+          background: $error;
+          color: $white;
+        }
+      }
     }
   }
 
-  .whatsapp-float {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    background: #25D366;
-    color: white;
-    border-radius: 50%;
-    width: 55px;
-    height: 55px;
+  .btn-close {
+    position: absolute;
+    top: $spacing-lg;
+    right: $spacing-lg;
     @include flex-center;
-    font-size: 1.8rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 30px;
+    height: 30px;
     border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: $font-size-xl;
     cursor: pointer;
-    z-index: 1000;
-    transition: all 0.3s ease;
+    transition: all $transition-fast;
+    background: red;
+
 
     &:hover {
-      transform: scale(1.1);
-      background: darken(#25D366, 5%);
+      transform: rotate(90deg);
     }
+  }
+}
+
+// Action bar
+.action-bar {
+  background: $gray-light;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid darken($gray-light, 5%);
+
+  .action-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+
+    .action-btn {
+      @include flex-center;
+      gap: $spacing-xs;
+      padding: $spacing-sm $spacing-lg;
+      border: 2px solid transparent;
+      border-radius: $radius-md;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all $transition-fast;
+      white-space: nowrap;
+
+      i {
+        font-size: $font-size-base;
+      }
+
+    //   &:disabled {
+    //     opacity: 0.4;
+    //     cursor: not-allowed;
+    //   }
+
+      &.btn-printed {
+        background: $success;
+        color: $white;
+        border-color: $success;
+
+        // &:hover:not(:disabled) {
+        //   background: darken($success, 8%);
+        //   transform: translateY(-2px);
+        //   box-shadow: 0 4px 12px rgba($success, 0.3);
+        // }
+      }
+
+    //   &.btn-printed {
+    //     background: $info;
+    //     color: $white;
+    //     border-color: $info;
+
+    //     &:hover:not(:disabled) {
+    //       background: darken($info, 8%);
+    //       transform: translateY(-2px);
+    //       box-shadow: 0 4px 12px rgba($info, 0.3);
+    //     }
+    //   }
+
+      &.btn-download {
+        background: $primary-dark;
+        color: $white;
+        border-color: $primary-dark;
+
+        &:hover:not(:disabled) {
+          background: lighten($primary-dark, 10%);
+          transform: translateY(-2px);
+          box-shadow: $shadow-primary;
+        }
+      }
+
+      &.btn-invoice {
+        background: $primary-yellow;
+        color: $primary-dark;
+        border-color: $primary-yellow;
+
+        &:hover:not(:disabled) {
+          background: darken($primary-yellow, 8%);
+          transform: translateY(-2px);
+          box-shadow: $shadow-yellow;
+        }
+      }
+
+      &.btn-whatsapp {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: $white;
+        border-color: #25D366;
+
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, darken(#25D366, 8%) 0%, darken(#128C7E, 8%) 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Tabs navigation
+.tabs-nav {
+  display: flex;
+  background: $white;
+  border-bottom: 2px solid $gray-light;
+
+  .tab-btn {
+    flex: 1;
+    @include flex-center;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: $gray-dark;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    i {
+      font-size: $font-size-base;
+    }
+
+    &:hover {
+      background: $gray-light;
+      color: $primary-dark;
+    }
+
+    &.active {
+      color: $primary-dark;
+      font-weight: $font-weight-bold;
+      border-bottom-color: $primary-dark;
+      background: lighten($primary-yellow, 45%);
+
+      i {
+        color: $primary-yellow;
+      }
+    }
+  }
+}
+
+// Body du modal avec scroll
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-xl;
+  background: $white;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $gray-light;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $gray-medium;
+    border-radius: $radius-full;
+
+    &:hover {
+      background: darken($gray-medium, 10%);
+    }
+  }
+}
+
+// Tab content
+.tab-content {
+  animation: fadeInContent 0.3s ease;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Details grid
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+
+  @include responsive(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.detail-section {
+  background: $gray-light;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+
+  .section-title {
+    @include heading-primary;
+    font-size: $font-size-base;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin: 0 0 $spacing-md 0;
+    color: $primary-dark;
+
+    i {
+      color: $primary-dark;
+    }
+  }
+
+  .detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm 0;
+    gap: $spacing-md;
+
+    .label {
+      font-size: $font-size-sm;
+      color: $gray-dark;
+      font-weight: $font-weight-medium;
+    }
+
+    .value {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $primary-dark;
+      text-align: right;
+
+      .link-email,
+      .link-phone {
+        color: $info;
+        text-decoration: none;
+        transition: color $transition-fast;
+
+        &:hover {
+          color: darken($info, 15%);
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &.highlight {
+      margin-top: $spacing-sm;
+      padding-top: $spacing-md;
+      border-top: 2px solid darken($gray-light, 8%);
+
+      .value {
+        font-size: $font-size-xl;
+        color: $success;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+}
+
+// Options display
+.options-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: $spacing-md;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $gray-light;
+  border-radius: $radius-lg;
+  border: 2px solid transparent;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $primary-yellow;
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+  }
+
+  .option-icon {
+    @include flex-center;
+    width: 48px;
+    height: 48px;
+    background: $white;
+    border-radius: $radius-md;
+    color: $primary-dark;
+    font-size: $font-size-xl;
+    flex-shrink: 0;
+  }
+
+  .option-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    .option-label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: $gray-dark;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .option-value {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $primary-dark;
+    }
+  }
+}
+
+// Notes container
+.notes-container {
+  .note-display {
+    .note-content {
+      background: $gray-light;
+      padding: $spacing-xl;
+      border-radius: $radius-lg;
+      margin-bottom: $spacing-lg;
+
+      p {
+        margin: 0;
+        color: $primary-dark;
+        line-height: 1.7;
+        white-space: pre-wrap;
+      }
+    }
+
+    .note-empty {
+      @include flex-center;
+      flex-direction: column;
+      gap: $spacing-md;
+      padding: $spacing-3xl;
+      background: $gray-light;
+      border-radius: $radius-lg;
+      margin-bottom: $spacing-lg;
+
+      i {
+        font-size: $font-size-4xl;
+        color: $gray-medium;
+      }
+
+      p {
+        color: $gray-medium;
+        font-style: italic;
+        margin: 0;
+      }
+    }
+
+    .btn-add-note {
+      @include button-primary;
+      width: 100%;
+    }
+  }
+
+  .note-form {
+    .note-textarea {
+      @include input-base;
+      min-height: 150px;
+      resize: vertical;
+      font-family: $font-primary;
+      margin-bottom: $spacing-lg;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: $spacing-md;
+
+      button {
+        flex: 1;
+        @include button-base;
+        padding: $spacing-md $spacing-xl;
+      }
+
+      .btn-save {
+        background: $success;
+        color: $white;
+
+        &:hover {
+          background: darken($success, 8%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba($success, 0.3);
+        }
+      }
+
+      .btn-cancel {
+        background: $gray-light;
+        color: $gray-dark;
+        border: 2px solid $gray-medium;
+
+        &:hover {
+          background: darken($gray-light, 5%);
+        }
+      }
+    }
+  }
+}
+
+// Responsive mobile
+@media (max-width: $breakpoint-md) {
+  .modal-container {
+    padding: $spacing-sm;
+  }
+
+  .modal-content {
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: $spacing-lg $spacing-md;
+
+    .header-main {
+      flex-direction: column;
+      gap: $spacing-md;
+
+      .status-area {
+        align-self: flex-start;
+      }
+    }
+  }
+
+  .action-bar {
+    .action-buttons {
+      .action-btn {
+        flex: 1;
+        min-width: calc(50% - 4px);
+
+        span {
+          display: none;
+        }
+
+        i {
+          font-size: $font-size-lg;
+        }
+      }
+    }
+  }
+
+  .tabs-nav {
+    .tab-btn {
+      span {
+        display: none;
+      }
+
+      i {
+        font-size: $font-size-lg;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: $spacing-lg $spacing-md;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .options-display {
+    grid-template-columns: 1fr;
   }
 }

@@ -116,3 +116,14 @@ export interface OrderSummary {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+export interface INotification {
+  id: number;
+  title: string;
+  message: string;
+  notif_type: 'order' | 'system' | 'promotion' | 'support';
+  is_read: boolean;
+  created_at: string;
+  user: number;
+}

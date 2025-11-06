@@ -1,5 +1,7 @@
 <!-- src/app/components/dashboard-printer/dashboard-printer.component.html -->
 <div class="dashboard-printer">
+
+
   <!-- Bandeau KPI -->
   <section class="kpi-section" role="region" aria-label="Indicateurs clés de performance">
     <div class="kpi-grid" *ngIf="kpis">
@@ -166,7 +168,7 @@
                   </button>
                   <button 
                     class="action-btn action-btn--download"
-                    (click)="onViewOrderDetails(order.id)">
+                    (click)="openDetailModal(order.id)">
                     <i class="fas fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
@@ -275,3 +277,10 @@
     </button>
   </footer>
 </div>
+
+<app-document-detail 
+  *ngIf="selectedOrderId"
+  [orderId]="selectedOrderId"
+  (closeModal)="onCloseDetailModal()"
+  (orderUpdated)="onOrderUpdated($event)">
+</app-document-detail>

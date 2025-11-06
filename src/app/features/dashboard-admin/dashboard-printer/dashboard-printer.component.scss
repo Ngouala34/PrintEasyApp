@@ -187,7 +187,7 @@
   // Table
   .table-container {
     margin: 0 (-$spacing-xl);
-    padding: 0 $spacing-xl;
+    padding:0.5rem;
   }
 
   .orders-table {
@@ -1009,7 +1009,6 @@
   .dashboard-printer {
     padding-left: $spacing-sm;
     padding-right: $spacing-sm;
-    background-color: red;
 
 
     .kpi-grid{

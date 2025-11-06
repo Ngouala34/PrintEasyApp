@@ -23,7 +23,12 @@
         <div class="kpi-info">
           <div class="kpi-label">{{ kpi.label }}</div>
           <div class="kpi-value">{{ kpi.value }}</div>
-
+          @if (kpi.trend) {
+            <div class="kpi-trend" [style.color]="kpi.trendColor">
+              <i [class]="'fas ' + kpi.trendIcon"></i>
+              {{ kpi.trend }}
+            </div>
+          }
         </div>
       </div>
     }
@@ -48,7 +53,12 @@
       </div>
 
       <div class="orders-container">
-        @if (recentOrders().length === 0) {
+        @if (isLoading()) {
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Chargement des commandes...</p>
+          </div>
+        } @else if (recentOrders().length === 0) {
           <div class="empty-state">
             <i class="fas fa-box-open"></i>
             <h3>Aucune commande récente</h3>
@@ -66,11 +76,13 @@
                   <div class="order-main-info">
                     <div class="order-number">
                       <i class="fas fa-file-alt"></i>
-                      {{ order.orderNumber }}
+                      {{ order.order_number }}
                     </div>
                     <div class="order-service">
-                      <span class="service-name">{{ order.service }}</span>
-                      <span class="service-details">{{ order.format }} • {{ order.quantity }} ex.</span>
+                      <span class="service-name">{{ order.document_type }}</span>
+                      <span class="service-details">
+                        {{ getPrintFormat(order) }} • {{ order.quantity }} ex. • {{ order.number_of_pages }} p.
+                      </span>
                     </div>
                   </div>
                   
@@ -82,7 +94,7 @@
                       {{ getStatusInfo(order.status).label }}
                     </div>
                     <div class="order-total">
-                      <strong>{{ order.total | number:'1.0-0' }} FCFA</strong>
+                      <strong>{{ order.total_price }} FCFA</strong>
                     </div>
                     <div class="expand-icon">
                       <i class="fas" 
@@ -97,28 +109,22 @@
                   <div class="order-details">
                     <div class="details-grid">
                       <div class="detail-group">
-                        <h4>Informations du document</h4>
+                        <h4>Informations</h4>
                         <div class="detail-item">
                           <span class="detail-label">Type de document:</span>
-                          <span class="detail-value">{{ order.documentType }}</span>
+                          <span class="detail-value">{{ order.document_type }}</span>
                         </div>
                         <div class="detail-item">
                           <span class="detail-label">Format:</span>
-                          <span class="detail-value">{{ order.format }}</span>
+                          <span class="detail-value">{{ getPrintFormat(order) }}</span>
                         </div>
-                        @if (order.customDimensions) {
-                          <div class="detail-item">
-                            <span class="detail-label">Dimensions:</span>
-                            <span class="detail-value">{{ order.customDimensions.width }} × {{ order.customDimensions.height }} cm</span>
-                          </div>
-                        }
                         <div class="detail-item">
                           <span class="detail-label">Impression:</span>
-                          <span class="detail-value">{{ order.sides === 'double' ? 'Recto-verso' : 'Recto simple' }}</span>
+                          <span class="detail-value">{{ getPrintSides(order) === 'double' ? 'Recto-verso' : 'Recto simple' }}</span>
                         </div>
                         <div class="detail-item">
                           <span class="detail-label">Couleur:</span>
-                          <span class="detail-value">{{ order.color === 'color' ? 'Couleur' : 'Noir & Blanc' }}</span>
+                          <span class="detail-value">{{ getPrintType(order) === 'color' ? 'Couleur' : 'Noir & Blanc' }}</span>
                         </div>
                       </div>
 
@@ -126,20 +132,24 @@
                         <h4>Configuration</h4>
                         <div class="detail-item">
                           <span class="detail-label">Support:</span>
-                          <span class="detail-value">{{ order.paperType }}</span>
+                          <span class="detail-value">{{ getPaperType(order) }}</span>
                         </div>
                         <div class="detail-item">
                           <span class="detail-label">Quantité:</span>
                           <span class="detail-value">{{ order.quantity }} exemplaires</span>
                         </div>
                         <div class="detail-item">
-                          <span class="detail-label">Fichiers:</span>
-                          <span class="detail-value">{{ order.fileCount }} fichier(s)</span>
+                          <span class="detail-label">Pages par exemplaire:</span>
+                          <span class="detail-value">{{ order.number_of_pages }} pages</span>
                         </div>
-                        @if (order.additionalNotes) {
+                        <div class="detail-item">
+                          <span class="detail-label">Pages totales:</span>
+                          <span class="detail-value">{{ order.number_of_pages * order.quantity }} pages</span>
+                        </div>
+                        @if (order.note) {
                           <div class="detail-item full-width">
                             <span class="detail-label">Instructions:</span>
-                            <span class="detail-value notes">{{ order.additionalNotes }}</span>
+                            <span class="detail-value notes">{{ order.note }}</span>
                           </div>
                         }
                       </div>
@@ -148,30 +158,48 @@
                         <h4>Livraison & Paiement</h4>
                         <div class="detail-item">
                           <span class="detail-label">Mode de récupération:</span>
-                          <span class="detail-value">{{ order.deliveryType === 'pickup' ? 'Retrait en magasin' : 'Livraison à domicile' }}</span>
+                          <span class="detail-value">{{ getDeliveryType(order) === 'delivery' ? 'Livraison à domicile' : 'Retrait en magasin' }}</span>
                         </div>
-                        @if (order.deliveryType === 'delivery') {
+                        @if (getDeliveryType(order) === 'delivery') {
                           <div class="detail-item">
                             <span class="detail-label">Adresse:</span>
-                            <span class="detail-value">{{ order.deliveryAddress }}</span>
+                            <span class="detail-value">
+                              {{ order.delivery_address }}, {{ order.delivery_neighborhood }}, {{ order.delivery_city }}
+                            </span>
                           </div>
+                          @if (order.delivery_phone) {
+                            <div class="detail-item">
+                              <span class="detail-label">Téléphone:</span>
+                              <span class="detail-value">{{ order.delivery_phone }}</span>
+                            </div>
+                          }
                         }
                         <div class="detail-item">
                           <span class="detail-label">Date de commande:</span>
-                          <span class="detail-value">{{ order.date | date:'dd/MM/yyyy à HH:mm' }}</span>
+                          <span class="detail-value">{{ getFormattedDate(order.created_at) }}</span>
                         </div>
                         <div class="detail-item">
                           <span class="detail-label">Estimation livraison:</span>
-                          <span class="detail-value">{{ order.estimatedDelivery | date:'dd/MM/yyyy' }}</span>
+                          <span class="detail-value">{{ getFormattedDate(getEstimatedDelivery(order.created_at)) }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Priorité:</span>
+                          <span class="detail-value">
+                            <span [class]="'priority-' + order.priority">
+                              {{ order.priority === 'normal' ? 'Normale' : order.priority === 'urgent' ? 'Urgente' : 'Très urgente' }}
+                            </span>
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div class="order-actions">
-                      <button class="btn-outline" (click)="downloadFiles(order)">
-                        <i class="fas fa-download"></i>
-                        Télécharger les fichiers
-                      </button>
+                      @if (order.document_url) {
+                        <button class="btn-outline" (click)="downloadFiles(order)">
+                          <i class="fas fa-download"></i>
+                          Télécharger les fichiers
+                        </button>
+                      }
                       <button class="btn-primary" (click)="contactSupport(order)">
                         <i class="fas fa-headset"></i>
                         Contacter le support
@@ -227,6 +255,12 @@
                 <div class="progress-fill" [style.width.%]="progress.percentage"></div>
               </div>
               <div class="progress-percentage">{{ progress.percentage }}%</div>
+            </div>
+          }
+          @if (currentProgress().length === 0 && !isLoading()) {
+            <div class="no-progress">
+              <i class="fas fa-check-circle"></i>
+              <p>Aucune commande en cours</p>
             </div>
           }
         </div>

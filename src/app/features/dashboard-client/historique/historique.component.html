@@ -16,7 +16,7 @@
       </div>
       <div class="stat-badge">
         <i class="fas fa-money-bill-wave"></i>
-        <span>{{ getTotalSpent() | number:'1.0-0' }} FCFA dépensés</span>
+        <span>{{ getTotalSpent() | number:'1.0-0' }} FCFA économisés</span>
       </div>
     </div>
   </div>
@@ -115,7 +115,6 @@
               <td>
                 <div class="service-info">
                   <strong>{{ order.service }}</strong>
-                  <small class="options-text">{{ getOrderOptionsText(order.options) }}</small>
                 </div>
               </td>
               <td>{{ order.quantity }}</td>
@@ -129,7 +128,7 @@
                   [style.background]="getStatusBadge(order.status).color + '20'"
                   [style.color]="getStatusBadge(order.status).color">
                   <i [class]="'fas ' + getStatusBadge(order.status).icon"></i>
-                  {{ getStatusBadge(order.status).label }}
+                  {{ getStatusBadge(order.status).label  }}
                 </span>
               </td>
               <td class="order-total">{{ order.total | number:'1.0-0' }} FCFA</td>

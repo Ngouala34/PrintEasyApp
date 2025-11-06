@@ -1,11 +1,13 @@
 // src/app/features/dashboard-client/dashboard-client-layout.component.ts
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Service } from '../../core/models/service';
 import { AuthService } from '../../core/services/auth.service';
 import { IUserProfile } from '../../core/models/user';
 import { UserService } from '../../core/services/user.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { INotification } from '../../core/models/order';
 
 @Component({
   selector: 'app-dashboard-client',
@@ -18,9 +20,13 @@ export class DashboardClientComponent {
   sidebarCollapsed = signal(false);
   showUserMenu = signal(false);
   showuSideBarElement = signal(false)
-  showNotifications = signal(false);
   showMenu= false;
   userProfil? : IUserProfile
+  private notificationService = inject(NotificationService);
+
+  notifications = signal<INotification[]>([]);
+  showNotifications = signal(false);
+  isLoading = signal(false);
 
 
   constructor(private router : Router, private authService : AuthService, private userService : UserService){
@@ -29,6 +35,7 @@ export class DashboardClientComponent {
 
   ngOnInit(): void {
     this.loadUserData();
+    this.loadNotifications();
     this.checkToken();
   }
 
@@ -74,7 +81,6 @@ export class DashboardClientComponent {
       icon: 'fa-bell',
       label: 'Notifications',
       route: '/dashboard-client/notifications',
-      badge: 5
     },
     {
       icon: 'fa-comments',
@@ -94,11 +100,7 @@ export class DashboardClientComponent {
     }
   ];
 
-  notifications = [
-    { id: 1, message: 'Votre commande #ORD-002 est prête', time: 'Il y a 2h', read: false },
-    { id: 2, message: 'Nouvelle promotion : -15% sur les flyers', time: 'Il y a 5h', read: false },
-    { id: 3, message: 'Commande #ORD-001 livrée', time: 'Hier', read: true }
-  ];
+
 
   toggleSidebar(): void {
     this.sidebarCollapsed.update(v => !v);
@@ -116,12 +118,7 @@ export class DashboardClientComponent {
     }
   }
 
-  toggleNotifications(): void {
-    this.showNotifications.update(v => !v);
-    if (this.showUserMenu()) {
-      this.showUserMenu.set(false);
-    }
-  }
+
 
   logout(): void {
     // Implémenter la déconnexion
@@ -141,10 +138,6 @@ export class DashboardClientComponent {
   });
 }
 
-
-  get unreadCount(): number {
-  return this.notifications.filter(n => !n.read).length;
-}
 
 showSidebarDropdown = false;
 
@@ -171,6 +164,35 @@ closeMenu() {
       this.showUserMenu.set(false);
       this.showMenu = false;
     }
+  }
+
+  
+  loadNotifications(): void { 
+    this.isLoading.set(true);
+    this.notificationService.getNotifications().subscribe({
+      next: (data: INotification[]) => {
+        this.notifications.set(data);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des notifications:', error);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications.set(!this.showNotifications());
+  }
+
+  /** Nombre de notifications non lues */
+  get unreadCount(): number {
+    return this.notifications().filter(n => !n.is_read).length;
+  }
+
+  /** Nombre total de notifications */
+  get notificationCount(): number {
+    return this.notifications().length;
   }
 
 }

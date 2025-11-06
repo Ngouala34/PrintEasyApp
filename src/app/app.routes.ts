@@ -45,12 +45,17 @@ export const routes: Routes = [
         import('./features/dashboard-admin/dashboard-printer/dashboard-printer.component')
           .then(m => m.DashboardPrinterComponent)
     },
-    {
-      path: 'document-detail/:id',
-      loadComponent: () =>
-        import('./features/dashboard-admin/document-detail/document-detail.component')
-          .then(m => m.DocumentDetailComponent)
-    }
+    { path: 'commandes', 
+      loadComponent: () => 
+        import('./features/dashboard-admin/commandes/commandes.component')
+          .then(m => m.CommandesComponent) 
+    },
+    { path: 'notifications', 
+      loadComponent: () => 
+        import('./features/dashboard-admin/notifications/notifications.component')
+          .then(m => m.NotificationsComponent) 
+    },
+
   ]
 }
 
