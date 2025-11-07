@@ -199,14 +199,14 @@
   background: $white;
   border-radius: $radius-xl;
   box-shadow: $shadow-lg;
-  overflow: hidden;
+  overflow:auto ;
   border: 1px solid rgba($primary-dark, 0.1);
 }
 
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1000px;
+  overflow-x: auto;
 
   thead {
     background: linear-gradient(135deg, $primary-dark 0%, lighten($primary-dark, 5%) 100%);

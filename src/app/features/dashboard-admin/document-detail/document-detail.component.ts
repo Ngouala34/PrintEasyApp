@@ -348,7 +348,7 @@ export class DocumentDetailComponent implements OnInit {
         const url = window.URL.createObjectURL(file);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `commande_${orderId}.pdf`;
+        a.download = `commande_${orderId}`;
         a.click();
         window.URL.revokeObjectURL(url);
       },

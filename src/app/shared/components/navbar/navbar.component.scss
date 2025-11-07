@@ -154,15 +154,33 @@
     top: 100%;
     right: 0;
     flex-direction: column;
-    background: white;
+    background: rgb(3, 3, 3);
     width: 200px;
     padding: 2rem;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: none;
+    color: white;
     &.open {
       display: flex;
+    }
+    .nav-link{
+      color: white;
+    }
+
+    .nav-actions{
+      .btn-login {
+        background: transparent;
+        border: 2px solid yellow;
+        color: white;
+
+        &:hover {
+          background: yellow;
+          color: black;
+
+        }
+      }
     }
   }
 }

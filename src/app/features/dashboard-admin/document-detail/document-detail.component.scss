@@ -291,11 +291,6 @@
         color: $white;
         border-color: $primary-dark;
 
-        &:hover:not(:disabled) {
-          background: lighten($primary-dark, 10%);
-          transform: translateY(-2px);
-          box-shadow: $shadow-primary;
-        }
       }
 
       &.btn-invoice {
